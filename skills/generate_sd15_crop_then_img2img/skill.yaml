@@ -1,0 +1,37 @@
+name: generate_sd15_crop_then_img2img
+description: Crop an input image and run SD1.5 img2img on the crop.
+
+inputs:
+  image:
+    type: string
+    default: "crop_source.png"
+  prompt:
+    type: string
+    default: "refined editorial portrait based on the cropped source image"
+  negative_prompt:
+    type: string
+    default: "watermark, text, blurry, low quality, distorted face"
+  x:
+    type: integer
+    default: 64
+  y:
+    type: integer
+    default: 64
+  width:
+    type: integer
+    default: 512
+  height:
+    type: integer
+    default: 512
+  steps:
+    type: integer
+    default: 24
+  denoise:
+    type: float
+    default: 0.5
+  seed:
+    type: integer
+    default: 73111924500188
+
+outputs:
+  image: string
