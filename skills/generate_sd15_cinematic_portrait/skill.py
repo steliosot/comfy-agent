@@ -14,10 +14,34 @@ dark teal background, ultra detailed""",
     steps=35,
     seed=904210331245118,
 ):
+    wf = build(
+        prompt=prompt,
+        negative_prompt=negative_prompt,
+        width=width,
+        height=height,
+        steps=steps,
+        seed=seed,
+    )
+    wf.run()
+
+    return {"status": "done", "output": "sd15_cinematic_portrait"}
+
+
+def build(
+    prompt="""cinematic portrait of a weathered space courier, detailed face,
+subtle freckles, dramatic rim light, moody atmosphere, 35mm photo,
+high contrast, realistic skin texture, shallow depth of field,
+dark teal background, ultra detailed""",
+    negative_prompt="watermark, text, logo, blurry, deformed hands, extra fingers",
+    width=512,
+    height=768,
+    steps=35,
+    seed=904210331245118,
+):
     wf = Workflow(COMFY_URL)
 
     model, clip, vae = wf.checkpointloadersimple(
-        ckpt_name="sd15/juggernaut_reborn.safetensors"
+        ckpt_name="sd1.5/juggernaut_reborn.safetensors"
     )
 
     pos = wf.cliptextencode(clip=clip, text=prompt)
@@ -40,6 +64,5 @@ dark teal background, ultra detailed""",
     img = wf.vaedecode(samples=samples, vae=vae)
 
     wf.saveimage(images=img, filename_prefix="sd15_cinematic_portrait")
-    wf.run()
 
-    return {"status": "done", "output": "sd15_cinematic_portrait"}
+    return wf

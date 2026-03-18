@@ -6,7 +6,7 @@ wf = Workflow()
 
 (
     wf
-    .checkpoint("sd15/juggernaut_reborn.safetensors")
+    .checkpoint("sd1.5/juggernaut_reborn.safetensors")
     .lora("sd15/CakeStyle.safetensors", strength=1.0)
     .prompt(
         """

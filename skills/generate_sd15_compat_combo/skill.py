@@ -17,6 +17,37 @@ high quality concept art""",
     denoise=0.5,
     seed=845102994511,
 ):
+    wf = build(
+        image=image,
+        prompt=prompt,
+        negative_prompt=negative_prompt,
+        x=x,
+        y=y,
+        width=width,
+        height=height,
+        steps=steps,
+        denoise=denoise,
+        seed=seed,
+    )
+    wf.run()
+
+    return {"status": "done", "output": "sd15_compat_combo"}
+
+
+def build(
+    image="agentic_1773257438367_00001_.png",
+    prompt="""cinematic redesign of the source image, crisp details,
+realistic lighting, polished textures, strong composition,
+high quality concept art""",
+    negative_prompt="watermark, text, blurry, artifacts, low quality, distorted anatomy",
+    x=64,
+    y=64,
+    width=512,
+    height=512,
+    steps=20,
+    denoise=0.5,
+    seed=845102994511,
+):
     wf = Workflow(COMFY_URL)
 
     source_image = wf.loadimage(image=image)[0]
@@ -29,7 +60,7 @@ high quality concept art""",
     )
 
     model, clip, vae = wf.checkpointloadersimple(
-        ckpt_name="sd15/juggernaut_reborn.safetensors"
+        ckpt_name="sd1.5/juggernaut_reborn.safetensors"
     )
 
     pos = wf.cliptextencode(clip=clip, text=prompt)
@@ -52,6 +83,5 @@ high quality concept art""",
     img = wf.vaedecode(samples=samples, vae=vae)
     wf.previewimage(images=img)
     wf.saveimage(images=img, filename_prefix="sd15_compat_combo")
-    wf.run()
 
-    return {"status": "done", "output": "sd15_compat_combo"}
+    return wf

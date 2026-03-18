@@ -15,6 +15,18 @@ Install directly from GitHub:
 pip install git+https://github.com/steliosot/comfy-agent.git
 ```
 
+Install a specific branch or tag:
+
+```bash
+pip install git+https://github.com/steliosot/comfy-agent.git@main
+```
+
+Quick install check on another machine:
+
+```bash
+python3 -c "from comfy_agent import Workflow; print('comfy-agent ok')"
+```
+
 For local development from this repository:
 
 ```bash
@@ -42,7 +54,7 @@ from comfy_agent import Workflow
 wf = Workflow("http://127.0.0.1:8000")
 
 model, clip, vae = wf.checkpointloadersimple(
-    ckpt_name="sd15/juggernaut_reborn.safetensors"
+    ckpt_name="sd1.5/juggernaut_reborn.safetensors"
 )
 
 pos = wf.cliptextencode(clip=clip, text="rusty robot")
@@ -76,7 +88,7 @@ wf = Workflow()
 
 (
     wf
-    .checkpoint("sd15/juggernaut_reborn.safetensors")
+    .checkpoint("sd1.5/juggernaut_reborn.safetensors")
     .prompt("rusty robot")
     .negative("bad quality")
     .latent(512, 512)
@@ -89,6 +101,21 @@ wf.run()
 ```
 
 `Workflow()` reads `COMFY_URL` if it is set. Otherwise it defaults to `http://127.0.0.1:8000`.
+
+Cloud/Nginx style with optional auth headers:
+
+```python
+from comfy_agent import Workflow
+
+wf = Workflow(
+    "http://YOUR_SERVER_IP",
+    headers={
+        "Authorization": "XXXXXX"
+    }
+)
+```
+
+If your Nginx proxy exposes ComfyUI under `/api`, `Workflow(...)` now auto-detects that path.
 
 ## Recommended KSampler Settings
 
@@ -105,6 +132,9 @@ Depending on your setup and model choice, you may want to tune them.
 ## Workflow Examples
 
 The [workflow_examples](/Users/stelios/Documents/comfy-agent/workflow_examples) folder contains direct DSL examples.
+
+For cloud/Nginx header examples, see
+[workflow_examples_cloud_server](/Users/stelios/Documents/comfy-agent/workflow_examples_cloud_server).
 
 To try one:
 

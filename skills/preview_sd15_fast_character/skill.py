@@ -11,10 +11,29 @@ game concept art, detailed costume""",
     steps=12,
     seed=192837465,
 ):
+    wf = build(
+        prompt=prompt,
+        negative_prompt=negative_prompt,
+        steps=steps,
+        seed=seed,
+    )
+    wf.run()
+
+    return {"status": "preview shown"}
+
+
+def build(
+    prompt="""stylized explorer character, leather coat, brass gadgets,
+full body pose, neutral studio background, clean silhouette,
+game concept art, detailed costume""",
+    negative_prompt="watermark, text, blurry, duplicate limbs, low quality",
+    steps=12,
+    seed=192837465,
+):
     wf = Workflow(COMFY_URL)
 
     model, clip, vae = wf.checkpointloadersimple(
-        ckpt_name="sd15/juggernaut_reborn.safetensors"
+        ckpt_name="sd1.5/juggernaut_reborn.safetensors"
     )
 
     pos = wf.cliptextencode(clip=clip, text=prompt)
@@ -36,6 +55,5 @@ game concept art, detailed costume""",
 
     img = wf.vaedecode(samples=samples, vae=vae)
     wf.previewimage(images=img)
-    wf.run()
 
-    return {"status": "preview shown"}
+    return wf

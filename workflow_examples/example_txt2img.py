@@ -10,7 +10,7 @@ single image from a text prompt using the SD1.5 model.
 Pipeline Steps
 --------------
 1. Load Stable Diffusion checkpoint
-   - Model: sd15/juggernaut_reborn.safetensors
+   - Model: sd1.5/juggernaut_reborn.safetensors
 
 2. Encode prompts using CLIP
    - Positive prompt describing the desired image
@@ -48,7 +48,7 @@ ComfyUI running at:
 http://127.0.0.1:8000
 
 Required model:
-models/checkpoints/sd15/juggernaut_reborn.safetensors
+models/checkpoints/sd1.5/juggernaut_reborn.safetensors
 
 Output
 ------
@@ -65,7 +65,7 @@ wf = Workflow(COMFY_URL)
 
 # Load model
 model, clip, vae = wf.checkpointloadersimple(
-    ckpt_name="sd15/juggernaut_reborn.safetensors"
+    ckpt_name="sd1.5/juggernaut_reborn.safetensors"
 )
 
 # Positive prompt

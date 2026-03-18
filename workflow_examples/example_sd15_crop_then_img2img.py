@@ -15,7 +15,7 @@ ComfyUI running at:
 http://127.0.0.1:8000
 
 Required model:
-models/checkpoints/sd15/juggernaut_reborn.safetensors
+models/checkpoints/sd1.5/juggernaut_reborn.safetensors
 
 Required input image:
 Place crop_source.png in the ComfyUI input directory.
@@ -42,7 +42,7 @@ cropped = wf.imagecrop(
 )
 
 model, clip, vae = wf.checkpointloadersimple(
-    ckpt_name="sd15/juggernaut_reborn.safetensors"
+    ckpt_name="sd1.5/juggernaut_reborn.safetensors"
 )
 
 pos = wf.cliptextencode(

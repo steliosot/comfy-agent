@@ -12,11 +12,33 @@ clean shapes, detailed costume design""",
     denoise=0.4,
     seed=1122334455,
 ):
+    wf = build(
+        image=image,
+        prompt=prompt,
+        negative_prompt=negative_prompt,
+        steps=steps,
+        denoise=denoise,
+        seed=seed,
+    )
+    wf.run()
+
+    return {"status": "preview shown"}
+
+
+def build(
+    image="preview_source.png",
+    prompt="""stylized concept art repaint, stronger silhouette, richer contrast,
+clean shapes, detailed costume design""",
+    negative_prompt="watermark, text, blurry, muddy colors, extra limbs",
+    steps=12,
+    denoise=0.4,
+    seed=1122334455,
+):
     wf = Workflow(COMFY_URL)
 
     source_image = wf.loadimage(image=image)[0]
     model, clip, vae = wf.checkpointloadersimple(
-        ckpt_name="sd15/juggernaut_reborn.safetensors"
+        ckpt_name="sd1.5/juggernaut_reborn.safetensors"
     )
 
     pos = wf.cliptextencode(clip=clip, text=prompt)
@@ -38,6 +60,5 @@ clean shapes, detailed costume design""",
 
     img = wf.vaedecode(samples=samples, vae=vae)
     wf.previewimage(images=img)
-    wf.run()
 
-    return {"status": "preview shown"}
+    return wf

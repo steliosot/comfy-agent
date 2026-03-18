@@ -7,7 +7,7 @@ ComfyUI pipeline shown in the example graph.
 Pipeline Steps
 --------------
 1. Load Stable Diffusion base model
-   - Model: sd15/juggernaut_reborn.safetensors
+   - Model: sd1.5/juggernaut_reborn.safetensors
 
 2. Apply LoRA style model
    - LoRA: sd15/CakeStyle.safetensors
@@ -45,7 +45,7 @@ ComfyUI running at:
 http://127.0.0.1:8000
 
 Required models:
-- models/checkpoints/sd15/juggernaut_reborn.safetensors
+- models/checkpoints/sd1.5/juggernaut_reborn.safetensors
 - models/loras/sd15/CakeStyle.safetensors
 """
 import sys
@@ -58,7 +58,7 @@ wf = Workflow(COMFY_URL)
 
 # Load base model
 model, clip, vae = wf.checkpointloadersimple(
-    ckpt_name="sd15/juggernaut_reborn.safetensors"
+    ckpt_name="sd1.5/juggernaut_reborn.safetensors"
 )
 
 # Load LoRA

@@ -8,7 +8,7 @@ wf = Workflow()
     wf
     .load_image("agentic_1773257438367_00001_.png")
     .crop(64, 64, 512, 512)
-    .checkpoint("sd15/juggernaut_reborn.safetensors")
+    .checkpoint("sd1.5/juggernaut_reborn.safetensors")
     .prompt(
         """
 cinematic redesign of the source image, crisp details,

@@ -3,8 +3,7 @@ from comfy_agent import Workflow
 COMFY_URL = "http://127.0.0.1:8000"
 
 
-def run(image, x=0, y=0, width=256, height=256):
-
+def build(image, x=0, y=0, width=256, height=256):
     wf = Workflow(COMFY_URL)
 
     img = wf.loadimage(
@@ -24,6 +23,11 @@ def run(image, x=0, y=0, width=256, height=256):
         filename_prefix="crop_result"
     )
 
+    return wf
+
+
+def run(image, x=0, y=0, width=256, height=256):
+    wf = build(image=image, x=x, y=y, width=width, height=height)
     wf.run()
 
     return {

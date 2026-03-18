@@ -14,10 +14,36 @@ dynamic pose, reflective street, detailed concept art""",
     fps=6,
     seed=20260317,
 ):
+    wf = build(
+        prompt=prompt,
+        negative_prompt=negative_prompt,
+        width=width,
+        height=height,
+        batch_size=batch_size,
+        steps=steps,
+        fps=fps,
+        seed=seed,
+    )
+    wf.run()
+
+    return {"status": "done", "output": "sd15_anim_test"}
+
+
+def build(
+    prompt="""stylized robot walking through neon rain, cinematic lighting,
+dynamic pose, reflective street, detailed concept art""",
+    negative_prompt="watermark, text, blurry, low quality, extra limbs",
+    width=512,
+    height=512,
+    batch_size=8,
+    steps=20,
+    fps=6,
+    seed=20260317,
+):
     wf = Workflow(COMFY_URL)
 
     model, clip, vae = wf.checkpointloadersimple(
-        ckpt_name="sd15/juggernaut_reborn.safetensors"
+        ckpt_name="sd1.5/juggernaut_reborn.safetensors"
     )
 
     pos = wf.cliptextencode(clip=clip, text=prompt)
@@ -47,6 +73,5 @@ dynamic pose, reflective street, detailed concept art""",
         quality=80,
         method="default",
     )
-    wf.run()
 
-    return {"status": "done", "output": "sd15_anim_test"}
+    return wf

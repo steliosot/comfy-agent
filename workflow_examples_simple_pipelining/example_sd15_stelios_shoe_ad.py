@@ -6,7 +6,7 @@ wf = Workflow()
 
 (
     wf
-    .checkpoint("sd15/juggernaut_reborn.safetensors")
+    .checkpoint("sd1.5/juggernaut_reborn.safetensors")
     .prompt(
         """
 cinematic advertisement for luxury shoes called Stelios, stylish young man

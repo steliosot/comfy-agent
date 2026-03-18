@@ -1,0 +1,30 @@
+graph:
+  - node: checkpoint
+    params:
+      ckpt_name: sd1.5/juggernaut_reborn.safetensors
+
+  - node: prompt
+    input: prompt
+
+  - node: negative
+    input: negative_prompt
+
+  - node: latent
+    params:
+      width: 512
+      height: 512
+      batch_size: 1
+
+  - node: sample
+    params:
+      steps: 35
+      cfg: 7.0
+      sampler_name: euler
+      scheduler: normal
+      denoise: 1.0
+
+  - node: decode
+
+  - node: save
+    params:
+      filename_prefix: generated_yaml

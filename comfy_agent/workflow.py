@@ -1,7 +1,73 @@
+import copy
 import json
 import os
-import requests
 import uuid
+from urllib import error, request
+
+try:
+    import requests
+except ImportError:  # pragma: no cover
+    class _HTTPError(Exception):
+        def __init__(self, message, response=None):
+            super().__init__(message)
+            self.response = response
+
+    class _Response:
+        def __init__(self, payload, status_code=200, text=None):
+            self._payload = payload
+            self.status_code = status_code
+            self.ok = 200 <= status_code < 300
+            self.text = text if text is not None else json.dumps(payload)
+
+        def json(self):
+            return self._payload
+
+        def raise_for_status(self):
+            if not self.ok:
+                raise _HTTPError(self.text, response=self)
+
+    class _RequestsCompat:
+        HTTPError = _HTTPError
+
+        @staticmethod
+        def get(url, headers=None):
+            req = request.Request(
+                url,
+                headers=headers or {},
+                method="GET",
+            )
+            try:
+                with request.urlopen(req) as response:
+                    payload = json.loads(response.read().decode("utf-8"))
+                    return _Response(payload, status_code=response.status)
+            except error.HTTPError as exc:
+                return _Response({}, status_code=exc.code, text=exc.read().decode("utf-8"))
+
+        @staticmethod
+        def post(url, json=None, headers=None):
+            data = None if json is None else __import__("json").dumps(json).encode("utf-8")
+            merged_headers = {"Content-Type": "application/json"}
+            if headers:
+                merged_headers.update(headers)
+            req = request.Request(
+                url,
+                data=data,
+                headers=merged_headers,
+                method="POST",
+            )
+            try:
+                with request.urlopen(req) as response:
+                    payload = __import__("json").loads(response.read().decode("utf-8"))
+                    return _Response(payload, status_code=response.status)
+            except error.HTTPError as exc:
+                body = exc.read().decode("utf-8")
+                try:
+                    payload = __import__("json").loads(body)
+                except ValueError:
+                    payload = {}
+                return _Response(payload, status_code=exc.code, text=body)
+
+    requests = _RequestsCompat()
 
 from .node import Node
 from .refs import DataRef, NodeResult
@@ -10,20 +76,57 @@ from .refs import DataRef, NodeResult
 class Workflow:
     """Spark-style lazy DAG builder for ComfyUI"""
 
-    def __init__(self, comfy_url=None, server=None):
+    def __init__(self, comfy_url=None, server=None, headers=None, api_prefix=None):
         base_url = server or comfy_url
         if not base_url:
             base_url = os.getenv("COMFY_URL", "http://127.0.0.1:8000")
 
-        self.url = base_url.rstrip("/")
-        r = requests.get(f"{self.url}/object_info")
-        r.raise_for_status()
-        self.registry = r.json()
+        self.base_url = base_url.rstrip("/")
+        self.headers = dict(headers or {})
+
+        env_api_prefix = os.getenv("COMFY_API_PREFIX")
+        if api_prefix is None:
+            api_prefix = env_api_prefix
+
+        normalized_prefix = (api_prefix or "").strip()
+        if normalized_prefix and not normalized_prefix.startswith("/"):
+            normalized_prefix = f"/{normalized_prefix}"
+        normalized_prefix = normalized_prefix.rstrip("/")
+
+        candidates = []
+        if normalized_prefix:
+            candidates.append(f"{self.base_url}{normalized_prefix}")
+        candidates.append(self.base_url)
+        if not normalized_prefix:
+            candidates.append(f"{self.base_url}/api")
+
+        seen = set()
+        ordered_candidates = []
+        for candidate in candidates:
+            if candidate not in seen:
+                seen.add(candidate)
+                ordered_candidates.append(candidate)
+
+        last_response = None
+        self.url = None
+        for candidate in ordered_candidates:
+            response = requests.get(f"{candidate}/object_info", headers=self.headers)
+            last_response = response
+            if response.ok:
+                self.url = candidate
+                self.registry = response.json()
+                break
+
+        if self.url is None:
+            if last_response is not None:
+                last_response.raise_for_status()
+            raise RuntimeError("Unable to connect to ComfyUI /object_info endpoint")
+
         self.nodes = []
         self.next_id = 1
         self._last_checkpoint = None
         self._reset_pipeline_state()
-        print("Loaded nodes:", len(self.registry))
+        print("Loaded nodes:", len(self.registry), "via", self.url)
 
     def _resolve(self, value):
         if isinstance(value, DataRef):
@@ -45,13 +148,14 @@ class Workflow:
         return value
 
     def _add_node(self, class_type, **kwargs):
+        alias = kwargs.pop("__alias", None)
         kwargs = self._prepare_inputs(class_type, kwargs)
 
         node_id = str(self.next_id)
         self.next_id += 1
 
         # store inputs lazily (do not resolve DataRef yet)
-        node = Node(node_id, class_type, kwargs)
+        node = Node(node_id, class_type, kwargs, alias=alias)
         self.nodes.append(node)
 
         # inspect outputs from Comfy registry
@@ -119,7 +223,11 @@ class Workflow:
         self._current_mask = None
 
     def checkpoint(self, ckpt_name):
-        checkpoint = self.CheckpointLoaderSimple(ckpt_name=ckpt_name)
+        checkpoint = self._add_node(
+            "CheckpointLoaderSimple",
+            __alias="checkpoint",
+            ckpt_name=ckpt_name,
+        )
         self._current_checkpoint = checkpoint
         self._current_model = checkpoint.MODEL
         self._current_clip = checkpoint.CLIP
@@ -130,7 +238,9 @@ class Workflow:
         if self._current_model is None:
             raise RuntimeError("Call .checkpoint(...) before .lora(...)")
 
-        model = self.LoraLoaderModelOnly(
+        model = self._add_node(
+            "LoraLoaderModelOnly",
+            __alias="lora",
             model=self._current_model,
             lora_name=lora_name,
             strength_model=strength,
@@ -142,7 +252,9 @@ class Workflow:
         if self._current_clip is None:
             raise RuntimeError("Call .checkpoint(...) before .prompt(...)")
 
-        conditioning = self.CLIPTextEncode(
+        conditioning = self._add_node(
+            "CLIPTextEncode",
+            __alias="prompt",
             clip=self._current_clip,
             text=text,
         )
@@ -153,7 +265,9 @@ class Workflow:
         if self._current_clip is None:
             raise RuntimeError("Call .checkpoint(...) before .negative(...)")
 
-        conditioning = self.CLIPTextEncode(
+        conditioning = self._add_node(
+            "CLIPTextEncode",
+            __alias="negative",
             clip=self._current_clip,
             text=text,
         )
@@ -161,7 +275,9 @@ class Workflow:
         return self
 
     def latent(self, width, height, batch_size=1):
-        latent = self.EmptyLatentImage(
+        latent = self._add_node(
+            "EmptyLatentImage",
+            __alias="latent",
             width=width,
             height=height,
             batch_size=batch_size,
@@ -170,7 +286,7 @@ class Workflow:
         return self
 
     def load_image(self, image):
-        result = self.LoadImage(image=image)
+        result = self._add_node("LoadImage", __alias="load_image", image=image)
         self._current_image = result.IMAGE
         if hasattr(result, "MASK"):
             self._current_mask = result.MASK
@@ -180,7 +296,9 @@ class Workflow:
         if self._current_image is None:
             raise RuntimeError("Call .load_image(...) before .crop(...)")
 
-        cropped = self.ImageCrop(
+        cropped = self._add_node(
+            "ImageCrop",
+            __alias="crop",
             image=self._current_image,
             x=x,
             y=y,
@@ -196,7 +314,9 @@ class Workflow:
         if self._current_vae is None:
             raise RuntimeError("Call .checkpoint(...) before .encode()")
 
-        latent = self.VAEEncode(
+        latent = self._add_node(
+            "VAEEncode",
+            __alias="encode",
             pixels=self._current_image,
             vae=self._current_vae,
         )
@@ -221,13 +341,17 @@ class Workflow:
 
         negative = self._current_negative
         if negative is None:
-            negative = self.CLIPTextEncode(
+            negative = self._add_node(
+                "CLIPTextEncode",
+                __alias="negative",
                 clip=self._current_clip,
                 text="",
             ).CONDITIONING
             self._current_negative = negative
 
-        sample = self.KSampler(
+        sample = self._add_node(
+            "KSampler",
+            __alias="ksampler",
             model=self._current_model,
             positive=self._current_positive,
             negative=negative,
@@ -248,7 +372,9 @@ class Workflow:
         if self._current_vae is None:
             raise RuntimeError("Call .checkpoint(...) before .decode()")
 
-        image = self.VAEDecode(
+        image = self._add_node(
+            "VAEDecode",
+            __alias="decode",
             samples=self._current_latent,
             vae=self._current_vae,
         )
@@ -259,14 +385,16 @@ class Workflow:
         if self._current_image is None:
             raise RuntimeError("Call .decode() before .preview()")
 
-        self.PreviewImage(images=self._current_image)
+        self._add_node("PreviewImage", __alias="preview", images=self._current_image)
         return self
 
     def save(self, filename_prefix):
         if self._current_image is None:
             raise RuntimeError("Call .decode() before .save(...)")
 
-        self.SaveImage(
+        self._add_node(
+            "SaveImage",
+            __alias="save",
             images=self._current_image,
             filename_prefix=filename_prefix,
         )
@@ -283,7 +411,9 @@ class Workflow:
         if self._current_image is None:
             raise RuntimeError("Call .decode() before .save_animated_webp(...)")
 
-        self.SaveAnimatedWEBP(
+        self._add_node(
+            "SaveAnimatedWEBP",
+            __alias="save_animated_webp",
             images=self._current_image,
             filename_prefix=filename_prefix,
             fps=fps,
@@ -292,6 +422,62 @@ class Workflow:
             method=method,
         )
         return self
+
+    def clone(self):
+        cloned = self.__class__.__new__(self.__class__)
+        for key, value in self.__dict__.items():
+            setattr(cloned, key, copy.deepcopy(value))
+        return cloned
+
+    def override(self, overrides):
+        for path, value in overrides.items():
+            selector, input_name = path.rsplit(".", 1)
+            node = self._find_node(selector)
+            if input_name not in node.inputs:
+                raise KeyError(f"Node '{selector}' has no input '{input_name}'")
+            node.inputs[input_name] = value
+        return self
+
+    def inspect(self, print_output=True):
+        lines = []
+        for index, node in enumerate(self.nodes):
+            outputs = self._output_names(node.class_type)
+            label = node.alias or self._normalize_node_name(node.class_type)
+            if outputs:
+                lines.append(
+                    f"{index}. {node.class_type} [{label}] -> {', '.join(outputs)}"
+                )
+            else:
+                lines.append(f"{index}. {node.class_type} [{label}]")
+
+        summary = "\n".join(lines)
+        if print_output:
+            print(summary)
+        return summary
+
+    def to_json(self, indent=2):
+        return json.dumps(self._build_dag(), indent=indent)
+
+    def then(self, other):
+        combined = self.clone()
+        mapping = {}
+
+        for node in other.nodes:
+            new_id = str(combined.next_id)
+            combined.next_id += 1
+            mapping[node.node_id] = new_id
+
+            combined.nodes.append(
+                Node(
+                    new_id,
+                    node.class_type,
+                    combined._remap_value(copy.deepcopy(node.inputs), mapping),
+                    alias=node.alias,
+                )
+            )
+
+        combined._remap_pipeline_state_from(other, mapping)
+        return combined
 
     def _normalize_output_name(self, name, index):
         if not name:
@@ -314,6 +500,90 @@ class Workflow:
         if result[0].isdigit():
             result = f"OUTPUT_{result}"
         return result
+
+    def _normalize_node_name(self, name):
+        normalized = []
+        previous_upper = False
+
+        for char in name:
+            if char.isupper() and normalized and not previous_upper:
+                normalized.append("_")
+            normalized.append(char.lower())
+            previous_upper = char.isupper()
+
+        return "".join(normalized)
+
+    def _output_names(self, class_type):
+        node_info = self.registry.get(class_type, {})
+        names = node_info.get("output_name") or node_info.get("output") or []
+        return [self._normalize_output_name(name, index) for index, name in enumerate(names)]
+
+    def _find_node(self, selector):
+        index = None
+        if selector.endswith("]") and "[" in selector:
+            selector, raw_index = selector[:-1].split("[", 1)
+            index = int(raw_index)
+
+        matches = []
+        normalized_selector = selector.lower()
+
+        for node in self.nodes:
+            alias = (node.alias or "").lower()
+            class_name = self._normalize_node_name(node.class_type)
+            candidates = {alias, class_name, node.class_type.lower()}
+            if normalized_selector in candidates:
+                matches.append(node)
+                continue
+
+            if alias and alias.startswith(normalized_selector):
+                matches.append(node)
+                continue
+
+            if class_name.startswith(normalized_selector):
+                matches.append(node)
+
+        if not matches:
+            raise KeyError(f"No node matched selector '{selector}'")
+
+        if index is None:
+            return matches[-1]
+
+        try:
+            return matches[index]
+        except IndexError as exc:
+            raise IndexError(f"Selector '{selector}' has no match at index {index}") from exc
+
+    def _remap_value(self, value, mapping):
+        if isinstance(value, DataRef):
+            return DataRef(mapping[value.node_id], value.output_index)
+        if isinstance(value, NodeResult):
+            refs = tuple(self._remap_value(ref, mapping) for ref in value)
+            return NodeResult(refs, value._output_names)
+        if isinstance(value, list):
+            return [self._remap_value(v, mapping) for v in value]
+        if isinstance(value, tuple):
+            return tuple(self._remap_value(v, mapping) for v in value)
+        if isinstance(value, dict):
+            return {k: self._remap_value(v, mapping) for k, v in value.items()}
+        return value
+
+    def _remap_pipeline_state_from(self, other, mapping):
+        state_fields = [
+            "_current_checkpoint",
+            "_current_model",
+            "_current_clip",
+            "_current_vae",
+            "_current_positive",
+            "_current_negative",
+            "_current_latent",
+            "_current_image",
+            "_current_mask",
+            "_last_checkpoint",
+        ]
+
+        for field in state_fields:
+            value = getattr(other, field)
+            setattr(self, field, self._remap_value(copy.deepcopy(value), mapping) if value is not None else None)
 
     def __getattr__(self, name):
         for node_name in self.registry:
@@ -381,7 +651,7 @@ class Workflow:
         if debug:
             print(json.dumps(payload, indent=2))
 
-        r = requests.post(f"{self.url}/prompt", json=payload)
+        r = requests.post(f"{self.url}/prompt", json=payload, headers=self.headers)
         if not r.ok:
             message = f"ComfyUI prompt request failed with {r.status_code}"
             try:

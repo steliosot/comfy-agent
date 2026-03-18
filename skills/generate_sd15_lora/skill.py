@@ -2,12 +2,11 @@ from comfy_agent import Workflow
 
 COMFY_URL = "http://127.0.0.1:8000"
 
-def run(prompt, lora, strength=1.0):
-
+def build(prompt, lora, strength=1.0):
     wf = Workflow(COMFY_URL)
 
     model, clip, vae = wf.checkpointloadersimple(
-        ckpt_name="sd15/juggernaut_reborn.safetensors"
+        ckpt_name="sd1.5/juggernaut_reborn.safetensors"
     )
 
     model = wf.loraloadermodelonly(
@@ -55,6 +54,11 @@ def run(prompt, lora, strength=1.0):
         filename_prefix="lora_image"
     )
 
+    return wf
+
+
+def run(prompt, lora, strength=1.0):
+    wf = build(prompt=prompt, lora=lora, strength=strength)
     wf.run()
 
     return {"status": "done"}

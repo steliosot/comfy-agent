@@ -6,7 +6,7 @@ wf = Workflow()
 
 (
     wf
-    .checkpoint("sd15/juggernaut_reborn.safetensors")
+    .checkpoint("sd1.5/juggernaut_reborn.safetensors")
     .prompt(
         """photo of a rusty robot, 3D render, sharp focus,
 studio lighting, dramatic shadows, soft rim light,

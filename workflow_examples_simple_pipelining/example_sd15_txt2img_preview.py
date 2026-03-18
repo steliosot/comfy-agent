@@ -6,7 +6,7 @@ wf = Workflow()
 
 (
     wf
-    .checkpoint("sd15/juggernaut_reborn.safetensors")
+    .checkpoint("sd1.5/juggernaut_reborn.safetensors")
     .prompt("a man face with a wall behind")
     .negative("low quality, blurry")
     .latent(512, 512)
