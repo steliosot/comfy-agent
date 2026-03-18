@@ -15,7 +15,7 @@ AUTH_HEADER = os.getenv(
     "COMFY_AUTH_HEADER",
     "XXXXXX",
 )
-CKPT_NAME = os.getenv("COMFY_CKPT", "juggernaut_reborn.safetensors")
+CKPT_NAME = os.getenv("COMFY_CKPT", "sd1.5/juggernaut_reborn.safetensors")
 
 headers = {"Authorization": AUTH_HEADER} if AUTH_HEADER else {}
 

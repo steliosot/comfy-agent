@@ -23,6 +23,7 @@ PYTHONPATH=. python3 workflow_examples_cloud_server/example_cloud_sd15_txt2img_p
 export COMFY_URL=http://34.30.216.121
 export COMFY_AUTH_HEADER="XXXXXX"
 export COMFY_INPUT_IMAGE="rosie.jpg"
+export COMFY_CKPT="sd1.5/juggernaut_reborn.safetensors"
 ```
 
 `COMFY_INPUT_IMAGE` must exist in the remote ComfyUI `input/` folder.
