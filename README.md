@@ -218,6 +218,19 @@ example_agent_parallel.py
 
 ComfyUI processes requests serially by default, so true parallel execution typically requires multiple ComfyUI instances.
 
+## Agentic Skill Examples
+
+The [agentic_skill_examples](/Users/stelios/Documents/comfy-agent/agentic_skill_examples) folder shows an agnostic routing layer that:
+
+- reasons over prompt intent
+- selects one or more skills with confidence scores
+- executes a single-skill or multi-skill plan
+
+Included examples:
+
+- `example_agentic_single_skill.py` (generate a Coke bottle image)
+- `example_agentic_generate_then_crop.py` (generate then crop to `1280x720`)
+
 ## Running in Parallel
 
 To achieve real parallel execution, run multiple ComfyUI servers and distribute jobs across them.

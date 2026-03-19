@@ -1,6 +1,7 @@
 import copy
 import json
 import os
+import time
 import uuid
 from urllib import error, request
 
@@ -125,6 +126,7 @@ class Workflow:
         self.nodes = []
         self.next_id = 1
         self._last_checkpoint = None
+        self.last_prompt_id = None
         self._reset_pipeline_state()
         print("Loaded nodes:", len(self.registry), "via", self.url)
 
@@ -660,4 +662,41 @@ class Workflow:
             except ValueError:
                 message += f": {r.text}"
             raise requests.HTTPError(message, response=r)
-        print(r.json())
+        result = r.json()
+        self.last_prompt_id = result.get("prompt_id")
+        print(result)
+        return result
+
+    def history(self, prompt_id=None):
+        target = prompt_id or self.last_prompt_id
+        if not target:
+            raise ValueError("prompt_id is required when no run() has been executed")
+
+        response = requests.get(f"{self.url}/history/{target}", headers=self.headers)
+        response.raise_for_status()
+        return response.json()
+
+    def saved_images(self, prompt_id=None, retries=12, delay=0.5):
+        target = prompt_id or self.last_prompt_id
+        if not target:
+            raise ValueError("prompt_id is required when no run() has been executed")
+
+        for attempt in range(max(1, retries)):
+            history = self.history(target)
+            entry = history.get(target, history) if isinstance(history, dict) else history
+            outputs = entry.get("outputs", {}) if isinstance(entry, dict) else {}
+
+            images = []
+            for node_id, node_output in outputs.items():
+                for image in node_output.get("images", []):
+                    item = dict(image)
+                    item["node_id"] = str(node_id)
+                    images.append(item)
+
+            if images:
+                return images
+
+            if attempt < retries - 1:
+                time.sleep(delay)
+
+        return []

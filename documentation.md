@@ -484,6 +484,43 @@ That lets an agent:
 
 This makes skills reusable, inspectable, and composable.
 
+## Agentic Skill Routing
+
+The project also includes an agnostic agentic layer that reasons about prompt intent,
+selects skills with confidence scores, and executes the plan.
+
+Example (single skill):
+
+```python
+from comfy_agent import run_agentic
+
+result = run_agentic(
+    prompt="cinematic product photo of a bottle of Coca-Cola",
+    server="http://34.30.216.121",
+    headers={"Authorization": "XXXXXX"},
+)
+
+print(result)
+```
+
+Example (combined skills: generate then crop):
+
+```python
+from comfy_agent import run_agentic
+
+result = run_agentic(
+    prompt="generate a bottle of Coca-Cola and then crop it to wide screen 1280x720",
+    server="http://34.30.216.121",
+    headers={"Authorization": "XXXXXX"},
+)
+
+print(result)
+```
+
+Try the ready-made examples in:
+
+- `agentic_skill_examples/`
+
 ## Testing
 
 The repository includes unit tests for workflows, skills, agents, and examples.
@@ -505,8 +542,9 @@ If you are new to the project, this is a good order to follow:
 3. Open a skill in `skills/` and study `build(...)`
 4. Try a buildable skill example from `skill_examples_buildable`
 5. Try an editable workflow example from `workflow_examples_editable_skills`
-6. Run the unit tests
-7. Build your own skill
+6. Try an agentic routing example from `agentic_skill_examples`
+7. Run the unit tests
+8. Build your own skill
 
 ## Where to Look Next
 
@@ -518,6 +556,7 @@ Useful folders in the repository:
 - `skills/`
 - `skill_examples/`
 - `skill_examples_buildable/`
+- `agentic_skill_examples/`
 - `agent_examples/`
 - `unit_tests/`
 

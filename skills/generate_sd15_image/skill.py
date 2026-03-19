@@ -1,13 +1,39 @@
+import os
+
 from comfy_agent import Workflow
 
-COMFY_URL = "http://127.0.0.1:8000"
+
+DEFAULT_COMFY_URL = "http://127.0.0.1:8000"
+
+
+def _resolve_headers(headers):
+    if headers is not None:
+        return headers
+
+    auth_header = os.getenv("COMFY_AUTH_HEADER")
+    if auth_header:
+        return {"Authorization": auth_header}
+
+    return None
+
 
 def build(prompt,
           negative_prompt="watermark, text",
           width=512,
           height=512,
-          steps=35):
-    wf = Workflow(COMFY_URL)
+          steps=35,
+          server=None,
+          headers=None,
+          api_prefix=None,
+          filename_prefix="generated",
+          workflow=None,
+          save=True,
+          return_image=False):
+    wf = workflow or Workflow(
+        server or os.getenv("COMFY_URL", DEFAULT_COMFY_URL),
+        headers=_resolve_headers(headers),
+        api_prefix=api_prefix
+    )
 
     model, clip, vae = wf.checkpointloadersimple(
         ckpt_name="sd1.5/juggernaut_reborn.safetensors"
@@ -47,10 +73,14 @@ def build(prompt,
         vae=vae
     )
 
-    wf.saveimage(
-        images=img,
-        filename_prefix="generated"
-    )
+    if save:
+        wf.saveimage(
+            images=img,
+            filename_prefix=filename_prefix
+        )
+
+    if return_image:
+        return wf, img
 
     return wf
 
@@ -59,14 +89,29 @@ def run(prompt,
         negative_prompt="watermark, text",
         width=512,
         height=512,
-        steps=35):
+        steps=35,
+        server=None,
+        headers=None,
+        api_prefix=None,
+        filename_prefix="generated"):
     wf = build(
         prompt=prompt,
         negative_prompt=negative_prompt,
         width=width,
         height=height,
-        steps=steps
+        steps=steps,
+        server=server,
+        headers=headers,
+        api_prefix=api_prefix,
+        filename_prefix=filename_prefix
     )
-    wf.run()
+    run_result = wf.run()
+    output_images = wf.saved_images(run_result.get("prompt_id"))
 
-    return {"status": "done"}
+    return {
+        "status": "done",
+        "skill": "generate_sd15_image",
+        "prompt_id": run_result.get("prompt_id"),
+        "filename_prefix": filename_prefix,
+        "output_images": output_images,
+    }
