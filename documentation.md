@@ -20,6 +20,12 @@ Install directly from GitHub:
 pip install git+https://github.com/steliosot/comfy-agent.git
 ```
 
+To update an existing installation to the latest commit:
+
+```bash
+pip install -U --force-reinstall --no-cache-dir git+https://github.com/steliosot/comfy-agent.git
+```
+
 Or install a specific branch/tag:
 
 ```bash
@@ -66,6 +72,9 @@ Example:
 export COMFY_URL=http://127.0.0.1:8000
 ```
 
+You can also use `localhost:8000` without the scheme.
+Comfy Agent normalizes it to `http://localhost:8000`.
+
 For remote servers behind Nginx, you can pass auth headers:
 
 ```python
@@ -80,6 +89,13 @@ wf = Workflow(
 ```
 
 `Workflow(...)` keeps local behavior unchanged and auto-detects `/api` when needed.
+
+For localhost without auth:
+
+```bash
+export COMFY_URL=localhost:8000
+unset COMFY_AUTH_HEADER
+```
 
 ## Your First Workflow
 
@@ -411,7 +427,7 @@ wf.run()
 
 For these workflows, the image file must exist in the ComfyUI input folder.
 
-## Animation and Video-Like Skills
+## Animation and Video Skills
 
 You can also create simple animated outputs by generating image batches and exporting them with `SaveAnimatedWEBP`.
 
@@ -430,6 +446,23 @@ wf.run()
 ```
 
 This is useful for compatibility testing and lightweight animation pipelines.
+
+For true video clip generation with WAN 2.1, use the generic video skill:
+
+```python
+from skills.generate_video_clip.skill import run
+
+result = run(
+    prompt="cinematic product video clip of a bottle on a kitchen counter",
+    server="http://34.30.216.121",
+    headers={"Authorization": "XXXXXX"},
+    filename_prefix="video_clip_h264",
+)
+
+print(result)
+```
+
+This exports via `VHS_VideoCombine` using `video/h264-mp4`.
 
 ## Using Skills in an Agent
 
@@ -489,7 +522,7 @@ This makes skills reusable, inspectable, and composable.
 The project also includes an agnostic agentic layer that reasons about prompt intent,
 selects skills with confidence scores, and executes the plan.
 
-Example (single skill):
+Example (single image skill):
 
 ```python
 from comfy_agent import run_agentic
@@ -503,7 +536,21 @@ result = run_agentic(
 print(result)
 ```
 
-Example (combined skills: generate then crop):
+Example (single video skill):
+
+```python
+from comfy_agent import run_agentic
+
+result = run_agentic(
+    prompt="cinematic product video clip of a bottle on a kitchen counter",
+    server="http://34.30.216.121",
+    headers={"Authorization": "XXXXXX"},
+)
+
+print(result)
+```
+
+Example (combined skills: generate image then crop):
 
 ```python
 from comfy_agent import run_agentic
@@ -516,6 +563,11 @@ result = run_agentic(
 
 print(result)
 ```
+
+If your prompt asks for video and crop together, current behavior is:
+
+- route to `generate_video_clip`
+- include a note that crop is image-only in `run_agentic` for now
 
 Try the ready-made examples in:
 
@@ -542,9 +594,10 @@ If you are new to the project, this is a good order to follow:
 3. Open a skill in `skills/` and study `build(...)`
 4. Try a buildable skill example from `examples/skills_buildable`
 5. Try an editable workflow example from `examples/workflows_editable`
-6. Try an agentic routing example from `examples/agents_agentic`
-7. Run the unit tests
-8. Build your own skill
+6. Try a video clip example (`example_wan21_video_clip.py` or `example_cloud_wan21_video_clip.py`)
+7. Try an agentic routing example from `examples/agents_agentic`
+8. Run the unit tests
+9. Build your own skill
 
 ## Where to Look Next
 
