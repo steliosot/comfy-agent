@@ -3,6 +3,7 @@ import json
 import os
 import time
 import uuid
+from urllib.parse import urlparse
 from urllib import error, request
 
 try:
@@ -81,6 +82,7 @@ class Workflow:
         base_url = server or comfy_url
         if not base_url:
             base_url = os.getenv("COMFY_URL", "http://127.0.0.1:8000")
+        base_url = self._normalize_base_url(base_url)
 
         self.base_url = base_url.rstrip("/")
         self.headers = dict(headers or {})
@@ -129,6 +131,15 @@ class Workflow:
         self.last_prompt_id = None
         self._reset_pipeline_state()
         print("Loaded nodes:", len(self.registry), "via", self.url)
+
+    @staticmethod
+    def _normalize_base_url(base_url):
+        base_url = str(base_url).strip()
+        if "://" in base_url:
+            parsed = urlparse(base_url)
+            if parsed.scheme:
+                return base_url
+        return f"http://{base_url}"
 
     def _resolve(self, value):
         if isinstance(value, DataRef):
@@ -688,10 +699,12 @@ class Workflow:
 
             images = []
             for node_id, node_output in outputs.items():
-                for image in node_output.get("images", []):
-                    item = dict(image)
-                    item["node_id"] = str(node_id)
-                    images.append(item)
+                for key in ("images", "gifs", "videos"):
+                    for image in node_output.get(key, []):
+                        item = dict(image)
+                        item["node_id"] = str(node_id)
+                        item["output_kind"] = key
+                        images.append(item)
 
             if images:
                 return images

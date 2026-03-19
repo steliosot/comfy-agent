@@ -83,6 +83,55 @@ def reason_skills(prompt):
     return choices
 
 
+def reasoning_agentic(prompt, print_output=True):
+    choices = reason_skills(prompt)
+    skill_names = [choice.name for choice in choices]
+    chain = "crop_image" in skill_names and "generate_sd15_image" in skill_names
+
+    if chain:
+        crop_params = _extract_crop_params(prompt)
+        plan = {
+            "steps": ["generate_sd15_image", "crop_image"],
+            "crop": crop_params,
+            "generation_prompt": _extract_generation_prompt(prompt),
+        }
+    else:
+        plan = {
+            "steps": ["generate_sd15_image"],
+            "generation_prompt": _extract_generation_prompt(prompt),
+        }
+
+    result = {
+        "choices": [
+            {
+                "skill": choice.name,
+                "confidence": round(choice.confidence, 4),
+                "reason": choice.reason,
+            }
+            for choice in choices
+        ],
+        "plan": plan,
+    }
+
+    if print_output:
+        print("Reasoning:")
+        for choice in result["choices"]:
+            print(
+                f"- {choice['skill']}: confidence={choice['confidence']:.2f} "
+                f"({choice['reason']})"
+            )
+        if chain:
+            crop = result["plan"]["crop"]
+            print(
+                "Plan: generate_sd15_image -> crop_image "
+                f"(x={crop['x']}, y={crop['y']}, width={crop['width']}, height={crop['height']})"
+            )
+        else:
+            print("Plan: generate_sd15_image")
+
+    return result
+
+
 def run_agentic(
     prompt,
     server=None,
@@ -92,10 +141,8 @@ def run_agentic(
     ckpt_name="sd1.5/juggernaut_reborn.safetensors",
     filename_prefix="agentic_generated",
 ):
+    reasoning = reasoning_agentic(prompt, print_output=True)
     choices = reason_skills(prompt)
-    print("Reasoning:")
-    for choice in choices:
-        print(f"- {choice.name}: confidence={choice.confidence:.2f} ({choice.reason})")
 
     wf = Workflow(server=server, headers=headers, api_prefix=api_prefix)
     skill_names = [choice.name for choice in choices]
@@ -121,12 +168,7 @@ def run_agentic(
     wf.saveimage(images=image, filename_prefix=filename_prefix)
 
     if "generate_sd15_image" in skill_names and "crop_image" in skill_names:
-        crop_params = _extract_crop_params(prompt)
-        print(
-            "Plan: generate_sd15_image -> crop_image "
-            f"(x={crop_params['x']}, y={crop_params['y']}, "
-            f"width={crop_params['width']}, height={crop_params['height']})"
-        )
+        crop_params = reasoning["plan"]["crop"]
         cropped = wf.imagecrop(
             image=image,
             x=crop_params["x"],
@@ -143,7 +185,6 @@ def run_agentic(
             "output_images": wf.saved_images(run_result.get("prompt_id")),
         }
 
-    print("Plan: generate_sd15_image")
     run_result = wf.run()
     return {
         "status": "done",
@@ -152,4 +193,3 @@ def run_agentic(
         "filename_prefix": filename_prefix,
         "output_images": wf.saved_images(run_result.get("prompt_id")),
     }
-

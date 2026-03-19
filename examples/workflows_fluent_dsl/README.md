@@ -1,6 +1,6 @@
 # Simple Pipelining Examples
 
-These examples mirror the existing workflows in `workflow_examples/`,
+These examples mirror the direct DSL workflows in `examples/workflows_direct_dsl/`,
 but use the fluent chain style:
 
 ```python
@@ -24,8 +24,8 @@ wf.run()
 
 Both styles are supported:
 
-- `workflow_examples/` keeps the original tuple/lowercase API
-- `workflow_examples_simple_pipelining/` uses the fluent chain API
+- `examples/workflows_direct_dsl/` keeps the original tuple/lowercase API
+- `examples/workflows_fluent_dsl/` uses the fluent chain API
 
 `Workflow()` reads `COMFY_URL` if it is set, otherwise it defaults to
 `http://127.0.0.1:8000`.

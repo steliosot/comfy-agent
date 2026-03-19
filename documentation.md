@@ -378,7 +378,7 @@ headers = {
 }
 
 wf = load_yaml_skill(
-    "workflow_examples_editable_skills/generate_sd15_image.yaml",
+    "examples/workflows_editable/generate_sd15_image.yaml",
     server="http://YOUR_SERVER_IP",
     headers=headers,
     prompt="cinematic robot",
@@ -519,7 +519,7 @@ print(result)
 
 Try the ready-made examples in:
 
-- `agentic_skill_examples/`
+- `examples/agents_agentic/`
 
 ## Testing
 
@@ -537,12 +537,12 @@ These tests use mocked ComfyUI API responses, so most of them do not require a l
 
 If you are new to the project, this is a good order to follow:
 
-1. Run a direct example from `workflow_examples`
-2. Run a fluent example from `workflow_examples_simple_pipelining`
+1. Run a direct example from `examples/workflows_direct_dsl`
+2. Run a fluent example from `examples/workflows_fluent_dsl`
 3. Open a skill in `skills/` and study `build(...)`
-4. Try a buildable skill example from `skill_examples_buildable`
-5. Try an editable workflow example from `workflow_examples_editable_skills`
-6. Try an agentic routing example from `agentic_skill_examples`
+4. Try a buildable skill example from `examples/skills_buildable`
+5. Try an editable workflow example from `examples/workflows_editable`
+6. Try an agentic routing example from `examples/agents_agentic`
 7. Run the unit tests
 8. Build your own skill
 
@@ -550,14 +550,14 @@ If you are new to the project, this is a good order to follow:
 
 Useful folders in the repository:
 
-- `workflow_examples/`
-- `workflow_examples_simple_pipelining/`
-- `workflow_examples_editable_skills/`
+- `examples/workflows_direct_dsl/`
+- `examples/workflows_fluent_dsl/`
+- `examples/workflows_editable/`
 - `skills/`
-- `skill_examples/`
-- `skill_examples_buildable/`
-- `agentic_skill_examples/`
-- `agent_examples/`
+- `examples/skills_basic/`
+- `examples/skills_buildable/`
+- `examples/agents_agentic/`
+- `examples/agents_threaded/`
 - `unit_tests/`
 
 If you want to extend the system, the main place to start is:

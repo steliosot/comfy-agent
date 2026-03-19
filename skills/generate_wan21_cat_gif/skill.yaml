@@ -1,0 +1,35 @@
+name: generate_wan21_cat_gif
+description: Generate a WAN 2.1 GIF with VHS_VideoCombine.
+
+inputs:
+  prompt:
+    type: string
+    default: "A cute 3D-rendered cartoon cat curiously looks at the camera with big, sparkling eyes."
+  negative_prompt:
+    type: string
+    default: "Overexposure, static, blurred details, low quality, artifacts"
+  width:
+    type: integer
+    default: 832
+  height:
+    type: integer
+    default: 480
+  batch_size:
+    type: integer
+    default: 1
+  steps:
+    type: integer
+    default: 10
+  cfg:
+    type: number
+    default: 8
+  frame_rate:
+    type: integer
+    default: 16
+  filename_prefix:
+    type: string
+    default: "wan21_cat_skill"
+
+outputs:
+  animation: string
+

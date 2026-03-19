@@ -12,9 +12,10 @@ If your server is proxied under `/api`, `Workflow(...)` now auto-detects that pa
 ## Run
 
 ```bash
-PYTHONPATH=. python3 workflow_examples_cloud_server/example_local_crop.py
-PYTHONPATH=. python3 workflow_examples_cloud_server/example_cloud_crop_with_headers.py
-PYTHONPATH=. python3 workflow_examples_cloud_server/example_cloud_sd15_txt2img_preview.py
+PYTHONPATH=. python3 examples/workflows_cloud_server/example_local_crop.py
+PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_crop_with_headers.py
+PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_sd15_txt2img_preview.py
+PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_wan21_cat_gif.py
 ```
 
 ## Cloud env vars

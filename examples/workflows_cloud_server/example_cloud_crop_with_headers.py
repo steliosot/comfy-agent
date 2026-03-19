@@ -1,6 +1,15 @@
 """
 Comfy Agent Workflow Test: Image Crop (Cloud + Optional Headers)
 
+Setup (examples):
+export COMFY_URL=http://34.30.216.121
+export COMFY_AUTH_HEADER="XXXXXX"
+export COMFY_INPUT_IMAGE="a124c61d-bb3f-4485-9c6b-fec142e56e6d.JPG"
+
+For localhost without auth:
+export COMFY_URL=localhost:8000
+unset COMFY_AUTH_HEADER
+
 Pipeline:
 LoadImage -> ImageCrop -> SaveImage
 """

@@ -1,6 +1,8 @@
 import importlib.util
 import json
+import os
 import unittest
+from unittest.mock import patch
 
 from comfy_agent import Workflow, load_yaml_skill
 
@@ -8,6 +10,34 @@ from unit_tests.test_helpers import mocked_comfy_api
 
 
 class WorkflowCoreTests(unittest.TestCase):
+    def test_comfy_url_env_without_scheme_gets_http_prefix(self):
+        captured = {"url": None}
+
+        def fake_get(url, *args, **kwargs):
+            captured["url"] = url
+
+            class Response:
+                ok = True
+                status_code = 200
+
+                @staticmethod
+                def json():
+                    return {"CheckpointLoaderSimple": {"output": ["MODEL", "CLIP", "VAE"], "output_name": ["MODEL", "CLIP", "VAE"]}}
+
+                @staticmethod
+                def raise_for_status():
+                    return None
+
+            return Response()
+
+        with patch.dict(os.environ, {"COMFY_URL": "localhost:8000"}), patch(
+            "comfy_agent.workflow.requests.get", side_effect=fake_get
+        ):
+            wf = Workflow()
+
+        self.assertEqual(captured["url"], "http://localhost:8000/object_info")
+        self.assertEqual(wf.base_url, "http://localhost:8000")
+
     def test_basic_workflow_run_posts_prompt(self):
         with mocked_comfy_api() as posted:
             wf = Workflow()
@@ -135,7 +165,7 @@ class WorkflowCoreTests(unittest.TestCase):
     def test_yaml_skill_loader_builds_workflow(self):
         with mocked_comfy_api():
             wf = load_yaml_skill(
-                "workflow_examples_editable_skills/generate_sd15_image.yaml",
+                "examples/workflows_editable/generate_sd15_image.yaml",
                 prompt="robot",
                 negative_prompt="bad",
             )
@@ -147,7 +177,7 @@ class WorkflowCoreTests(unittest.TestCase):
     @unittest.skipIf(importlib.util.find_spec("yaml"), "PyYAML installed")
     def test_yaml_skill_loader_fallback_raises_clear_error(self):
         with self.assertRaises(ImportError) as context:
-            load_yaml_skill("workflow_examples_editable_skills/generate_sd15_image.yaml")
+            load_yaml_skill("examples/workflows_editable/generate_sd15_image.yaml")
 
         self.assertIn("PyYAML", str(context.exception))
 

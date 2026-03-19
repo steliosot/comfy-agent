@@ -12,3 +12,4 @@ Examples:
 - `example_clone_override.py`
 - `example_inspect_and_json.py`
 - `example_yaml_skill.py`
+- `example_wan21_clone_override.py`

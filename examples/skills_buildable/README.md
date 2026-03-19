@@ -17,3 +17,7 @@ wf.run()
 
 You can also keep the workflow object around, inspect `wf.nodes`, add more
 nodes, or submit it later.
+
+Additional example:
+
+- `example_build_wan21_cat_gif.py`
