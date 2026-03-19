@@ -1,8 +1,7 @@
 import re
 from dataclasses import dataclass
 
-from skills.crop_image import skill as crop_skill
-from skills.generate_sd15_image import skill as generate_skill
+from .workflow import Workflow
 
 
 @dataclass
@@ -14,8 +13,6 @@ class SkillChoice:
 
 def _extract_crop_params(prompt):
     text = prompt.lower()
-
-    # Default crop params if prompt does not include explicit coordinates.
     params = {"x": 0, "y": 0, "width": 256, "height": 256}
 
     size_match = re.search(r"(\d{2,4})\s*[xX]\s*(\d{2,4})", text)
@@ -38,9 +35,9 @@ def _extract_generation_prompt(prompt):
     split_tokens = [" then crop", " and then crop", " crop it", " and crop"]
     split_index = -1
     for token in split_tokens:
-        i = lowered.find(token)
-        if i != -1:
-            split_index = i if split_index == -1 else min(split_index, i)
+        index = lowered.find(token)
+        if index != -1:
+            split_index = index if split_index == -1 else min(split_index, index)
 
     if split_index == -1:
         return prompt.strip()
@@ -50,8 +47,9 @@ def _extract_generation_prompt(prompt):
 
 def reason_skills(prompt):
     text = prompt.lower()
-
-    wants_generate = any(k in text for k in ["generate", "create", "make", "photo", "image", "portrait"])
+    wants_generate = any(
+        key in text for key in ["generate", "create", "make", "photo", "image", "portrait"]
+    )
     wants_crop = "crop" in text
 
     choices = []
@@ -85,64 +83,73 @@ def reason_skills(prompt):
     return choices
 
 
-def run_agentic(prompt,
-                server=None,
-                headers=None,
-                api_prefix=None,
-                negative_prompt="watermark, text"):
+def run_agentic(
+    prompt,
+    server=None,
+    headers=None,
+    api_prefix=None,
+    negative_prompt="watermark, text",
+    ckpt_name="sd1.5/juggernaut_reborn.safetensors",
+    filename_prefix="agentic_generated",
+):
     choices = reason_skills(prompt)
     print("Reasoning:")
     for choice in choices:
         print(f"- {choice.name}: confidence={choice.confidence:.2f} ({choice.reason})")
 
-    skill_names = [c.name for c in choices]
+    wf = Workflow(server=server, headers=headers, api_prefix=api_prefix)
+    skill_names = [choice.name for choice in choices]
+
+    generation_prompt = _extract_generation_prompt(prompt)
+    model, clip, vae = wf.checkpointloadersimple(ckpt_name=ckpt_name)
+    pos = wf.cliptextencode(clip=clip, text=generation_prompt)
+    neg = wf.cliptextencode(clip=clip, text=negative_prompt)
+    latent = wf.emptylatentimage(width=512, height=512, batch_size=1)
+    samples = wf.ksampler(
+        model=model,
+        positive=pos,
+        negative=neg,
+        latent_image=latent,
+        seed=1,
+        steps=35,
+        cfg=7.0,
+        sampler_name="euler",
+        scheduler="normal",
+        denoise=1.0,
+    )
+    image = wf.vaedecode(samples=samples, vae=vae)
+    wf.saveimage(images=image, filename_prefix=filename_prefix)
 
     if "generate_sd15_image" in skill_names and "crop_image" in skill_names:
-        gen_prompt = _extract_generation_prompt(prompt)
         crop_params = _extract_crop_params(prompt)
         print(
             "Plan: generate_sd15_image -> crop_image "
             f"(x={crop_params['x']}, y={crop_params['y']}, "
             f"width={crop_params['width']}, height={crop_params['height']})"
         )
-
-        wf, generated_img = generate_skill.build(
-            prompt=gen_prompt,
-            negative_prompt=negative_prompt,
-            server=server,
-            headers=headers,
-            api_prefix=api_prefix,
-            filename_prefix="agentic_generated",
-            return_image=True,
-        )
-
-        crop_skill.build(
-            workflow=wf,
-            image_ref=generated_img,
+        cropped = wf.imagecrop(
+            image=image,
             x=crop_params["x"],
             y=crop_params["y"],
             width=crop_params["width"],
             height=crop_params["height"],
-            filename_prefix="agentic_cropped",
         )
-
+        wf.saveimage(images=cropped, filename_prefix="agentic_cropped")
         run_result = wf.run()
-        output_images = wf.saved_images(run_result.get("prompt_id"))
-
         return {
             "status": "done",
             "plan": ["generate_sd15_image", "crop_image"],
             "prompt_id": run_result.get("prompt_id"),
-            "output_images": output_images,
+            "output_images": wf.saved_images(run_result.get("prompt_id")),
         }
 
     print("Plan: generate_sd15_image")
-    return generate_skill.run(
-        prompt=prompt,
-        negative_prompt=negative_prompt,
-        server=server,
-        headers=headers,
-        api_prefix=api_prefix,
-        filename_prefix="agentic_generated",
-    )
+    run_result = wf.run()
+    return {
+        "status": "done",
+        "skill": "generate_sd15_image",
+        "prompt_id": run_result.get("prompt_id"),
+        "filename_prefix": filename_prefix,
+        "output_images": wf.saved_images(run_result.get("prompt_id")),
+    }
 
