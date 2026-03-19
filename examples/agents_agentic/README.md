@@ -10,7 +10,7 @@ Examples:
 
 - `example_agentic_single_skill.py`: generate a Coke bottle image with one skill
 - `example_agentic_generate_then_crop.py`: generate a Coke bottle and then crop to widescreen in one workflow run
-- `example_agentic_wan21_cat_gif.py`: route to generic WAN video clip skill (`video/h264-mp4`)
+- `example_agentic_video_clip.py`: route to generic WAN video clip skill (`video/h264-mp4`)
 - `example_reasonings_agentic.py`: reasoning-only matrix with multiple prompts
 
 ## Cloud run
@@ -21,6 +21,6 @@ export COMFY_AUTH_HEADER=XXXXXX
 
 PYTHONPATH=. python3 examples/agents_agentic/example_agentic_single_skill.py
 PYTHONPATH=. python3 examples/agents_agentic/example_agentic_generate_then_crop.py
-PYTHONPATH=. python3 examples/agents_agentic/example_agentic_wan21_cat_gif.py
+PYTHONPATH=. python3 examples/agents_agentic/example_agentic_video_clip.py
 PYTHONPATH=. python3 examples/agents_agentic/example_reasonings_agentic.py
 ```

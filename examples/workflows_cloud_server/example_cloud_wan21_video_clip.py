@@ -1,8 +1,17 @@
 """
-Comfy Agent Workflow Test: WAN 2.1 Text-to-Video H264 MP4
+Comfy Agent Workflow Test: WAN 2.1 Text-to-Video H264 MP4 (Cloud)
 
-This example lives in the fluent folder for parity, but uses direct node calls
-because WAN + VHS nodes are not part of the small fluent helper set.
+Setup (examples):
+export COMFY_URL=http://34.30.216.121
+export COMFY_AUTH_HEADER="XXXXXX"
+
+For localhost without auth:
+export COMFY_URL=localhost:8000
+unset COMFY_AUTH_HEADER
+
+Pipeline:
+UNETLoader -> CLIPLoader -> CLIPTextEncode -> EmptyHunyuanLatentVideo ->
+KSampler -> VAEDecode -> VHS_VideoCombine
 """
 
 import os
@@ -10,10 +19,12 @@ import os
 from comfy_agent import Workflow
 
 
-wf = Workflow(
-    os.getenv("COMFY_URL"),
-    headers={"Authorization": os.getenv("COMFY_AUTH_HEADER")} if os.getenv("COMFY_AUTH_HEADER") else None,
-)
+COMFY_URL = os.getenv("COMFY_URL", "http://34.30.216.121")
+AUTH_HEADER = os.getenv("COMFY_AUTH_HEADER", "XXXXXX")
+
+headers = {"Authorization": AUTH_HEADER} if AUTH_HEADER else None
+
+wf = Workflow(COMFY_URL, headers=headers)
 
 model = wf.unetloader(
     unet_name="wan2.1/wan2.1_t2v_1.3B_fp16.safetensors",
@@ -62,7 +73,7 @@ wf.vhs_videocombine(
     vae=vae,
     frame_rate=16,
     loop_count=0,
-    filename_prefix="wan21_cat_h264_fluent",
+    filename_prefix="wan21_video_clip_h264_cloud",
     format="video/h264-mp4",
     pix_fmt="yuv420p",
     crf=19,

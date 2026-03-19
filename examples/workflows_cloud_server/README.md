@@ -15,10 +15,10 @@ If your server is proxied under `/api`, `Workflow(...)` now auto-detects that pa
 PYTHONPATH=. python3 examples/workflows_cloud_server/example_local_crop.py
 PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_crop_with_headers.py
 PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_sd15_txt2img_preview.py
-PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_wan21_cat_gif.py
+PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_wan21_video_clip.py
 ```
 
-`example_cloud_wan21_cat_gif.py` exports `video/h264-mp4` (`pix_fmt=yuv420p`, `crf=19`).
+`example_cloud_wan21_video_clip.py` exports `video/h264-mp4` (`pix_fmt=yuv420p`, `crf=19`).
 
 ## Cloud env vars
 

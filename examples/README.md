@@ -16,7 +16,7 @@ All runnable examples are grouped under this `examples/` folder.
   - Python examples adapted from exported ComfyUI workflows.
 - `workflows_comfyui_json/`
   - Raw ComfyUI JSON workflows for testing in ComfyUI directly.
-  - Includes `4 WAN cat gif.json` (video export via VHS).
+  - Includes `4 WAN video clip.json` (video export via VHS).
 
 ## Skills
 

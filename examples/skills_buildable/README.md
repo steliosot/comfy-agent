@@ -20,4 +20,4 @@ nodes, or submit it later.
 
 Additional example:
 
-- `example_build_wan21_cat_gif.py` (uses the generic `generate_video_clip` skill and exports `video/h264-mp4`)
+- `example_build_video_clip.py` (uses the generic `generate_video_clip` skill and exports `video/h264-mp4`)
