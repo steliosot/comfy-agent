@@ -2,6 +2,7 @@ import runpy
 import unittest
 from unittest.mock import patch
 
+from comfy_agent import reason_skills
 from unit_tests.test_helpers import mocked_comfy_api
 
 
@@ -52,6 +53,11 @@ class AgentAndExampleTests(unittest.TestCase):
                 "examples/workflows_editable/example_inspect_and_json.py",
                 run_name="__main__",
             )
+
+    def test_reason_skills_routes_video_prompt_to_wan(self):
+        choices = reason_skills("generate a short video clip of a robot in the city")
+        names = [choice.name for choice in choices]
+        self.assertIn("generate_video_clip", names)
 
 
 if __name__ == "__main__":

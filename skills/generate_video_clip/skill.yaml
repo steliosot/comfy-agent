@@ -1,5 +1,5 @@
-name: generate_wan21_cat_gif
-description: Deprecated alias for generate_video_clip. Use generate_video_clip for generic WAN 2.1 video generation.
+name: generate_video_clip
+description: Generate a WAN 2.1 video clip using EmptyHunyuanLatentVideo and VHS_VideoCombine (video/h264-mp4).
 
 inputs:
   prompt:

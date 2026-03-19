@@ -47,13 +47,44 @@ def _extract_generation_prompt(prompt):
 
 def reason_skills(prompt):
     text = prompt.lower()
+    wants_video = any(
+        key in text
+        for key in [
+            "video",
+            "video clip",
+            "animation",
+            "gif",
+            "mp4",
+            "webm",
+            "h264",
+            "webp",
+            "t2v",
+            "text-to-video",
+        ]
+    )
     wants_generate = any(
         key in text for key in ["generate", "create", "make", "photo", "image", "portrait"]
     )
     wants_crop = "crop" in text
 
     choices = []
-    if wants_generate:
+    if wants_video:
+        choices.append(
+            SkillChoice(
+                name="generate_video_clip",
+                confidence=0.97,
+                reason="Prompt asks for video generation.",
+            )
+        )
+        if wants_crop:
+            choices.append(
+                SkillChoice(
+                    name="crop_image",
+                    confidence=0.42,
+                    reason="Crop requested, but current crop tool is image-only.",
+                )
+            )
+    elif wants_generate:
         choices.append(
             SkillChoice(
                 name="generate_sd15_image",
@@ -62,7 +93,7 @@ def reason_skills(prompt):
             )
         )
 
-    if wants_crop:
+    if wants_crop and not wants_video:
         choices.append(
             SkillChoice(
                 name="crop_image",
@@ -86,9 +117,20 @@ def reason_skills(prompt):
 def reasoning_agentic(prompt, print_output=True):
     choices = reason_skills(prompt)
     skill_names = [choice.name for choice in choices]
+    video = "generate_video_clip" in skill_names
     chain = "crop_image" in skill_names and "generate_sd15_image" in skill_names
 
-    if chain:
+    if video:
+        plan = {
+            "steps": ["generate_video_clip"],
+            "generation_prompt": _extract_generation_prompt(prompt),
+        }
+        if "crop_image" in skill_names:
+            plan["note"] = (
+                "Crop was requested, but crop_image currently applies to still images only; "
+                "video is generated without crop."
+            )
+    elif chain:
         crop_params = _extract_crop_params(prompt)
         plan = {
             "steps": ["generate_sd15_image", "crop_image"],
@@ -126,6 +168,12 @@ def reasoning_agentic(prompt, print_output=True):
                 "Plan: generate_sd15_image -> crop_image "
                 f"(x={crop['x']}, y={crop['y']}, width={crop['width']}, height={crop['height']})"
             )
+        elif video:
+            line = "Plan: generate_video_clip"
+            note = result["plan"].get("note")
+            if note:
+                line += f" ({note})"
+            print(line)
         else:
             print("Plan: generate_sd15_image")
 
@@ -149,6 +197,60 @@ def run_agentic(
     skill_names = [choice.name for choice in choices]
 
     generation_prompt = _extract_generation_prompt(prompt)
+    if "generate_video_clip" in skill_names:
+        model = wf.unetloader(
+            unet_name="wan2.1/wan2.1_t2v_1.3B_fp16.safetensors",
+            weight_dtype="default",
+        )[0]
+        clip = wf.cliploader(
+            clip_name="umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+            type="wan",
+            device="default",
+        )[0]
+        vae = wf.vaeloader(vae_name="wan_2.1_vae.safetensors")[0]
+        pos = wf.cliptextencode(clip=clip, text=generation_prompt)[0]
+        neg = wf.cliptextencode(clip=clip, text=negative_prompt)[0]
+        latent = wf.emptyhunyuanlatentvideo(width=848, height=480, length=25, batch_size=1)[0]
+        samples = wf.ksampler(
+            model=model,
+            positive=pos,
+            negative=neg,
+            latent_image=latent,
+            seed=226274808933316,
+            steps=10,
+            cfg=8,
+            sampler_name="uni_pc",
+            scheduler="simple",
+            denoise=1,
+        )[0]
+        images = wf.vaedecode(samples=samples, vae=vae)[0]
+        wf.vhs_videocombine(
+            images=images,
+            vae=vae,
+            frame_rate=16,
+            loop_count=0,
+            filename_prefix=f"{filename_prefix}_h264",
+            format="video/h264-mp4",
+            pix_fmt="yuv420p",
+            crf=19,
+            save_metadata=True,
+            trim_to_audio=False,
+            pingpong=False,
+            save_output=True,
+        )
+        run_result = wf.run()
+        output = {
+            "status": "done",
+            "plan": ["generate_video_clip"],
+            "prompt_id": run_result.get("prompt_id"),
+            "output_images": wf.saved_images(run_result.get("prompt_id")),
+        }
+        if "crop_image" in skill_names:
+            output["note"] = (
+                "Crop request detected, but video crop is not yet implemented in run_agentic."
+            )
+        return output
+
     model, clip, vae = wf.checkpointloadersimple(ckpt_name=ckpt_name)
     pos = wf.cliptextencode(clip=clip, text=generation_prompt)
     neg = wf.cliptextencode(clip=clip, text=negative_prompt)
