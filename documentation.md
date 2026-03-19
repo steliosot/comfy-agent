@@ -373,8 +373,14 @@ Load it like this:
 ```python
 from comfy_agent import load_yaml_skill
 
+headers = {
+    "Authorization": "XXXXXX"
+}
+
 wf = load_yaml_skill(
     "workflow_examples_editable_skills/generate_sd15_image.yaml",
+    server="http://YOUR_SERVER_IP",
+    headers=headers,
     prompt="cinematic robot",
     negative_prompt="watermark, text"
 )

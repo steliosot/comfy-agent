@@ -5,9 +5,26 @@ import yaml
 from .workflow import Workflow
 
 
-def load_yaml_skill(path, **inputs):
+def load_yaml_skill(
+    path,
+    *,
+    workflow=None,
+    comfy_url=None,
+    server=None,
+    headers=None,
+    api_prefix=None,
+    **inputs,
+):
     config = yaml.safe_load(Path(path).read_text())
-    wf = Workflow()
+    if workflow is not None:
+        wf = workflow
+    else:
+        wf = Workflow(
+            comfy_url=comfy_url,
+            server=server,
+            headers=headers,
+            api_prefix=api_prefix,
+        )
 
     for step in config.get("graph", []):
         node = step["node"]

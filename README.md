@@ -190,6 +190,22 @@ The [skills](/Users/stelios/Documents/comfy-agent/skills) folder contains the ac
 - img2img skills
 - animated WEBP skills
 
+YAML skill loading also supports both local and cloud ComfyUI:
+
+```python
+from comfy_agent import load_yaml_skill
+
+wf = load_yaml_skill(
+    "workflow_examples_editable_skills/generate_sd15_image.yaml",
+    server="http://YOUR_SERVER_IP",
+    headers={"Authorization": "XXXXXX"},
+    prompt="cinematic robot",
+    negative_prompt="watermark, text",
+)
+
+wf.run()
+```
+
 ## Agent Examples
 
 The [agent_examples](/Users/stelios/Documents/comfy-agent/agent_examples) folder shows how multiple jobs can be executed using threads.
