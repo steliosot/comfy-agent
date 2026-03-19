@@ -20,4 +20,4 @@ nodes, or submit it later.
 
 Additional example:
 
-- `example_build_wan21_cat_gif.py`
+- `example_build_wan21_cat_gif.py` (exports `video/h264-mp4` animation)

@@ -27,7 +27,7 @@ neg = wf.cliptextencode(
     text="low quality, blurry, artifacts",
 )[0]
 
-latent = wf.emptylatentimage(width=832, height=480, batch_size=1)[0]
+latent = wf.emptyhunyuanlatentvideo(width=848, height=480, length=25, batch_size=1)[0]
 samples = wf.ksampler(
     model=model,
     positive=pos,
@@ -44,10 +44,15 @@ images = wf.vaedecode(samples=samples, vae=vae)[0]
 
 wf.vhs_videocombine(
     images=images,
+    vae=vae,
     frame_rate=16,
     loop_count=0,
-    filename_prefix="wan21_editable",
-    format="image/gif",
+    filename_prefix="wan21_h264_editable",
+    format="video/h264-mp4",
+    pix_fmt="yuv420p",
+    crf=19,
+    save_metadata=True,
+    trim_to_audio=False,
     pingpong=False,
     save_output=True,
 )
@@ -56,7 +61,7 @@ clone = wf.clone().override(
     {
         "ksampler.steps": 12,
         "vhs_videocombine.frame_rate": 20,
-        "vhs_videocombine.filename_prefix": "wan21_editable_override",
+        "vhs_videocombine.filename_prefix": "wan21_h264_editable_override",
     }
 )
 

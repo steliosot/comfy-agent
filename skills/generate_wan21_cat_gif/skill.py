@@ -21,8 +21,9 @@ def build(
     unet_name="wan2.1/wan2.1_t2v_1.3B_fp16.safetensors",
     clip_name="umt5_xxl_fp8_e4m3fn_scaled.safetensors",
     vae_name="wan_2.1_vae.safetensors",
-    width=832,
+    width=848,
     height=480,
+    length=25,
     batch_size=1,
     seed=226274808933316,
     steps=10,
@@ -32,8 +33,12 @@ def build(
     denoise=1,
     frame_rate=16,
     loop_count=0,
-    filename_prefix="wan21_cat_skill",
-    format="image/gif",
+    filename_prefix="wan21_cat_h264_skill",
+    format="video/h264-mp4",
+    pix_fmt="yuv420p",
+    crf=19,
+    save_metadata=True,
+    trim_to_audio=False,
     pingpong=False,
     save_output=True,
     server=None,
@@ -52,7 +57,12 @@ def build(
 
     pos = wf.cliptextencode(clip=clip, text=prompt)[0]
     neg = wf.cliptextencode(clip=clip, text=negative_prompt)[0]
-    latent = wf.emptylatentimage(width=width, height=height, batch_size=batch_size)[0]
+    latent = wf.emptyhunyuanlatentvideo(
+        width=width,
+        height=height,
+        length=length,
+        batch_size=batch_size,
+    )[0]
 
     samples = wf.ksampler(
         model=model,
@@ -71,10 +81,15 @@ def build(
 
     wf.vhs_videocombine(
         images=images,
+        vae=vae,
         frame_rate=frame_rate,
         loop_count=loop_count,
         filename_prefix=filename_prefix,
         format=format,
+        pix_fmt=pix_fmt,
+        crf=crf,
+        save_metadata=save_metadata,
+        trim_to_audio=trim_to_audio,
         pingpong=pingpong,
         save_output=save_output,
     )
@@ -91,4 +106,3 @@ def run(**kwargs):
         "prompt_id": run_result.get("prompt_id"),
         "output_images": wf.saved_images(run_result.get("prompt_id")),
     }
-

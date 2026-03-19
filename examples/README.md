@@ -16,7 +16,7 @@ All runnable examples are grouped under this `examples/` folder.
   - Python examples adapted from exported ComfyUI workflows.
 - `workflows_comfyui_json/`
   - Raw ComfyUI JSON workflows for testing in ComfyUI directly.
-  - Includes `4 WAN cat gif.json`.
+  - Includes `4 WAN cat gif.json` (video export via VHS).
 
 ## Skills
 
@@ -24,7 +24,7 @@ All runnable examples are grouped under this `examples/` folder.
   - Basic skill usage examples.
 - `skills_buildable/`
   - Build-first skill examples where `build(...)` returns a workflow.
-  - Includes WAN 2.1 GIF skill examples.
+  - Includes WAN 2.1 h264-mp4 animation skill examples.
 
 ## Agents
 

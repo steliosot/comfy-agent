@@ -140,8 +140,9 @@ def run_agentic(
     negative_prompt="watermark, text",
     ckpt_name="sd1.5/juggernaut_reborn.safetensors",
     filename_prefix="agentic_generated",
+    print_reasoning=True,
 ):
-    reasoning = reasoning_agentic(prompt, print_output=True)
+    reasoning = reasoning_agentic(prompt, print_output=print_reasoning)
     choices = reason_skills(prompt)
 
     wf = Workflow(server=server, headers=headers, api_prefix=api_prefix)

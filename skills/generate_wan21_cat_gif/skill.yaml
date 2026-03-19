@@ -1,5 +1,5 @@
 name: generate_wan21_cat_gif
-description: Generate a WAN 2.1 GIF with VHS_VideoCombine.
+description: Generate a WAN 2.1 animation with EmptyHunyuanLatentVideo and VHS_VideoCombine (video/h264-mp4).
 
 inputs:
   prompt:
@@ -10,10 +10,13 @@ inputs:
     default: "Overexposure, static, blurred details, low quality, artifacts"
   width:
     type: integer
-    default: 832
+    default: 848
   height:
     type: integer
     default: 480
+  length:
+    type: integer
+    default: 25
   batch_size:
     type: integer
     default: 1
@@ -28,8 +31,7 @@ inputs:
     default: 16
   filename_prefix:
     type: string
-    default: "wan21_cat_skill"
+    default: "wan21_cat_h264_skill"
 
 outputs:
   animation: string
-
