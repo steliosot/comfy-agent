@@ -1,9 +1,7 @@
 from comfy_agent import Workflow
 
-COMFY_URL = "http://127.0.0.1:8000"
-
 def build(prompt, lora, strength=1.0):
-    wf = Workflow(COMFY_URL)
+    wf = Workflow()
 
     model, clip, vae = wf.checkpointloadersimple(
         ckpt_name="sd1.5/juggernaut_reborn.safetensors"

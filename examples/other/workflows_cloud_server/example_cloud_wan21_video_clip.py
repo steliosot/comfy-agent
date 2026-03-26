@@ -2,8 +2,8 @@
 Comfy Agent Workflow Test: WAN 2.1 Text-to-Video H264 MP4 (Cloud)
 
 Setup (examples):
-export COMFY_URL=http://34.30.216.121
-export COMFY_AUTH_HEADER="XXXXXX"
+export COMFY_URL=http://34.27.83.101
+export COMFY_AUTH_HEADER="YOUR_AUTH_KEY"
 
 For localhost without auth:
 export COMFY_URL=localhost:8000
@@ -19,8 +19,8 @@ import os
 from comfy_agent import Workflow
 
 
-COMFY_URL = os.getenv("COMFY_URL", "http://34.30.216.121")
-AUTH_HEADER = os.getenv("COMFY_AUTH_HEADER", "XXXXXX")
+COMFY_URL = os.getenv("COMFY_URL", "http://34.27.83.101")
+AUTH_HEADER = os.getenv("COMFY_AUTH_HEADER")
 
 headers = {"Authorization": AUTH_HEADER} if AUTH_HEADER else None
 

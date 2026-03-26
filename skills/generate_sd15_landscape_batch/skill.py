@@ -1,7 +1,5 @@
 from comfy_agent import Workflow
 
-COMFY_URL = "http://127.0.0.1:8000"
-
 
 def run(
     prompt="""epic mountain valley at sunrise, winding river, pine forest,
@@ -39,7 +37,7 @@ volumetric light, crisp details, wide composition""",
     steps=30,
     seed=440912775103002,
 ):
-    wf = Workflow(COMFY_URL)
+    wf = Workflow()
 
     model, clip, vae = wf.checkpointloadersimple(
         ckpt_name="sd1.5/juggernaut_reborn.safetensors"

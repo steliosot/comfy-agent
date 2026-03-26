@@ -1,7 +1,5 @@
 from comfy_agent import Workflow
 
-COMFY_URL = "http://127.0.0.1:8000"
-
 
 def run(
     image="crop_source.png",
@@ -46,7 +44,7 @@ soft studio light, crisp details, natural skin texture""",
     denoise=0.5,
     seed=73111924500188,
 ):
-    wf = Workflow(COMFY_URL)
+    wf = Workflow()
 
     source_image = wf.loadimage(image=image)[0]
     cropped = wf.imagecrop(

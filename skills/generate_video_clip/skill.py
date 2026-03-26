@@ -2,10 +2,6 @@ import os
 
 from comfy_agent import Workflow
 
-
-DEFAULT_COMFY_URL = "http://127.0.0.1:8000"
-
-
 def _resolve_headers(headers):
     if headers is not None:
         return headers
@@ -46,7 +42,7 @@ def build(
     api_prefix=None,
 ):
     wf = Workflow(
-        server or os.getenv("COMFY_URL", DEFAULT_COMFY_URL),
+        server or os.getenv("COMFY_URL"),
         headers=_resolve_headers(headers),
         api_prefix=api_prefix,
     )

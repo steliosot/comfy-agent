@@ -1,7 +1,5 @@
 from comfy_agent import Workflow
 
-COMFY_URL = "http://127.0.0.1:8000"
-
 
 def run(
     prompt="""stylized robot walking through neon rain, cinematic lighting,
@@ -40,7 +38,7 @@ dynamic pose, reflective street, detailed concept art""",
     fps=6,
     seed=20260317,
 ):
-    wf = Workflow(COMFY_URL)
+    wf = Workflow()
 
     model, clip, vae = wf.checkpointloadersimple(
         ckpt_name="sd1.5/juggernaut_reborn.safetensors"

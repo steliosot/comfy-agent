@@ -1,5 +1,6 @@
 from .workflow import Workflow
 from .agentic import run_agentic, reason_skills, reasoning_agentic
+from .config import ComfyConfig, load_comfy_env
 
 try:
     from .yaml_skill import load_yaml_skill

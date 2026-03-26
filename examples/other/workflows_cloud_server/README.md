@@ -12,10 +12,10 @@ If your server is proxied under `/api`, `Workflow(...)` now auto-detects that pa
 ## Run
 
 ```bash
-PYTHONPATH=. python3 examples/workflows_cloud_server/example_local_crop.py
-PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_crop_with_headers.py
-PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_sd15_txt2img_preview.py
-PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_wan21_video_clip.py
+PYTHONPATH=. python3 examples/other/workflows_cloud_server/example_local_crop.py
+PYTHONPATH=. python3 examples/other/workflows_cloud_server/example_cloud_crop_with_headers.py
+PYTHONPATH=. python3 examples/other/workflows_cloud_server/example_cloud_sd15_txt2img_preview.py
+PYTHONPATH=. python3 examples/other/workflows_cloud_server/example_cloud_wan21_video_clip.py
 ```
 
 `example_cloud_wan21_video_clip.py` exports `video/h264-mp4` (`pix_fmt=yuv420p`, `crf=19`).
@@ -23,8 +23,8 @@ PYTHONPATH=. python3 examples/workflows_cloud_server/example_cloud_wan21_video_c
 ## Cloud env vars
 
 ```bash
-export COMFY_URL=http://34.30.216.121
-export COMFY_AUTH_HEADER="XXXXXX"
+export COMFY_URL=http://34.27.83.101
+export COMFY_AUTH_HEADER="YOUR_AUTH_KEY"
 export COMFY_INPUT_IMAGE="rosie.jpg"
 export COMFY_CKPT="sd1.5/juggernaut_reborn.safetensors"
 ```
