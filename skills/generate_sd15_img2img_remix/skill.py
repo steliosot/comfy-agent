@@ -1,7 +1,5 @@
 from comfy_agent import Workflow
 
-COMFY_URL = "http://127.0.0.1:8000"
-
 
 def run(
     image="remix_source.png",
@@ -34,7 +32,7 @@ high detail, realistic textures, polished composition""",
     denoise=0.55,
     seed=56120499810023,
 ):
-    wf = Workflow(COMFY_URL)
+    wf = Workflow()
 
     source_image = wf.loadimage(image=image)[0]
     model, clip, vae = wf.checkpointloadersimple(

@@ -1,7 +1,5 @@
 from comfy_agent import Workflow
 
-COMFY_URL = "http://127.0.0.1:8000"
-
 
 def run(
     image="agentic_1773257438367_00001_.png",
@@ -48,7 +46,7 @@ high quality concept art""",
     denoise=0.5,
     seed=845102994511,
 ):
-    wf = Workflow(COMFY_URL)
+    wf = Workflow()
 
     source_image = wf.loadimage(image=image)[0]
     cropped = wf.imagecrop(

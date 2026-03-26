@@ -33,15 +33,21 @@ For local development from this repository:
 pip install -e .
 ```
 
+Optional: install from `requirements.txt` for script usage:
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Requirements
 
 - Python 3.10+
 - A running ComfyUI server
 - The required models placed in the correct ComfyUI `models/` directories
 
-All runnable examples are organized under [examples/README.md](/Users/stelios/Documents/comfy-agent/examples/README.md).
+All runnable examples are organized under [examples/README.md](examples/README.md).
 
-Before running the examples, first test the JSON workflows in [workflows_comfyui_json](/Users/stelios/Documents/comfy-agent/examples/workflows_comfyui_json) inside ComfyUI. Those files include notes about:
+Before running the examples, first test the JSON workflows in [workflows_comfyui_json](examples/other/workflows_comfyui_json) inside ComfyUI. Those files include notes about:
 
 - which models to download
 - where to place them in ComfyUI
@@ -102,17 +108,60 @@ wf = Workflow()
 wf.run()
 ```
 
-`Workflow()` reads `COMFY_URL` if it is set. Otherwise it defaults to `http://127.0.0.1:8000`.
+`Workflow()` reads config from `.env` (or process env vars).
+
+Create a local config:
+
+```bash
+cp .env.example .env
+```
+
+Example `.env` for your remote server:
+
+```bash
+COMFY_URL=http://34.27.83.101
+COMFY_AUTH_HEADER=YOUR_AUTH_KEY
+COMFY_INPUT_DIR=tmp/inputs
+COMFY_OUTPUT_DIR=tmp/outputs
+```
+
+Example `.env` for localhost:
+
+```bash
+COMFY_URL=http://127.0.0.1:8000
+COMFY_AUTH_HEADER=
+COMFY_INPUT_DIR=/absolute/path/to/local/input
+COMFY_OUTPUT_DIR=/absolute/path/to/local/output
+```
+
+Validate config and endpoints in one command:
+
+```bash
+comfy-agent-doctor
+```
+
+Or without installing the script entrypoint:
+
+```bash
+python3 -m comfy_agent.doctor
+```
+
+JSON output mode:
+
+```bash
+python3 -m comfy_agent.doctor --json
+```
 
 Cloud/Nginx style with optional auth headers:
 
 ```python
 from comfy_agent import Workflow
+import os
 
 wf = Workflow(
     "http://YOUR_SERVER_IP",
     headers={
-        "Authorization": "XXXXXX"
+        "Authorization": os.getenv("COMFY_AUTH_HEADER", "")
     }
 )
 ```
@@ -133,14 +182,14 @@ Depending on your setup and model choice, you may want to tune them.
 
 ## Workflow Examples
 
-The [workflows_direct_dsl](/Users/stelios/Documents/comfy-agent/examples/workflows_direct_dsl) folder contains direct DSL examples.
+The [workflows_direct_dsl](examples/workflows_direct_dsl) folder contains direct DSL examples.
 
 For cloud/Nginx header examples, see
-[workflows_cloud_server](/Users/stelios/Documents/comfy-agent/examples/workflows_cloud_server).
+[workflows_cloud_server](examples/other/workflows_cloud_server).
 
 To try one:
 
-1. Open an example such as [example_txt2img.py](/Users/stelios/Documents/comfy-agent/examples/workflows_direct_dsl/example_txt2img.py)
+1. Open an example such as [example_txt2img.py](examples/workflows_direct_dsl/example_txt2img.py)
 2. Confirm the ComfyUI URL is correct for your machine
 3. Run it with Python
 
@@ -171,7 +220,7 @@ Compatibility-focused examples:
 
 ## Simple Pipelining Examples
 
-The [workflows_fluent_dsl](/Users/stelios/Documents/comfy-agent/examples/workflows_fluent_dsl) folder contains the same general ideas in the fluent chaining style.
+The [workflows_fluent_dsl](examples/workflows_fluent_dsl) folder contains the same general ideas in the fluent chaining style.
 
 Run one with:
 
@@ -183,9 +232,9 @@ These examples are useful if you want a simpler authoring style while keeping th
 
 ## Skill Examples
 
-The [skills_basic](/Users/stelios/Documents/comfy-agent/examples/skills_basic) folder shows how workflows can be wrapped as reusable skills.
+The [skills_basic](examples/other/skills_basic) folder shows how workflows can be wrapped as reusable skills.
 
-The [skills](/Users/stelios/Documents/comfy-agent/skills) folder contains the actual skill definitions, including:
+The [skills](skills) folder contains the actual skill definitions, including:
 
 - image generation skills
 - preview skills
@@ -196,11 +245,12 @@ YAML skill loading also supports both local and cloud ComfyUI:
 
 ```python
 from comfy_agent import load_yaml_skill
+import os
 
 wf = load_yaml_skill(
-    "examples/workflows_editable/generate_sd15_image.yaml",
-    server="http://YOUR_SERVER_IP",
-    headers={"Authorization": "XXXXXX"},
+    "examples/other/workflows_editable/generate_sd15_image.yaml",
+    server=os.getenv("COMFY_URL"),
+    headers={"Authorization": os.getenv("COMFY_AUTH_HEADER", "")},
     prompt="cinematic robot",
     negative_prompt="watermark, text",
 )
@@ -210,7 +260,7 @@ wf.run()
 
 ## Agent Examples
 
-The [agents_threaded](/Users/stelios/Documents/comfy-agent/examples/agents_threaded) folder shows how multiple jobs can be executed using threads.
+The [agents_threaded](examples/other/agents_threaded) folder shows how multiple jobs can be executed using threads.
 
 Example:
 
@@ -222,7 +272,7 @@ ComfyUI processes requests serially by default, so true parallel execution typic
 
 ## Agentic Skill Examples
 
-The [agents_agentic](/Users/stelios/Documents/comfy-agent/examples/agents_agentic) folder shows an agnostic routing layer that:
+The [agents_agentic](examples/agents_agentic) folder shows an agnostic routing layer that:
 
 - reasons over prompt intent
 - selects one or more skills with confidence scores
@@ -232,6 +282,7 @@ Included examples:
 
 - `example_agentic_single_skill.py` (generate a Coke bottle image)
 - `example_agentic_generate_then_crop.py` (generate then crop to `1280x720`)
+- `example_upload_crop_download.py` (upload local image -> run skill -> download locally)
 
 ## Running in Parallel
 

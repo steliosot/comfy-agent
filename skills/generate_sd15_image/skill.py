@@ -1,9 +1,7 @@
 import os
 
 from comfy_agent import Workflow
-
-
-DEFAULT_COMFY_URL = "http://127.0.0.1:8000"
+from comfy_agent.artifacts import build_artifact, ensure_run_id, make_stage_prefix
 
 
 def _resolve_headers(headers):
@@ -30,7 +28,7 @@ def build(prompt,
           save=True,
           return_image=False):
     wf = workflow or Workflow(
-        server or os.getenv("COMFY_URL", DEFAULT_COMFY_URL),
+        server or os.getenv("COMFY_URL"),
         headers=_resolve_headers(headers),
         api_prefix=api_prefix
     )
@@ -93,7 +91,13 @@ def run(prompt,
         server=None,
         headers=None,
         api_prefix=None,
-        filename_prefix="generated"):
+        filename_prefix="generated",
+        run_id=None):
+    resolved_run_id = ensure_run_id(run_id)
+    resolved_prefix = filename_prefix
+    if filename_prefix == "generated":
+        resolved_prefix = make_stage_prefix(resolved_run_id, "generate")
+
     wf = build(
         prompt=prompt,
         negative_prompt=negative_prompt,
@@ -103,15 +107,29 @@ def run(prompt,
         server=server,
         headers=headers,
         api_prefix=api_prefix,
-        filename_prefix=filename_prefix
+        filename_prefix=resolved_prefix
     )
     run_result = wf.run()
     output_images = wf.saved_images(run_result.get("prompt_id"))
+    artifacts = [
+        build_artifact(
+            role="output",
+            remote_name=item.get("filename"),
+            source="comfy_history",
+            node_id=item.get("node_id"),
+            subfolder=item.get("subfolder", ""),
+            type=item.get("type", "output"),
+            downloaded_path=None,
+        )
+        for item in output_images
+    ]
 
     return {
         "status": "done",
         "skill": "generate_sd15_image",
+        "run_id": resolved_run_id,
         "prompt_id": run_result.get("prompt_id"),
-        "filename_prefix": filename_prefix,
+        "filename_prefix": resolved_prefix,
         "output_images": output_images,
+        "artifacts": artifacts,
     }

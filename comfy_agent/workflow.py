@@ -1,9 +1,11 @@
 import copy
 import json
+import mimetypes
 import os
 import time
 import uuid
-from urllib.parse import urlparse
+from pathlib import Path
+from urllib.parse import urlencode, urlparse
 from urllib import error, request
 
 try:
@@ -15,11 +17,12 @@ except ImportError:  # pragma: no cover
             self.response = response
 
     class _Response:
-        def __init__(self, payload, status_code=200, text=None):
+        def __init__(self, payload, status_code=200, text=None, content=None):
             self._payload = payload
             self.status_code = status_code
             self.ok = 200 <= status_code < 300
             self.text = text if text is not None else json.dumps(payload)
+            self.content = content if content is not None else self.text.encode("utf-8")
 
         def json(self):
             return self._payload
@@ -32,7 +35,10 @@ except ImportError:  # pragma: no cover
         HTTPError = _HTTPError
 
         @staticmethod
-        def get(url, headers=None):
+        def get(url, headers=None, params=None):
+            if params:
+                separator = "&" if "?" in url else "?"
+                url = f"{url}{separator}{urlencode(params)}"
             req = request.Request(
                 url,
                 headers=headers or {},
@@ -40,54 +46,109 @@ except ImportError:  # pragma: no cover
             )
             try:
                 with request.urlopen(req) as response:
-                    payload = json.loads(response.read().decode("utf-8"))
-                    return _Response(payload, status_code=response.status)
+                    content = response.read()
+                    try:
+                        payload = json.loads(content.decode("utf-8"))
+                    except ValueError:
+                        payload = {}
+                    return _Response(
+                        payload,
+                        status_code=response.status,
+                        content=content
+                    )
             except error.HTTPError as exc:
-                return _Response({}, status_code=exc.code, text=exc.read().decode("utf-8"))
+                body = exc.read()
+                return _Response(
+                    {},
+                    status_code=exc.code,
+                    text=body.decode("utf-8", errors="replace"),
+                    content=body
+                )
 
         @staticmethod
-        def post(url, json=None, headers=None):
-            data = None if json is None else __import__("json").dumps(json).encode("utf-8")
-            merged_headers = {"Content-Type": "application/json"}
+        def post(url, json=None, headers=None, data=None, files=None):
+            payload = data
+            merged_headers = {}
             if headers:
                 merged_headers.update(headers)
+            if json is not None:
+                payload = __import__("json").dumps(json).encode("utf-8")
+                merged_headers["Content-Type"] = "application/json"
+            elif files:
+                field_name, file_spec = next(iter(files.items()))
+                filename, file_obj, content_type = file_spec
+                file_data = file_obj.read()
+                boundary = f"----comfy-agent-{uuid.uuid4().hex}"
+                merged_headers["Content-Type"] = f"multipart/form-data; boundary={boundary}"
+                parts = []
+                if isinstance(data, dict):
+                    for key, value in data.items():
+                        parts.extend(
+                            [
+                                f"--{boundary}".encode("utf-8"),
+                                f'Content-Disposition: form-data; name="{key}"'.encode("utf-8"),
+                                b"",
+                                str(value).encode("utf-8"),
+                            ]
+                        )
+                parts.extend(
+                    [
+                        f"--{boundary}".encode("utf-8"),
+                        (
+                            f'Content-Disposition: form-data; name="{field_name}"; '
+                            f'filename="{filename}"'
+                        ).encode("utf-8"),
+                        f"Content-Type: {content_type}".encode("utf-8"),
+                        b"",
+                        file_data,
+                        f"--{boundary}--".encode("utf-8"),
+                        b"",
+                    ]
+                )
+                payload = b"\r\n".join(parts)
             req = request.Request(
                 url,
-                data=data,
+                data=payload,
                 headers=merged_headers,
                 method="POST",
             )
             try:
                 with request.urlopen(req) as response:
-                    payload = __import__("json").loads(response.read().decode("utf-8"))
-                    return _Response(payload, status_code=response.status)
+                    raw = response.read()
+                    try:
+                        parsed = __import__("json").loads(raw.decode("utf-8"))
+                    except ValueError:
+                        parsed = {}
+                    return _Response(parsed, status_code=response.status, content=raw)
             except error.HTTPError as exc:
                 body = exc.read().decode("utf-8")
                 try:
                     payload = __import__("json").loads(body)
                 except ValueError:
                     payload = {}
-                return _Response(payload, status_code=exc.code, text=body)
+                return _Response(payload, status_code=exc.code, text=body, content=body.encode("utf-8"))
 
     requests = _RequestsCompat()
 
 from .node import Node
 from .refs import DataRef, NodeResult
+from .config import ComfyConfig
 
 
 class Workflow:
     """Spark-style lazy DAG builder for ComfyUI"""
 
     def __init__(self, comfy_url=None, server=None, headers=None, api_prefix=None):
-        base_url = server or comfy_url
+        cfg = ComfyConfig.from_env(load_env=True)
+        base_url = server or comfy_url or cfg.server
         if not base_url:
-            base_url = os.getenv("COMFY_URL", "http://127.0.0.1:8000")
+            base_url = "http://127.0.0.1:8000"
         base_url = self._normalize_base_url(base_url)
 
         self.base_url = base_url.rstrip("/")
-        self.headers = dict(headers or {})
+        self.headers = dict(headers if headers is not None else cfg.headers)
 
-        env_api_prefix = os.getenv("COMFY_API_PREFIX")
+        env_api_prefix = cfg.api_prefix
         if api_prefix is None:
             api_prefix = env_api_prefix
 
@@ -713,3 +774,119 @@ class Workflow:
                 time.sleep(delay)
 
         return []
+
+    def upload_image(self, local_path, remote_name=None, overwrite=True, type="input"):
+        path = Path(local_path)
+        if not path.exists():
+            raise FileNotFoundError(f"Image path not found: {local_path}")
+        if not path.is_file():
+            raise ValueError(f"Image path must be a file: {local_path}")
+
+        resolved_remote = remote_name or path.name
+        mime_type = mimetypes.guess_type(resolved_remote)[0] or "application/octet-stream"
+
+        with path.open("rb") as file_obj:
+            response = requests.post(
+                f"{self.url}/upload/image",
+                files={
+                    "image": (resolved_remote, file_obj, mime_type)
+                },
+                data={
+                    "overwrite": "true" if overwrite else "false",
+                    "type": type,
+                },
+                headers=self.headers,
+            )
+        if not response.ok:
+            response.raise_for_status()
+        payload = response.json() if hasattr(response, "json") else {}
+        filename = payload.get("name", resolved_remote) if isinstance(payload, dict) else resolved_remote
+        subfolder = payload.get("subfolder", "") if isinstance(payload, dict) else ""
+        image_type = payload.get("type", type) if isinstance(payload, dict) else type
+
+        return {
+            "local_path": str(path.resolve()),
+            "remote_name": filename,
+            "subfolder": subfolder,
+            "type": image_type,
+            "source": "upload",
+        }
+
+    def download_image(self, image_meta, output_path=None, output_dir=None):
+        if not isinstance(image_meta, dict):
+            raise ValueError("image_meta must be a dict")
+        filename = image_meta.get("filename")
+        if not filename:
+            raise ValueError("image_meta.filename is required")
+
+        params = {
+            "filename": filename,
+            "subfolder": image_meta.get("subfolder", ""),
+            "type": image_meta.get("type", "output"),
+        }
+
+        if output_path is None:
+            resolved_output_dir = output_dir or ComfyConfig.from_env(load_env=True).output_dir
+            out_dir = Path(resolved_output_dir)
+            out_dir.mkdir(parents=True, exist_ok=True)
+            target_path = out_dir / filename
+        else:
+            target_path = Path(output_path)
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+
+        response = requests.get(
+            f"{self.url}/view",
+            params=params,
+            headers=self.headers
+        )
+        if not response.ok:
+            response.raise_for_status()
+        content = getattr(response, "content", None)
+        if content is None:
+            content = response.text.encode("utf-8")
+        target_path.write_bytes(content)
+
+        return {
+            "filename": filename,
+            "subfolder": params["subfolder"],
+            "type": params["type"],
+            "downloaded_path": str(target_path.resolve()),
+            "source": "download",
+            "node_id": image_meta.get("node_id"),
+            "output_kind": image_meta.get("output_kind"),
+        }
+
+    def download_saved_images(
+        self,
+        prompt_id,
+        output_dir=None,
+        filename_strategy=None,
+        retries=12,
+        delay=0.5,
+    ):
+        resolved_output_dir = output_dir or ComfyConfig.from_env(load_env=True).output_dir
+        images = self.saved_images(prompt_id=prompt_id, retries=retries, delay=delay)
+        downloaded = []
+        for index, image_meta in enumerate(images, start=1):
+            if filename_strategy is not None:
+                if callable(filename_strategy):
+                    custom_name = filename_strategy(image_meta, index)
+                else:
+                    custom_name = str(filename_strategy).format(
+                        index=index,
+                        filename=image_meta.get("filename", ""),
+                        node_id=image_meta.get("node_id", ""),
+                        output_kind=image_meta.get("output_kind", ""),
+                    )
+                output_path = str(Path(resolved_output_dir) / custom_name)
+            else:
+                output_path = None
+
+            downloaded.append(
+                self.download_image(
+                    image_meta=image_meta,
+                    output_path=output_path,
+                    output_dir=resolved_output_dir,
+                )
+            )
+        return downloaded

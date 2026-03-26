@@ -1,0 +1,27 @@
+name: download_image
+
+description: Download ComfyUI image outputs to local files using deterministic names.
+
+inputs:
+  image_meta:
+    type: object
+    required: false
+    description: Single saved image metadata dict from Comfy history output.
+
+  prompt_id:
+    type: string
+    required: false
+    description: Prompt id used to fetch all saved outputs from Comfy history.
+
+  output_dir:
+    type: string
+    required: false
+    description: Optional output directory. Defaults to COMFY_OUTPUT_DIR from config.
+
+  run_id:
+    type: string
+    required: false
+
+outputs:
+  artifacts:
+    type: array

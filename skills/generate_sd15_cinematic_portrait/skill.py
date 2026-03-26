@@ -1,7 +1,5 @@
 from comfy_agent import Workflow
 
-COMFY_URL = "http://127.0.0.1:8000"
-
 
 def run(
     prompt="""cinematic portrait of a weathered space courier, detailed face,
@@ -38,7 +36,7 @@ dark teal background, ultra detailed""",
     steps=35,
     seed=904210331245118,
 ):
-    wf = Workflow(COMFY_URL)
+    wf = Workflow()
 
     model, clip, vae = wf.checkpointloadersimple(
         ckpt_name="sd1.5/juggernaut_reborn.safetensors"

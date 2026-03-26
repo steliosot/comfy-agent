@@ -30,7 +30,10 @@ class WorkflowCoreTests(unittest.TestCase):
 
             return Response()
 
-        with patch.dict(os.environ, {"COMFY_URL": "localhost:8000"}), patch(
+        with patch.dict(
+            os.environ,
+            {"COMFY_URL": "localhost:8000", "COMFY_API_PREFIX": ""},
+        ), patch(
             "comfy_agent.workflow.requests.get", side_effect=fake_get
         ):
             wf = Workflow()
@@ -165,7 +168,7 @@ class WorkflowCoreTests(unittest.TestCase):
     def test_yaml_skill_loader_builds_workflow(self):
         with mocked_comfy_api():
             wf = load_yaml_skill(
-                "examples/workflows_editable/generate_sd15_image.yaml",
+                "examples/other/workflows_editable/generate_sd15_image.yaml",
                 prompt="robot",
                 negative_prompt="bad",
             )
@@ -177,7 +180,7 @@ class WorkflowCoreTests(unittest.TestCase):
     @unittest.skipIf(importlib.util.find_spec("yaml"), "PyYAML installed")
     def test_yaml_skill_loader_fallback_raises_clear_error(self):
         with self.assertRaises(ImportError) as context:
-            load_yaml_skill("examples/workflows_editable/generate_sd15_image.yaml")
+            load_yaml_skill("examples/other/workflows_editable/generate_sd15_image.yaml")
 
         self.assertIn("PyYAML", str(context.exception))
 

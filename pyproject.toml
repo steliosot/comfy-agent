@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "comfy-agent"
-version = "0.1.0"
+version = "0.2.0"
 description = "A lightweight Python DSL for building and running ComfyUI workflows."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -12,6 +12,7 @@ license = { text = "MIT" }
 dependencies = [
     "requests",
     "PyYAML",
+    "python-dotenv",
 ]
 authors = [
     { name = "Stelios" },
@@ -29,3 +30,6 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 include = ["comfy_agent*"]
+
+[project.scripts]
+comfy-agent-doctor = "comfy_agent.doctor:main"

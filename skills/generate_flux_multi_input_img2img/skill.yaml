@@ -1,0 +1,41 @@
+name: generate_flux_multi_input_img2img
+
+description: Generate one image from 2 or 3 reference input images using a FLUX multi-reference img2img pipeline.
+
+inputs:
+  prompt:
+    type: string
+    description: Main prompt text used for CLIP encoding.
+
+  images:
+    type: array
+    required: false
+    description: List of 2 or 3 input image paths (or Comfy input filenames if upload_inputs=false).
+
+  image1:
+    type: string
+    required: false
+  image2:
+    type: string
+    required: false
+  image3:
+    type: string
+    required: false
+
+  upload_inputs:
+    type: boolean
+    default: true
+    description: Upload local paths to Comfy input before running.
+
+  download_output:
+    type: boolean
+    default: true
+    description: Download generated outputs to local COMFY_OUTPUT_DIR.
+
+outputs:
+  artifacts:
+    type: array
+  engine:
+    type: string
+    required: false
+    description: "auto (default), flux, or checkpoint."

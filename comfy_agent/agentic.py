@@ -1,6 +1,7 @@
 import re
 from dataclasses import dataclass
 
+from .artifacts import build_artifact, ensure_run_id, make_stage_prefix
 from .workflow import Workflow
 
 
@@ -189,9 +190,14 @@ def run_agentic(
     ckpt_name="sd1.5/juggernaut_reborn.safetensors",
     filename_prefix="agentic_generated",
     print_reasoning=True,
+    run_id=None,
+    context=None,
 ):
     reasoning = reasoning_agentic(prompt, print_output=print_reasoning)
     choices = reason_skills(prompt)
+    context = context if context is not None else {}
+    resolved_run_id = ensure_run_id(context.get("run_id") or run_id)
+    context["run_id"] = resolved_run_id
 
     wf = Workflow(server=server, headers=headers, api_prefix=api_prefix)
     skill_names = [choice.name for choice in choices]
@@ -229,7 +235,7 @@ def run_agentic(
             vae=vae,
             frame_rate=16,
             loop_count=0,
-            filename_prefix=f"{filename_prefix}_h264",
+            filename_prefix=f"{make_stage_prefix(resolved_run_id, 'video')}_h264",
             format="video/h264-mp4",
             pix_fmt="yuv420p",
             crf=19,
@@ -239,11 +245,31 @@ def run_agentic(
             save_output=True,
         )
         run_result = wf.run()
+        output_images = wf.saved_images(run_result.get("prompt_id"))
+        artifacts = [
+            build_artifact(
+                role="output",
+                remote_name=item.get("filename"),
+                source="comfy_history",
+                node_id=item.get("node_id"),
+                subfolder=item.get("subfolder", ""),
+                type=item.get("type", "output"),
+                downloaded_path=None,
+            )
+            for item in output_images
+        ]
+        context["prompt_id"] = run_result.get("prompt_id")
+        context["output_images"] = output_images
+        context["artifacts"] = artifacts
         output = {
             "status": "done",
+            "run_id": resolved_run_id,
             "plan": ["generate_video_clip"],
             "prompt_id": run_result.get("prompt_id"),
-            "output_images": wf.saved_images(run_result.get("prompt_id")),
+            "filename_prefix": make_stage_prefix(resolved_run_id, "video"),
+            "output_images": output_images,
+            "artifacts": artifacts,
+            "context": context,
         }
         if "crop_image" in skill_names:
             output["note"] = (
@@ -251,6 +277,9 @@ def run_agentic(
             )
         return output
 
+    resolved_prefix = filename_prefix
+    if filename_prefix == "agentic_generated":
+        resolved_prefix = make_stage_prefix(resolved_run_id, "generate")
     model, clip, vae = wf.checkpointloadersimple(ckpt_name=ckpt_name)
     pos = wf.cliptextencode(clip=clip, text=generation_prompt)
     neg = wf.cliptextencode(clip=clip, text=negative_prompt)
@@ -268,7 +297,7 @@ def run_agentic(
         denoise=1.0,
     )
     image = wf.vaedecode(samples=samples, vae=vae)
-    wf.saveimage(images=image, filename_prefix=filename_prefix)
+    wf.saveimage(images=image, filename_prefix=resolved_prefix)
 
     if "generate_sd15_image" in skill_names and "crop_image" in skill_names:
         crop_params = reasoning["plan"]["crop"]
@@ -279,20 +308,60 @@ def run_agentic(
             width=crop_params["width"],
             height=crop_params["height"],
         )
-        wf.saveimage(images=cropped, filename_prefix="agentic_cropped")
+        crop_prefix = make_stage_prefix(resolved_run_id, "crop")
+        wf.saveimage(images=cropped, filename_prefix=crop_prefix)
         run_result = wf.run()
+        output_images = wf.saved_images(run_result.get("prompt_id"))
+        artifacts = [
+            build_artifact(
+                role="output",
+                remote_name=item.get("filename"),
+                source="comfy_history",
+                node_id=item.get("node_id"),
+                subfolder=item.get("subfolder", ""),
+                type=item.get("type", "output"),
+                downloaded_path=None,
+            )
+            for item in output_images
+        ]
+        context["prompt_id"] = run_result.get("prompt_id")
+        context["output_images"] = output_images
+        context["artifacts"] = artifacts
         return {
             "status": "done",
+            "run_id": resolved_run_id,
             "plan": ["generate_sd15_image", "crop_image"],
             "prompt_id": run_result.get("prompt_id"),
-            "output_images": wf.saved_images(run_result.get("prompt_id")),
+            "filename_prefix": crop_prefix,
+            "output_images": output_images,
+            "artifacts": artifacts,
+            "context": context,
         }
 
     run_result = wf.run()
+    output_images = wf.saved_images(run_result.get("prompt_id"))
+    artifacts = [
+        build_artifact(
+            role="output",
+            remote_name=item.get("filename"),
+            source="comfy_history",
+            node_id=item.get("node_id"),
+            subfolder=item.get("subfolder", ""),
+            type=item.get("type", "output"),
+            downloaded_path=None,
+        )
+        for item in output_images
+    ]
+    context["prompt_id"] = run_result.get("prompt_id")
+    context["output_images"] = output_images
+    context["artifacts"] = artifacts
     return {
         "status": "done",
         "skill": "generate_sd15_image",
+        "run_id": resolved_run_id,
         "prompt_id": run_result.get("prompt_id"),
-        "filename_prefix": filename_prefix,
-        "output_images": wf.saved_images(run_result.get("prompt_id")),
+        "filename_prefix": resolved_prefix,
+        "output_images": output_images,
+        "artifacts": artifacts,
+        "context": context,
     }

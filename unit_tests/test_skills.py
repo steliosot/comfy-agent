@@ -20,6 +20,8 @@ class SkillTests(unittest.TestCase):
             result = run(prompt="cinematic robot")
 
         self.assertEqual(result["status"], "done")
+        self.assertIn("run_id", result)
+        self.assertIn("artifacts", result)
         self.assertEqual(len(posted), 1)
 
     def test_preview_skill_build_is_editable(self):
@@ -77,6 +79,48 @@ class SkillTests(unittest.TestCase):
             summary = wf.inspect(print_output=False)
 
         self.assertIn("ImageCrop [image_crop]", summary)
+
+    def test_crop_skill_run_returns_artifacts(self):
+        from skills.crop_image.skill import run
+
+        with mocked_comfy_api():
+            result = run(image="rosie.jpg")
+
+        self.assertEqual(result["status"], "ok")
+        self.assertIn("run_id", result)
+        self.assertIn("artifacts", result)
+
+    def test_flux_multi_input_build_supports_two_images(self):
+        from skills.generate_flux_multi_input_img2img.skill import build
+
+        with mocked_comfy_api():
+            wf, run_id, prefix, artifacts, engine = build(
+                prompt="test prompt",
+                images=["a.png", "b.png"],
+                upload_inputs=False,
+            )
+            summary = wf.inspect(print_output=False)
+
+        self.assertIn("ReferenceLatent", summary)
+        self.assertEqual(len(artifacts), 2)
+        self.assertTrue(run_id)
+        self.assertTrue(prefix)
+        self.assertIn(engine, {"flux", "checkpoint"})
+
+    def test_flux_multi_input_run_downloads_outputs(self):
+        from skills.generate_flux_multi_input_img2img.skill import run
+
+        with mocked_comfy_api():
+            result = run(
+                prompt="test prompt",
+                images=["a.png", "b.png", "c.png"],
+                upload_inputs=False,
+                download_output=True,
+            )
+
+        self.assertEqual(result["status"], "done")
+        self.assertEqual(result["image_count"], 3)
+        self.assertIn("downloaded", result)
 
 
 if __name__ == "__main__":

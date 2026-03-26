@@ -1,0 +1,22 @@
+name: upload_image
+
+description: Upload a local image to ComfyUI input storage with deterministic naming.
+
+inputs:
+  image_path:
+    type: string
+    description: Absolute path, or filename resolved from COMFY_INPUT_DIR if present.
+
+  run_id:
+    type: string
+    required: false
+    description: Optional shared run identifier for composed skills.
+
+  remote_name:
+    type: string
+    required: false
+    description: Optional remote Comfy filename. Defaults to {run_id}_input.ext.
+
+outputs:
+  artifacts:
+    type: array
