@@ -13,8 +13,8 @@ Examples:
 - `example_agentic_video_clip.py`: route to generic WAN video clip skill (`video/h264-mp4`)
 - `example_reasonings_agentic.py`: reasoning-only matrix with multiple prompts
 - `example_upload_crop_download.py`: upload local image -> crop skill -> download outputs
-- `example_agentic_compose_two_images.py`: compose skills with `woman.png` + `St-Pauls-Cathedral.png`
-- `example_agentic_compose_three_images.py`: compose skills with `woman.png` + `St-Pauls-Cathedral.png` + `hat.jpeg`
+- `example_agentic_compose_two_images.py`: compose single-purpose skills with two refs
+- `example_agentic_compose_three_images.py`: compose single-purpose skills with three refs
 
 ## Cloud run
 
@@ -33,3 +33,6 @@ PYTHONPATH=. python3 examples/agents_agentic/example_upload_crop_download.py
 PYTHONPATH=. python3 examples/agents_agentic/example_agentic_compose_two_images.py
 PYTHONPATH=. python3 examples/agents_agentic/example_agentic_compose_three_images.py
 ```
+
+Compose examples now reuse shared helper utilities in
+`comfy_agent/examples_helpers.py` to keep naming and flow consistent.

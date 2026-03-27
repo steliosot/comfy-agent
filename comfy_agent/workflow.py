@@ -1,4 +1,5 @@
 import copy
+import io
 import json
 import mimetypes
 import os
@@ -890,3 +891,61 @@ class Workflow:
                 )
             )
         return downloaded
+
+    def transfer_output_to_input(
+        self,
+        image_meta,
+        remote_name=None,
+        overwrite=True,
+    ):
+        if not isinstance(image_meta, dict):
+            raise ValueError("image_meta must be a dict")
+        filename = image_meta.get("filename")
+        if not filename:
+            raise ValueError("image_meta.filename is required")
+
+        params = {
+            "filename": filename,
+            "subfolder": image_meta.get("subfolder", ""),
+            "type": image_meta.get("type", "output"),
+        }
+        response = requests.get(
+            f"{self.url}/view",
+            params=params,
+            headers=self.headers,
+        )
+        if not response.ok:
+            response.raise_for_status()
+        content = getattr(response, "content", None)
+        if content is None:
+            content = response.text.encode("utf-8")
+
+        resolved_remote = remote_name or filename
+        mime_type = mimetypes.guess_type(resolved_remote)[0] or "application/octet-stream"
+        file_obj = io.BytesIO(content)
+
+        upload_response = requests.post(
+            f"{self.url}/upload/image",
+            files={"image": (resolved_remote, file_obj, mime_type)},
+            data={
+                "overwrite": "true" if overwrite else "false",
+                "type": "input",
+            },
+            headers=self.headers,
+        )
+        if not upload_response.ok:
+            upload_response.raise_for_status()
+        payload = upload_response.json() if hasattr(upload_response, "json") else {}
+        uploaded_name = (
+            payload.get("name", resolved_remote) if isinstance(payload, dict) else resolved_remote
+        )
+        subfolder = payload.get("subfolder", "") if isinstance(payload, dict) else ""
+        item_type = payload.get("type", "input") if isinstance(payload, dict) else "input"
+
+        return {
+            "source_filename": filename,
+            "remote_name": uploaded_name,
+            "subfolder": subfolder,
+            "type": item_type,
+            "source": "server_transfer",
+        }

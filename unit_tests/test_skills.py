@@ -1,4 +1,6 @@
 import unittest
+import tempfile
+from unittest.mock import patch
 
 from unit_tests.test_helpers import mocked_comfy_api
 
@@ -97,7 +99,6 @@ class SkillTests(unittest.TestCase):
             wf, run_id, prefix, artifacts, engine = build(
                 prompt="test prompt",
                 images=["a.png", "b.png"],
-                upload_inputs=False,
             )
             summary = wf.inspect(print_output=False)
 
@@ -107,20 +108,96 @@ class SkillTests(unittest.TestCase):
         self.assertTrue(prefix)
         self.assertIn(engine, {"flux", "checkpoint"})
 
-    def test_flux_multi_input_run_downloads_outputs(self):
+    def test_flux_multi_input_run_returns_output_metadata(self):
         from skills.generate_flux_multi_input_img2img.skill import run
 
         with mocked_comfy_api():
             result = run(
                 prompt="test prompt",
                 images=["a.png", "b.png", "c.png"],
-                upload_inputs=False,
-                download_output=True,
             )
 
         self.assertEqual(result["status"], "done")
         self.assertEqual(result["image_count"], 3)
-        self.assertIn("downloaded", result)
+        self.assertIn("output_images", result)
+        self.assertIn("artifacts", result)
+        self.assertGreaterEqual(len(result["artifacts"]), 3)
+
+    def test_flux_multi_input_build_rejects_upload_stage(self):
+        from skills.generate_flux_multi_input_img2img.skill import build
+
+        with self.assertRaises(ValueError):
+            build(prompt="x", images=["a.png", "b.png"], upload_inputs=True)
+
+    def test_flux_multi_input_run_rejects_download_stage(self):
+        from skills.generate_flux_multi_input_img2img.skill import run
+
+        with self.assertRaises(ValueError):
+            run(prompt="x", images=["a.png", "b.png"], download_output=True)
+
+    def test_list_comfy_assets_returns_structure(self):
+        from skills.list_comfy_assets.skill import run
+
+        with tempfile.TemporaryDirectory() as tmp_in, tempfile.TemporaryDirectory() as tmp_out:
+            with open(f"{tmp_in}/a.png", "wb") as f:
+                f.write(b"x")
+            with open(f"{tmp_out}/b.png", "wb") as f:
+                f.write(b"y")
+            with patch.dict(
+                "os.environ",
+                {
+                    "COMFY_INPUT_DIR": tmp_in,
+                    "COMFY_OUTPUT_DIR": tmp_out,
+                },
+                clear=False,
+            ), mocked_comfy_api():
+                result = run(include_files=True)
+
+        self.assertEqual(result["status"], "ok")
+        self.assertIn("assets", result)
+        self.assertIn("counts", result)
+        self.assertIn("input_files", result["assets"])
+        self.assertIn("output_files", result["assets"])
+
+    def test_upload_video_returns_remote_name(self):
+        from skills.upload_video.skill import run
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            video_path = f"{tmp_dir}/clip.mp4"
+            with open(video_path, "wb") as f:
+                f.write(b"video")
+            with mocked_comfy_api():
+                result = run(video_path=video_path, run_id="vidrun")
+
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["run_id"], "vidrun")
+        self.assertIn("input_video_remote", result)
+
+    def test_download_video_with_video_meta_downloads_mp4(self):
+        from skills.download_video.skill import run
+
+        with tempfile.TemporaryDirectory() as tmp_dir, mocked_comfy_api():
+            result = run(
+                video_meta={"filename": "clip.mp4", "subfolder": "", "type": "output"},
+                run_id="vidrun",
+                output_dir=tmp_dir,
+            )
+
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(len(result["artifacts"]), 1)
+        self.assertTrue(result["artifacts"][0]["downloaded_path"].endswith(".mp4"))
+
+    def test_validate_server_models_returns_validation_shape(self):
+        from skills.validate_server_models.skill import run
+
+        with mocked_comfy_api():
+            result = run(model_names=["modelA.safetensors"])
+
+        self.assertEqual(result["status"], "ok")
+        self.assertIn("models", result)
+        self.assertIn("all_model_names", result)
+        self.assertIn("exists", result)
+        self.assertIn("missing", result)
 
 
 if __name__ == "__main__":

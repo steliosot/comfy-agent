@@ -1,0 +1,28 @@
+name: validate_server_models
+
+description: List all available server model names and validate whether requested models exist.
+
+inputs:
+  model_names:
+    type: array
+    required: false
+    description: Optional model names to validate.
+  include_groups:
+    type: array
+    required: false
+    description: Optional subset from checkpoints, vae, clip, lora, unet.
+  case_sensitive:
+    type: boolean
+    default: false
+
+outputs:
+  status:
+    type: string
+  models:
+    type: object
+  all_model_names:
+    type: array
+  exists:
+    type: object
+  missing:
+    type: array

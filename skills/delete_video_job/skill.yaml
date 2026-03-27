@@ -1,0 +1,20 @@
+name: delete_video_job
+
+description: Delete a completed video-generation job from ComfyUI history by prompt_id.
+
+inputs:
+  prompt_id:
+    type: string
+  force:
+    type: boolean
+    default: false
+
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  counts:
+    type: object
+  deleted:
+    type: object

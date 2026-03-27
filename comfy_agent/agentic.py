@@ -12,6 +12,60 @@ class SkillChoice:
     reason: str
 
 
+def _extract_choices(registry, node_name, input_name):
+    node_info = registry.get(node_name, {})
+    required = node_info.get("input", {}).get("required", {})
+    spec = required.get(input_name)
+    if not spec:
+        return []
+    values = spec[0] if isinstance(spec, (list, tuple)) and spec else spec
+    if isinstance(values, (list, tuple)):
+        return [str(v) for v in values if str(v).strip()]
+    return []
+
+
+def _build_asset_inventory(wf):
+    registry = wf.registry
+    inventory = {
+        "checkpoints": _extract_choices(registry, "CheckpointLoaderSimple", "ckpt_name"),
+        "vae": _extract_choices(registry, "VAELoader", "vae_name"),
+        "clip": _extract_choices(registry, "CLIPLoader", "clip_name"),
+        "unet": _extract_choices(registry, "UNETLoader", "unet_name"),
+        "lora": _extract_choices(registry, "LoraLoaderModelOnly", "lora_name"),
+    }
+    counts = {name: len(values) for name, values in inventory.items()}
+    return {"assets": inventory, "counts": counts}
+
+
+def _preflight_required_assets(inventory, skill_names, ckpt_name):
+    required = []
+    if "generate_video_clip" in skill_names:
+        required.extend(
+            [
+                ("unet", "wan2.1/wan2.1_t2v_1.3B_fp16.safetensors"),
+                ("clip", "umt5_xxl_fp8_e4m3fn_scaled.safetensors"),
+                ("vae", "wan_2.1_vae.safetensors"),
+            ]
+        )
+    else:
+        required.append(("checkpoints", ckpt_name))
+
+    missing = []
+    for group, name in required:
+        options = inventory["assets"].get(group, [])
+        if not options:
+            # Unknown list from server/mock; do not hard-fail.
+            continue
+        if name not in options:
+            missing.append({"group": group, "name": name})
+
+    return {
+        "required": required,
+        "missing": missing,
+        "ok": len(missing) == 0,
+    }
+
+
 def _extract_crop_params(prompt):
     text = prompt.lower()
     params = {"x": 0, "y": 0, "width": 256, "height": 256}
@@ -72,6 +126,13 @@ def reason_skills(prompt):
     if wants_video:
         choices.append(
             SkillChoice(
+                name="list_comfy_assets",
+                confidence=0.88,
+                reason="Preflight asset validation before generation.",
+            )
+        )
+        choices.append(
+            SkillChoice(
                 name="generate_video_clip",
                 confidence=0.97,
                 reason="Prompt asks for video generation.",
@@ -86,6 +147,13 @@ def reason_skills(prompt):
                 )
             )
     elif wants_generate:
+        choices.append(
+            SkillChoice(
+                name="list_comfy_assets",
+                confidence=0.88,
+                reason="Preflight asset validation before generation.",
+            )
+        )
         choices.append(
             SkillChoice(
                 name="generate_sd15_image",
@@ -106,6 +174,13 @@ def reason_skills(prompt):
     if not choices:
         choices.append(
             SkillChoice(
+                name="list_comfy_assets",
+                confidence=0.75,
+                reason="Preflight asset validation before fallback generation.",
+            )
+        )
+        choices.append(
+            SkillChoice(
                 name="generate_sd15_image",
                 confidence=0.62,
                 reason="Fallback to image generation when intent is ambiguous.",
@@ -123,7 +198,7 @@ def reasoning_agentic(prompt, print_output=True):
 
     if video:
         plan = {
-            "steps": ["generate_video_clip"],
+            "steps": ["list_comfy_assets", "generate_video_clip"],
             "generation_prompt": _extract_generation_prompt(prompt),
         }
         if "crop_image" in skill_names:
@@ -134,13 +209,13 @@ def reasoning_agentic(prompt, print_output=True):
     elif chain:
         crop_params = _extract_crop_params(prompt)
         plan = {
-            "steps": ["generate_sd15_image", "crop_image"],
+            "steps": ["list_comfy_assets", "generate_sd15_image", "crop_image"],
             "crop": crop_params,
             "generation_prompt": _extract_generation_prompt(prompt),
         }
     else:
         plan = {
-            "steps": ["generate_sd15_image"],
+            "steps": ["list_comfy_assets", "generate_sd15_image"],
             "generation_prompt": _extract_generation_prompt(prompt),
         }
 
@@ -192,6 +267,7 @@ def run_agentic(
     print_reasoning=True,
     run_id=None,
     context=None,
+    asset_preflight=True,
 ):
     reasoning = reasoning_agentic(prompt, print_output=print_reasoning)
     choices = reason_skills(prompt)
@@ -201,6 +277,22 @@ def run_agentic(
 
     wf = Workflow(server=server, headers=headers, api_prefix=api_prefix)
     skill_names = [choice.name for choice in choices]
+    preflight = None
+    if asset_preflight:
+        inventory = _build_asset_inventory(wf)
+        preflight = _preflight_required_assets(inventory, skill_names, ckpt_name)
+        preflight["inventory"] = inventory
+        context["asset_preflight"] = preflight
+        if not preflight["ok"]:
+            return {
+                "status": "error",
+                "skill": "list_comfy_assets",
+                "run_id": resolved_run_id,
+                "error": "missing_required_assets",
+                "missing_assets": preflight["missing"],
+                "preflight": preflight,
+                "context": context,
+            }
 
     generation_prompt = _extract_generation_prompt(prompt)
     if "generate_video_clip" in skill_names:
@@ -264,11 +356,12 @@ def run_agentic(
         output = {
             "status": "done",
             "run_id": resolved_run_id,
-            "plan": ["generate_video_clip"],
+            "plan": ["list_comfy_assets", "generate_video_clip"],
             "prompt_id": run_result.get("prompt_id"),
             "filename_prefix": make_stage_prefix(resolved_run_id, "video"),
             "output_images": output_images,
             "artifacts": artifacts,
+            "preflight": preflight,
             "context": context,
         }
         if "crop_image" in skill_names:
@@ -330,11 +423,12 @@ def run_agentic(
         return {
             "status": "done",
             "run_id": resolved_run_id,
-            "plan": ["generate_sd15_image", "crop_image"],
+            "plan": ["list_comfy_assets", "generate_sd15_image", "crop_image"],
             "prompt_id": run_result.get("prompt_id"),
             "filename_prefix": crop_prefix,
             "output_images": output_images,
             "artifacts": artifacts,
+            "preflight": preflight,
             "context": context,
         }
 
@@ -363,5 +457,6 @@ def run_agentic(
         "filename_prefix": resolved_prefix,
         "output_images": output_images,
         "artifacts": artifacts,
+        "preflight": preflight,
         "context": context,
     }

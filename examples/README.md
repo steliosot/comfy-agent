@@ -10,6 +10,8 @@ All runnable examples are grouped under this `examples/` folder.
   - Fluent chain-style workflow examples.
 - `agents_agentic/`
   - Agnostic routing layer examples with reasoning + confidence + multi-skill planning.
+- `end_to_end_pipelines/`
+  - Full multi-skill pipelines (upload -> generate -> download -> video).
 
 ## Other Examples
 
@@ -31,3 +33,18 @@ All additional examples are grouped under `other/`:
   - Includes WAN 2.1 h264-mp4 animation skill examples.
 - `other/agents_threaded/`
   - Threaded agent/job execution examples.
+
+## Skills Package Layout
+
+Skill implementations live under `skills/` and now include:
+
+- `skill.py`
+- `skill.yaml`
+- `SKILL.md`
+- `scripts/run.py`
+
+Run a skill directly from CLI:
+
+```bash
+python3 skills/generate_sd15_image/scripts/run.py --args '{"prompt":"cinematic robot"}' --pretty
+```
