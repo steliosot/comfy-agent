@@ -57,6 +57,7 @@ class AgentAndExampleTests(unittest.TestCase):
     def test_reason_skills_routes_video_prompt_to_wan(self):
         choices = reason_skills("generate a short video clip of a robot in the city")
         names = [choice.name for choice in choices]
+        self.assertIn("list_comfy_assets", names)
         self.assertIn("generate_video_clip", names)
 
 

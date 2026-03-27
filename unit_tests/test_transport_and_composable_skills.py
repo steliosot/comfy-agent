@@ -47,6 +47,17 @@ class TransportAndComposableSkillsTests(unittest.TestCase):
             self.assertEqual(len(records), 1)
             self.assertTrue(Path(records[0]["downloaded_path"]).name.startswith("rid_download_"))
 
+    def test_workflow_transfer_output_to_input_returns_remote_name(self):
+        with mocked_comfy_api() as posted:
+            wf = Workflow()
+            transferred = wf.transfer_output_to_input(
+                image_meta={"filename": "ComfyUI_00001_.png", "subfolder": "", "type": "output"},
+                remote_name="copied_input.png",
+            )
+
+        self.assertEqual(transferred["remote_name"], "copied_input.png")
+        self.assertEqual(posted[-1]["url"].endswith("/upload/image"), True)
+
     def test_upload_and_download_skills_chain_with_shared_run_id(self):
         from skills.crop_image.skill import run as crop_run
         from skills.download_image.skill import run as download_run
@@ -97,6 +108,8 @@ class TransportAndComposableSkillsTests(unittest.TestCase):
         self.assertEqual(result["run_id"], "agentic123")
         self.assertEqual(result["context"]["run_id"], "agentic123")
         self.assertIn("artifacts", result)
+        self.assertIn("preflight", result)
+        self.assertTrue(result["preflight"]["ok"])
 
 
 if __name__ == "__main__":

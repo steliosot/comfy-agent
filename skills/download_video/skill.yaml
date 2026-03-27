@@ -1,0 +1,30 @@
+name: download_video
+
+description: Download generated video outputs from ComfyUI history to local storage.
+
+inputs:
+  video_meta:
+    type: object
+    required: false
+  prompt_id:
+    type: string
+    required: false
+  output_dir:
+    type: string
+    required: false
+  run_id:
+    type: string
+    required: false
+  first_only:
+    type: boolean
+    default: true
+
+outputs:
+  status:
+    type: string
+  run_id:
+    type: string
+  artifacts:
+    type: array
+  downloaded:
+    type: array

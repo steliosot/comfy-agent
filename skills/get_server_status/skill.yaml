@@ -1,0 +1,22 @@
+name: get_server_status
+
+description: Query ComfyUI server health, queue counters, and system stats.
+
+inputs:
+  server:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  busy:
+    type: boolean
+  running_count:
+    type: integer
+  pending_count:
+    type: integer
+  queue:
+    type: object
+  system_stats:
+    type: object

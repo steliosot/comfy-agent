@@ -1,33 +1,25 @@
-# Simple Pipelining Examples
+# Fluent DSL Examples
 
-These examples mirror the direct DSL workflows in `examples/workflows_direct_dsl/`,
-but use the fluent chain style:
+These examples are intentionally simple and skill-first.
+
+Each file calls a single `skills/*/skill.py` `run(...)` entrypoint (or a very small
+composition chain), so users can learn one pattern and reuse it everywhere.
+
+For composable image flows, see:
+
+- `example_compose_skills_three_images.py`
+- pattern: `upload_image -> generate_flux_multi_input_img2img -> download_image`
+
+The compose example now uses a fluent chain wrapper as well:
 
 ```python
-from comfy_agent import Workflow
-
-wf = Workflow()
-
 (
-    wf
-    .checkpoint("model.safetensors")
-    .prompt("rusty robot")
-    .negative("bad quality")
-    .latent(512, 512)
-    .sample()
-    .decode()
-    .save("robot")
+    FluentSkillComposeFlow(cfg, run_id="shared_compose_three_refs")
+    .ref("woman.png")
+    .ref("St-Pauls-Cathedral.png")
+    .ref("hat.jpeg")
+    .prompt("...")
+    .stage("final")
+    .run()
 )
-
-wf.run()
 ```
-
-Both styles are supported:
-
-- `examples/workflows_direct_dsl/` keeps the original tuple/lowercase API
-- `examples/workflows_fluent_dsl/` uses the fluent chain API
-- `example_compose_skills_three_images.py` shows fluent-style composition of
-  `upload_image -> generate_flux_multi_input_img2img -> download_image`
-
-`Workflow()` reads `COMFY_URL` if it is set, otherwise it defaults to
-`http://127.0.0.1:8000`.

@@ -1,0 +1,15 @@
+name: list_comfy_assets
+
+description: List available ComfyUI assets (checkpoints, vae, clip, lora, unet) and local input/output image files.
+
+inputs:
+  include_files:
+    type: boolean
+    default: true
+    description: Include local input/output file listings from COMFY_INPUT_DIR and COMFY_OUTPUT_DIR.
+
+outputs:
+  assets:
+    type: object
+  counts:
+    type: object

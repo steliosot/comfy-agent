@@ -1,0 +1,22 @@
+name: get_progress
+
+description: Get generation progress percentage from ComfyUI; uses queue/history fallback when /progress is unavailable.
+
+inputs:
+  prompt_id:
+    type: string
+    required: false
+  server:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  progress_percent:
+    type: number
+  state:
+    type: string
+    required: false
+  source:
+    type: string

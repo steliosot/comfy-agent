@@ -1,0 +1,24 @@
+name: upload_video
+
+description: Upload a local video file to ComfyUI input storage with deterministic naming.
+
+inputs:
+  video_path:
+    type: string
+    description: Local video file path (absolute or relative to COMFY_INPUT_DIR).
+  run_id:
+    type: string
+    required: false
+  remote_name:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  run_id:
+    type: string
+  artifacts:
+    type: array
+  input_video_remote:
+    type: string

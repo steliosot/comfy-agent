@@ -1,0 +1,20 @@
+name: get_queue_status
+
+description: Query ComfyUI queue status (running and pending jobs).
+
+inputs:
+  server:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  running_count:
+    type: integer
+  pending_count:
+    type: integer
+  running:
+    type: array
+  pending:
+    type: array

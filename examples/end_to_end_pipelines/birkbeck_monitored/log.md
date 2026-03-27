@@ -1,0 +1,119 @@
+# Birkbeck Monitored End-to-End Log
+- Timestamp (UTC): 2026-03-27T12:10:40.109996+00:00
+- Run ID: `birkbeck_monitored_1774612541`
+- Still Prompt ID: `6e912c3a-fe27-4ccc-bcee-69a4da374e8d`
+- Video Prompt ID: `841f6667-e179-424a-b0ce-a6aac2c9cb33`
+- Video Duration Request: `6s` (144 frames @ 24fps)
+- Still file: `/Users/stelios/Documents/comfy-agent/tmp/outputs/birkbeck_monitored_1774612541_still_1.png`
+- Video file: `/Users/stelios/Documents/comfy-agent/tmp/outputs/birkbeck_monitored_1774612541_video_1.mp4`
+## Status
+- Initial busy: `False` running=0 pending=0
+- Final busy: `False` running=0 pending=0
+## Timings
+- Upload refs: `5.28s`
+- Still submit: `1.60s`
+- Still wait: `158.76s`
+- Still download: `2.51s`
+- Video submit: `4.20s`
+- Video wait: `722.04s`
+- Video download: `3.04s`
+- Total: `898.94s`
+## Progress Snapshots (Still)
+- t=1.25s percent=20.0 state=running running=1 pending=0
+- t=10.48s percent=20.0 state=running running=1 pending=0
+- t=19.96s percent=20.0 state=running running=1 pending=0
+- t=29.18s percent=20.0 state=running running=1 pending=0
+- t=38.41s percent=20.0 state=running running=1 pending=0
+- t=47.64s percent=20.0 state=running running=1 pending=0
+- t=56.88s percent=20.0 state=running running=1 pending=0
+- t=66.15s percent=20.0 state=running running=1 pending=0
+- t=75.4s percent=20.0 state=running running=1 pending=0
+- t=84.65s percent=20.0 state=running running=1 pending=0
+- t=93.91s percent=20.0 state=running running=1 pending=0
+- t=103.16s percent=20.0 state=running running=1 pending=0
+- t=112.42s percent=20.0 state=running running=1 pending=0
+- t=121.68s percent=20.0 state=running running=1 pending=0
+- t=130.99s percent=20.0 state=running running=1 pending=0
+- t=140.25s percent=20.0 state=running running=1 pending=0
+- t=149.5s percent=20.0 state=running running=1 pending=0
+- t=158.76s percent=100.0 state=history_complete running=0 pending=0
+## Progress Snapshots (Video)
+- t=1.25s percent=20.0 state=running running=1 pending=0
+- t=10.49s percent=20.0 state=running running=1 pending=0
+- t=19.73s percent=20.0 state=running running=1 pending=0
+- t=28.97s percent=20.0 state=running running=1 pending=0
+- t=38.19s percent=20.0 state=running running=1 pending=0
+- t=47.43s percent=20.0 state=running running=1 pending=0
+- t=56.66s percent=20.0 state=running running=1 pending=0
+- t=65.88s percent=20.0 state=running running=1 pending=0
+- t=75.37s percent=20.0 state=running running=1 pending=0
+- t=84.58s percent=20.0 state=running running=1 pending=0
+- t=93.82s percent=20.0 state=running running=1 pending=0
+- t=103.07s percent=20.0 state=running running=1 pending=0
+- t=112.29s percent=20.0 state=running running=1 pending=0
+- t=121.55s percent=20.0 state=running running=1 pending=0
+- t=130.78s percent=20.0 state=running running=1 pending=0
+- t=140.02s percent=20.0 state=running running=1 pending=0
+- t=149.27s percent=20.0 state=running running=1 pending=0
+- t=158.54s percent=20.0 state=running running=1 pending=0
+- t=167.8s percent=20.0 state=running running=1 pending=0
+- t=177.05s percent=20.0 state=running running=1 pending=0
+- t=186.31s percent=20.0 state=running running=1 pending=0
+- t=195.51s percent=20.0 state=running running=1 pending=0
+- t=204.77s percent=20.0 state=running running=1 pending=0
+- t=213.99s percent=20.0 state=running running=1 pending=0
+- t=223.2s percent=20.0 state=running running=1 pending=0
+- t=232.44s percent=20.0 state=running running=1 pending=0
+- t=241.69s percent=20.0 state=running running=1 pending=0
+- t=250.91s percent=20.0 state=running running=1 pending=0
+- t=260.14s percent=20.0 state=running running=1 pending=0
+- t=269.38s percent=20.0 state=running running=1 pending=0
+- t=278.62s percent=20.0 state=running running=1 pending=0
+- t=287.87s percent=20.0 state=running running=1 pending=0
+- t=297.11s percent=20.0 state=running running=1 pending=0
+- t=306.32s percent=20.0 state=running running=1 pending=0
+- t=315.58s percent=20.0 state=running running=1 pending=0
+- t=324.81s percent=20.0 state=running running=1 pending=0
+- t=334.05s percent=20.0 state=running running=1 pending=0
+- t=343.24s percent=20.0 state=running running=1 pending=0
+- t=352.47s percent=20.0 state=running running=1 pending=0
+- t=361.7s percent=20.0 state=running running=1 pending=0
+- t=370.93s percent=20.0 state=running running=1 pending=0
+- t=380.16s percent=20.0 state=running running=1 pending=0
+- t=389.38s percent=20.0 state=running running=1 pending=0
+- t=398.6s percent=20.0 state=running running=1 pending=0
+- t=407.85s percent=20.0 state=running running=1 pending=0
+- t=417.07s percent=20.0 state=running running=1 pending=0
+- t=426.31s percent=20.0 state=running running=1 pending=0
+- t=435.54s percent=20.0 state=running running=1 pending=0
+- t=444.77s percent=20.0 state=running running=1 pending=0
+- t=454.02s percent=20.0 state=running running=1 pending=0
+- t=463.27s percent=20.0 state=running running=1 pending=0
+- t=472.49s percent=20.0 state=running running=1 pending=0
+- t=481.74s percent=20.0 state=running running=1 pending=0
+- t=491.05s percent=20.0 state=running running=1 pending=0
+- t=500.29s percent=20.0 state=running running=1 pending=0
+- t=509.51s percent=20.0 state=running running=1 pending=0
+- t=518.73s percent=20.0 state=running running=1 pending=0
+- t=527.94s percent=20.0 state=running running=1 pending=0
+- t=537.18s percent=20.0 state=running running=1 pending=0
+- t=546.42s percent=20.0 state=running running=1 pending=0
+- t=555.66s percent=20.0 state=running running=1 pending=0
+- t=564.89s percent=20.0 state=running running=1 pending=0
+- t=574.14s percent=20.0 state=running running=1 pending=0
+- t=583.36s percent=20.0 state=running running=1 pending=0
+- t=592.6s percent=20.0 state=running running=1 pending=0
+- t=601.83s percent=20.0 state=running running=1 pending=0
+- t=611.09s percent=20.0 state=running running=1 pending=0
+- t=620.33s percent=20.0 state=running running=1 pending=0
+- t=629.56s percent=20.0 state=running running=1 pending=0
+- t=638.81s percent=20.0 state=running running=1 pending=0
+- t=648.04s percent=20.0 state=running running=1 pending=0
+- t=657.29s percent=20.0 state=running running=1 pending=0
+- t=666.52s percent=20.0 state=running running=1 pending=0
+- t=675.78s percent=20.0 state=running running=1 pending=0
+- t=685.03s percent=20.0 state=running running=1 pending=0
+- t=694.27s percent=20.0 state=running running=1 pending=0
+- t=703.53s percent=20.0 state=running running=1 pending=0
+- t=712.79s percent=20.0 state=running running=1 pending=0
+- t=722.04s percent=100.0 state=history_complete running=0 pending=0

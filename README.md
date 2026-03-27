@@ -7,6 +7,12 @@ It supports:
 - a fluent chaining style for simple pipelines
 - reusable skills built on top of workflows
 
+## OpenClaw Guide
+
+For skill-first usage (compose, monitor, and cleanup pipelines), see:
+
+- [openclaw-helper.md](openclaw-helper.md)
+
 ## Installation
 
 Install directly from GitHub:
@@ -240,6 +246,21 @@ The [skills](skills) folder contains the actual skill definitions, including:
 - preview skills
 - img2img skills
 - animated WEBP skills
+
+Each skill folder now follows a consistent package structure:
+
+- `skill.py`: implementation (`build(...)` / `run(...)`)
+- `skill.yaml`: input/output schema
+- `SKILL.md`: rich metadata + usage notes (Claw-style frontmatter)
+- `scripts/run.py`: tiny CLI wrapper for `run(...)` with JSON kwargs
+
+Example:
+
+```bash
+python3 skills/generate_sd15_image/scripts/run.py \
+  --args '{"prompt":"cinematic robot"}' \
+  --pretty
+```
 
 YAML skill loading also supports both local and cloud ComfyUI:
 
