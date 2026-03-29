@@ -1,0 +1,106 @@
+name: curated_unified_style_flux_dev_fp8_2_style_images
+description: Curated workflow wrapper for Unified Style Flux Dev FP8 - 2 Style Images.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: checkpoint
+    name: flux1-dev-fp8.safetensors
+    target_folder: models/checkpoints
+  - type: lora
+    name: uso-flux1-dit-lora-v1.safetensors
+    target_folder: models/loras
+  custom_nodes:
+  - controlaltai-nodes
+  links:
+  - https://blog.comfy.org/p/uso-available-in-comfyui
+  - https://discord.com/invite/gggpkVgBf3
+  - https://github.com/bytedance/USO
+  - https://huggingface.co/Comfy-Org/USO_1.0_Repackaged/resolve/main/split_files/loras/uso-flux1-dit-lora-v1.safetensors
+  - https://huggingface.co/Comfy-Org/USO_1.0_Repackaged/resolve/main/split_files/model_patches/uso-flux1-projector-v1.safetensors
+  - https://huggingface.co/Comfy-Org/flux1-dev/resolve/main/flux1-dev-fp8.safetensors
+  - https://huggingface.co/Comfy-Org/sigclip_vision_384/resolve/main/sigclip_vision_patch14_384.safetensors
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  - sd3
+  node_count: 25
+  node_types:
+  - CLIPTextEncode
+  - CLIPVisionEncode
+  - CLIPVisionLoader
+  - CheckpointLoaderSimple
+  - ConditioningZeroOut
+  - EasyCache
+  - EmptySD3LatentImage
+  - FluxResolutionNode
+  - KSampler
+  - Label (rgthree)
+  - LoadImage
+  - LoraLoaderModelOnly
+  - MarkdownNote
+  - ModelPatchLoader
+  - SaveImage
+  - USOStyleReference
+  - VAEDecode
+selection_metadata:
+  family: editing_restyle
+  resource_profile: medium
+  complexity_score: 3
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - Medium-high resolution detected; expect moderate extra runtime.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: 1024
+  max_height: 1024
+  max_steps: 20

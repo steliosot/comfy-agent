@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from skills.generate_video_clip.skill import run
+from skills.workflows.video_t2v_i2v_avatar.generate_video_clip.skill import run
 
 
 result = run(

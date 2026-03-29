@@ -1,0 +1,46 @@
+name: preview_sd15_img2img
+description: Preview an SD1.5 img2img result from an input image.
+inputs:
+  image:
+    type: string
+    default: preview_source.png
+  prompt:
+    type: string
+    default: stylized concept art repaint
+  negative_prompt:
+    type: string
+    default: watermark, text, blurry, muddy colors, extra limbs
+  steps:
+    type: integer
+    default: 12
+  denoise:
+    type: float
+    default: 0.4
+  seed:
+    type: integer
+    default: 1122334455
+outputs:
+  preview: string
+requirements:
+  models: []
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - application/json
+  model_families:
+  - other
+  node_count: null
+  node_types: []
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: unknown
+  complexity_score: null
+  estimated_runtime: depends on runtime parameters and server resources
+  warnings:
+  - Hand-authored skill (no embedded workflow.json); metadata is inferred and may
+    be approximate.
+  max_width: null
+  max_height: null
+  max_steps: null

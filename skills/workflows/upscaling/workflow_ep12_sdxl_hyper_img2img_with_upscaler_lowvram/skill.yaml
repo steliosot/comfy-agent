@@ -1,0 +1,92 @@
+name: workflow_ep12_sdxl_hyper_img2img_with_upscaler_lowvram
+description: Workflow wrapper for Ep12 SDXL Hyper IMG2IMG with Upscaler LOWVRAM.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: checkpoint
+    name: Juggernaut_X_RunDiffusion_Hyper.safetensors
+    target_folder: models/checkpoints
+  - type: upscale_model
+    name: 4x_NMKD-Siax_200k.pth
+    target_folder: models/upscale_models
+  custom_nodes: []
+  links:
+  - https://civitai.com/models/133005?modelVersionId=471120
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 28
+  node_types:
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - Image Comparer (rgthree)
+  - ImageScaleBy
+  - ImageUpscaleWithModel
+  - KSampler
+  - Label (rgthree)
+  - LoadImage
+  - Note
+  - SaveImage
+  - UpscaleModelLoader
+  - VAEDecodeTiled
+  - VAEEncodeTiled
+  - easy imageScaleDownToSize
+selection_metadata:
+  family: upscaling
+  resource_profile: low
+  complexity_score: 0
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings: []
+  max_width: null
+  max_height: null
+  max_steps: 4

@@ -296,7 +296,7 @@ This pattern is useful because:
 Once you have a skill with a `build(...)` function:
 
 ```python
-from skills.generate_sd15_image.skill import build
+from skills.workflows.txt2img.generate_sd15_image.skill import build
 
 wf = build(prompt="cinematic robot")
 wf.run()
@@ -305,7 +305,7 @@ wf.run()
 If you want the shortcut:
 
 ```python
-from skills.generate_sd15_image.skill import run
+from skills.workflows.txt2img.generate_sd15_image.skill import run
 
 run(prompt="cinematic robot")
 ```
@@ -323,7 +323,7 @@ python3 tools/validate_curated_workflow_skills.py
 
 Generated output lives in:
 
-- `skills/curated_workflows/<capability>/<skill_name>/`
+- `skills/workflows/<capability>/<skill_name>/`
 
 Each folder contains:
 
@@ -336,8 +336,8 @@ Each folder contains:
 ### Match and Run the Best Curated Workflow
 
 ```python
-from skills.match_curated_workflow.skill import run as match_workflow
-from skills.run_curated_workflow.skill import run as run_workflow
+from skills.infra.match_curated_workflow.skill import run as match_workflow
+from skills.workflows.txt2img.run_curated_workflow.skill import run as run_workflow
 
 prompt = "cinematic product video of sneakers with smooth camera motion"
 
@@ -352,7 +352,7 @@ print(result)
 ### Extract Correct Download Links From Workflow Notes
 
 ```python
-from skills.get_workflow_download_links.skill import run
+from skills.infra.get_workflow_download_links.skill import run
 
 links = run(skill_id="curated_ltx_0_95_text2video")
 print(links)
@@ -369,7 +369,7 @@ This reads URLs directly from note/content nodes inside `workflow.json` and grou
 ### Predict Whether a Job Is Likely to Succeed
 
 ```python
-from skills.predict_job_success_likelihood.skill import run
+from skills.infra.predict_job_success_likelihood.skill import run
 
 result = run(skill_id="curated_ltx_0_95_text2video")
 print(result["likelihood"], result["confidence"], result["recommendation"])
@@ -386,14 +386,14 @@ Prediction uses:
 To keep the repository easier to navigate:
 
 - Infra/ops skills are documented in `skills/infra/README.md`
-- Workflow/execution skills are documented in `skills/workflow/README.md`
+- Workflow/execution skills are documented in `skills/workflows/README.md`
 
 ## Extending a Skill Before Execution
 
 Because a skill returns a workflow, it can be edited before it runs.
 
 ```python
-from skills.generate_sd15_image.skill import build
+from skills.workflows.txt2img.generate_sd15_image.skill import build
 
 wf = build(prompt="cinematic robot")
 
@@ -418,7 +418,7 @@ This is the key idea behind editable skills:
 Use `model_folder_guide` to check where each model should be installed:
 
 ```python
-from skills.model_folder_guide.skill import run as folder_guide
+from skills.infra.model_folder_guide.skill import run as folder_guide
 
 print(folder_guide(model_type="checkpoint"))      # models/checkpoints
 print(folder_guide(model_type="lora"))            # models/loras
@@ -428,7 +428,7 @@ print(folder_guide(model_type="diffusion_model")) # models/diffusion_models
 Download a model with provider-backed auth:
 
 ```python
-from skills.download_model.skill import run as download_model
+from skills.infra.download_model.skill import run as download_model
 
 result = download_model(
     source="civitai",
@@ -442,7 +442,7 @@ print(result)
 Remove a model if you need to roll back:
 
 ```python
-from skills.remove_model.skill import run as remove_model
+from skills.infra.remove_model.skill import run as remove_model
 
 result = remove_model(
     filename="example_light_lora.safetensors",
@@ -456,7 +456,7 @@ print(result)
 If you want to branch a workflow safely, clone it first.
 
 ```python
-from skills.generate_sd15_image.skill import build
+from skills.workflows.txt2img.generate_sd15_image.skill import build
 
 wf = build(prompt="robot portrait")
 
@@ -546,7 +546,7 @@ Skills can also work with input images.
 Example:
 
 ```python
-from skills.generate_sd15_img2img_remix.skill import build
+from skills.workflows.img2img_inpaint_outpaint.generate_sd15_img2img_remix.skill import build
 
 wf = build(
     image="remix_source.png",
@@ -566,7 +566,7 @@ You can also create simple animated outputs by generating image batches and expo
 Example:
 
 ```python
-from skills.generate_sd15_stelios_shoe_ad.skill import build
+from skills.workflows.txt2img.generate_sd15_stelios_shoe_ad.skill import build
 
 wf = build(
     prompt="cinematic advertisement for Stelios shoes",
@@ -582,7 +582,7 @@ This is useful for compatibility testing and lightweight animation pipelines.
 For true video clip generation with WAN 2.1, use the generic video skill:
 
 ```python
-from skills.generate_video_clip.skill import run
+from skills.workflows.video_t2v_i2v_avatar.generate_video_clip.skill import run
 
 result = run(
     prompt="cinematic product video clip of a bottle on a kitchen counter",
@@ -604,7 +604,7 @@ Example:
 
 ```python
 from comfy_agent.job import Job, Executor
-from skills.generate_sd15_image.skill import run as generate_image
+from skills.workflows.txt2img.generate_sd15_image.skill import run as generate_image
 
 jobs = [
     Job(generate_image, prompt="greek island"),
@@ -628,7 +628,7 @@ This pattern is a good fit when:
 The most important pattern in this project is:
 
 ```python
-from skills.generate_sd15_image.skill import build
+from skills.workflows.txt2img.generate_sd15_image.skill import build
 
 wf = build(prompt="robot")
 
@@ -653,6 +653,9 @@ This makes skills reusable, inspectable, and composable.
 
 The project also includes an agnostic agentic layer that reasons about prompt intent,
 selects skills with confidence scores, and executes the plan.
+
+You can use it in one-shot mode (`run_agentic`) or explicit two-step mode
+(`agentic_plan` then `agentic_execute`).
 
 Example (single image skill):
 
@@ -723,6 +726,35 @@ result = run_agentic(
     headers={"Authorization": "XXXXXX"},
 )
 
+print(result)
+```
+
+Example (two-step plan then execute):
+
+```python
+from comfy_agent import agentic_plan, agentic_execute
+
+plan = agentic_plan(
+    prompt="generate a bottle of Coca-Cola and then crop it to wide screen 1280x720",
+    auto_prepare=True,
+)
+print(plan)
+
+result = agentic_execute(
+    plan_payload=plan,
+    server="http://34.30.216.121",
+    headers={"Authorization": "XXXXXX"},
+)
+print(result)
+```
+
+Example (slash indicators helper):
+
+```python
+from comfy_agent import agentic_command
+
+plan = agentic_command("/plan cinematic product photo of a bottle of Coca-Cola")
+result = agentic_command("/execute", plan_payload=plan)
 print(result)
 ```
 

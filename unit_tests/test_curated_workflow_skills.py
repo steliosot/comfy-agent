@@ -6,13 +6,12 @@ from unittest.mock import patch
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-CURATED_ROOT = REPO_ROOT / "skills" / "curated_workflows"
-MANIFEST_PATH = CURATED_ROOT / "manifest.json"
+MANIFEST_PATH = REPO_ROOT / "skills" / "workflows" / "curated_manifest.json"
 
 
 class CuratedWorkflowSkillsTests(unittest.TestCase):
     def test_manifest_and_required_files(self):
-        self.assertTrue(MANIFEST_PATH.exists(), "skills/curated_workflows/manifest.json is missing")
+        self.assertTrue(MANIFEST_PATH.exists(), "skills/workflows/curated_manifest.json is missing")
         manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
         entries = manifest.get("entries", [])
         self.assertEqual(len(entries), 120)
@@ -33,7 +32,7 @@ class CuratedWorkflowSkillsTests(unittest.TestCase):
         for entry in entries:
             skill_id = entry["id"]
             family = entry["family"]
-            module_name = f"skills.curated_workflows.{family}.{skill_id}.skill"
+            module_name = f"skills.workflows.{family}.{skill_id}.skill"
             module = importlib.import_module(module_name)
             with patch.object(
                 module,

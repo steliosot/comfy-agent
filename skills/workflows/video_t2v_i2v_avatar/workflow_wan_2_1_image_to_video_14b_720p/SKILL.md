@@ -1,0 +1,94 @@
+---
+name: workflow_wan_2_1_image_to_video_14b_720p
+description: >
+  Workflow wrapper imported from `Wan 2.1 Image to Video 14B 720p.json`.
+homepage: https://github.com/steliosot/comfy-agent
+metadata.clawdbot.os: ["darwin", "linux"]
+metadata.clawdbot.requires.bins: ["python3"]
+metadata.clawdbot.requires.env: ["COMFY_URL", "COMFY_AUTH_HEADER"]
+metadata.clawdbot.files: ["workflow.json", "skill.py", "skill.yaml", "scripts/*"]
+metadata.clawdbot.tags: ["comfyui", "workflow", "library", "video_t2v_i2v_avatar"]
+metadata.clawdbot.category: "media-generation"
+metadata.clawdbot.input_type: "image/png"
+metadata.clawdbot.output_type: "video/mp4"
+metadata.clawdbot.output_can_feed_into: []
+metadata.clawdbot.accepts_input_from: []
+metadata.clawdbot.priority: 60
+---
+
+# workflow_wan_2_1_image_to_video_14b_720p
+
+Imported workflow skill generated from `Wan 2.1 Image to Video 14B 720p.json`.
+
+## Family
+
+- `video_t2v_i2v_avatar`
+
+## Inputs
+
+- Optional runtime overrides supported by `run(...)`:
+  - `prompt`
+  - `negative_prompt`
+  - `width`, `height`
+  - `seed`, `steps`, `cfg`
+  - `sampler_name`, `scheduler`, `denoise`
+  - `server`, `headers`, `api_prefix`
+
+## Outputs
+
+- Returns JSON with:
+  - `status`
+  - `prompt_id`
+  - `output_images`
+
+## Model Requirements
+
+- `clip`: `umt5_xxl_fp8_e4m3fn_scaled.safetensors` -> `models/clip`
+- `vae`: `wan_2.1_vae.safetensors` -> `models/vae`
+- `diffusion_model`: `wan2.1-i2v-14b-720p-Q4_0.gguf` -> `models/diffusion_models`
+
+## Custom Node Requirements
+
+- `comfyui-videohelpersuite`
+
+## Links
+
+- https://discord.com/invite/gggpkVgBf3
+- https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors?download=true
+- https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors?download=true
+- https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors?download=true
+- https://huggingface.co/city96/Wan2.1-I2V-14B-720P-gguf/resolve/main/wan2.1-i2v-14b-720p-Q4_0.gguf?download=true
+- https://huggingface.co/city96/Wan2.1-I2V-14B-720P-gguf/tree/main
+- https://www.youtube.com/@pixaroma
+
+<!-- AUTO-METADATA-START -->
+## Routing Metadata
+
+- Family: `video_t2v_i2v_avatar`
+- Input modalities: `image, text_prompt`
+- Output modalities: `video/mp4`
+- Model families: `wan`
+- Node count: `14`
+- Complexity score: `8`
+- Resource profile: `high`
+- Estimated runtime: `slow (often 2-6 min depending on model/server load)`
+- Max latent resolution hint: `None`x`None`
+- Max sampler steps hint: `30`
+
+## Detected Models
+
+- `clip`: `umt5_xxl_fp8_e4m3fn_scaled.safetensors` -> `models/clip`
+- `vae`: `wan_2.1_vae.safetensors` -> `models/vae`
+- `diffusion_model`: `wan2.1-i2v-14b-720p-Q4_0.gguf` -> `models/diffusion_models`
+
+## Detected Custom Nodes
+
+- `comfyui-videohelpersuite`
+
+## Runtime Warnings
+
+- Large model(s) detected; ensure enough VRAM and disk space.
+- Uses custom nodes; missing nodes can cause validation/runtime failures.
+- Video workflow: usually slower and VRAM-intensive than still-image workflows.
+<!-- AUTO-METADATA-END -->
+

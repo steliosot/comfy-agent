@@ -1,0 +1,81 @@
+name: workflow_qwenvl_image_to_text
+description: Workflow wrapper for QwenVL Image to Text.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes:
+  - comfyui-qwenvl
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://github.com/1038lab/ComfyUI-QwenVL
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  output_modalities:
+  - application/json
+  model_families:
+  - qwen
+  - wan
+  node_count: 5
+  node_types:
+  - AILab_QwenVL
+  - Label (rgthree)
+  - LoadImage
+  - MarkdownNote
+  - PreviewAny
+selection_metadata:
+  family: txt2img
+  resource_profile: low
+  complexity_score: 1
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: null

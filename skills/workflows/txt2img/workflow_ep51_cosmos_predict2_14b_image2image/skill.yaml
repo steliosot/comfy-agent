@@ -1,0 +1,102 @@
+name: workflow_ep51_cosmos_predict2_14b_image2image
+description: Workflow wrapper for EP51 Cosmos Predict2 14B Image2Image.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: clip
+    name: oldt5_xxl_fp8_e4m3fn_scaled.safetensors
+    target_folder: models/clip
+  - type: diffusion_model
+    name: cosmos-predict2-14b-t2i-ex3-q8_0.gguf
+    target_folder: models/diffusion_models
+  - type: vae
+    name: wan_2.1_vae.safetensors
+    target_folder: models/vae
+  custom_nodes:
+  - comfyui-easy-use
+  - comfyui-gguf
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors
+  - https://huggingface.co/calcuis/cosmos-predict2-gguf/resolve/main/cosmos-predict2-14b-t2i-ex3-q4_0.gguf?download=true
+  - https://huggingface.co/calcuis/cosmos-predict2-gguf/resolve/main/cosmos-predict2-14b-t2i-ex3-q8_0.gguf?download=true
+  - https://huggingface.co/calcuis/cosmos-predict2-gguf/tree/main
+  - https://huggingface.co/comfyanonymous/cosmos_1.0_text_encoder_and_VAE_ComfyUI/resolve/main/text_encoders/oldt5_xxl_fp8_e4m3fn_scaled.safetensors
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - wan
+  node_count: 12
+  node_types:
+  - CLIPLoader
+  - CLIPTextEncode
+  - KSampler
+  - LoadImage
+  - MarkdownNote
+  - SaveImage
+  - UnetLoaderGGUF
+  - VAEDecode
+  - VAEEncode
+  - VAELoader
+  - easy imageScaleDownToSize
+selection_metadata:
+  family: txt2img
+  resource_profile: medium
+  complexity_score: 4
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: 35

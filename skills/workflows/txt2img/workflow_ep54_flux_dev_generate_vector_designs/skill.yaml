@@ -1,0 +1,113 @@
+name: workflow_ep54_flux_dev_generate_vector_designs
+description: Workflow wrapper for EP54 Flux Dev - Generate Vector Designs.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  - type: clip
+    name: t5-v1_1-xxl-encoder-Q8_0.gguf
+    target_folder: models/clip
+  - type: diffusion_model
+    name: flux1-dev-Q8_0.gguf
+    target_folder: models/diffusion_models
+  custom_nodes:
+  - comfyui-gguf
+  - comfyui-tosvg
+  - rgthree-comfy
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://github.com/Yanick112/ComfyUI-ToSVG
+  - https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve/main/split_files/vae/ae.safetensors?download=true
+  - https://huggingface.co/Pixaroma/flux-kontext-loras/resolve/main/svg_style.safetensors?download=true
+  - https://huggingface.co/YarvixPA/FLUX.1-Fill-dev-gguf/resolve/main/flux1-fill-dev-Q8_0.gguf?download=true
+  - https://huggingface.co/YarvixPA/FLUX.1-Fill-dev-gguf/tree/main
+  - https://huggingface.co/city96/t5-v1_1-xxl-encoder-gguf/resolve/main/t5-v1_1-xxl-encoder-Q8_0.gguf?download=true
+  - https://huggingface.co/city96/t5-v1_1-xxl-encoder-gguf/tree/main
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  - sd3
+  node_count: 23
+  node_types:
+  - CLIPTextEncode
+  - DualCLIPLoaderGGUF
+  - EmptySD3LatentImage
+  - FluxGuidance
+  - KSampler
+  - Label (rgthree)
+  - MarkdownNote
+  - Note
+  - Power Lora Loader (rgthree)
+  - SaveImage
+  - TS_ImageQuantize
+  - TS_ImageToSVGStringBW_Vtracer
+  - TS_SVGStringToImage
+  - TS_SaveSVGString
+  - UnetLoaderGGUF
+  - VAEDecode
+  - VAELoader
+selection_metadata:
+  family: txt2img
+  resource_profile: high
+  complexity_score: 6
+  estimated_runtime: slow (often 2-6 min depending on model/server load)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Medium-high resolution detected; expect moderate extra runtime.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: 1024
+  max_height: 1024
+  max_steps: 30

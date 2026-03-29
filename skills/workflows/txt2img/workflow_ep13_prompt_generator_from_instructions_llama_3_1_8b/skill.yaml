@@ -1,0 +1,76 @@
+name: workflow_ep13_prompt_generator_from_instructions_llama_3_1_8b
+description: Workflow wrapper for EP13 Prompt Generator from Instructions LLAMA 3.1
+  8b.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes: []
+  links:
+  - http://127.0.0.1:11434
+  - https://ollama.com/library/llama3.1:8b
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - application/json
+  model_families:
+  - wan
+  node_count: 3
+  node_types:
+  - Note
+  - OllamaGenerateAdvance
+  - easy showAnything
+selection_metadata:
+  family: txt2img
+  resource_profile: low
+  complexity_score: 0
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings: []
+  max_width: null
+  max_height: null
+  max_steps: null

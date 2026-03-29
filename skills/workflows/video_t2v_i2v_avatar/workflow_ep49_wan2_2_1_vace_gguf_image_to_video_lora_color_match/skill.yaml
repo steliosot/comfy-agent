@@ -1,0 +1,114 @@
+name: workflow_ep49_wan2_2_1_vace_gguf_image_to_video_lora_color_match
+description: Workflow wrapper for Ep49 Wan2 2.1 Vace GGUF Image To Video + Lora +
+  Color Match.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: vae
+    name: wan_2.1_vae.safetensors
+    target_folder: models/vae
+  - type: diffusion_model
+    name: Wan2.1-VACE-14B-Q4_K_M.gguf
+    target_folder: models/diffusion_models
+  - type: clip
+    name: umt5_xxl_fp8_e4m3fn_scaled.safetensors
+    target_folder: models/clip
+  custom_nodes:
+  - comfyui-easy-use
+  - comfyui-gguf
+  - rgthree-comfy
+  links:
+  - https://civitai.com/api/download/models/1794316?type=Model&format=SafeTensor
+  - https://civitai.com/models/1585622?modelVersionId=1794316
+  - https://discord.com/invite/gggpkVgBf3
+  - https://docs.comfy.org/tutorials/video/wan/vace
+  - https://github.com/ali-vilab/VACE
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp16.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors?download=true
+  - https://huggingface.co/QuantStack/Wan2.1-VACE-14B-GGUF/resolve/main/Wan2.1-VACE-14B-Q4_K_M.gguf?download=true
+  - https://huggingface.co/QuantStack/Wan2.1-VACE-14B-GGUF/tree/main
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - video/mp4
+  model_families:
+  - sd3
+  - wan
+  node_count: 17
+  node_types:
+  - CLIPLoader
+  - CLIPTextEncode
+  - CreateVideo
+  - KSampler
+  - LoadImage
+  - MarkdownNote
+  - ModelSamplingSD3
+  - Power Lora Loader (rgthree)
+  - SaveVideo
+  - TrimVideoLatent
+  - UnetLoaderGGUF
+  - VAEDecode
+  - VAELoader
+  - WanVaceToVideo
+  - easy imageColorMatch
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: high
+  complexity_score: 8
+  estimated_runtime: slow (often 2-6 min depending on model/server load)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  - 'Video workflow: usually slower and VRAM-intensive than still-image workflows.'
+  max_width: null
+  max_height: null
+  max_steps: 6

@@ -1,0 +1,34 @@
+name: agentic_execute
+description: Execute a previously prepared agentic plan payload.
+
+inputs:
+  plan_payload:
+    type: object
+    required: true
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+  run_id:
+    type: string
+    required: false
+  context:
+    type: object
+    required: false
+
+outputs:
+  status:
+    type: string
+  run_id:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+  artifacts:
+    type: array

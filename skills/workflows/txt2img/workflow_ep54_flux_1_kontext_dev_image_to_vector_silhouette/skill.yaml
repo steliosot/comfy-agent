@@ -1,0 +1,115 @@
+name: workflow_ep54_flux_1_kontext_dev_image_to_vector_silhouette
+description: Workflow wrapper for EP54 Flux 1 Kontext Dev - Image to Vector Silhouette.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  - type: diffusion_model
+    name: flux1-dev-kontext_fp8_scaled.safetensors
+    target_folder: models/diffusion_models
+  custom_nodes:
+  - comfyui-tosvg
+  - rgthree-comfy
+  links:
+  - https://bfl.ai/models/flux-kontext
+  - https://discord.com/invite/gggpkVgBf3
+  - https://docs.bfl.ai/guides/prompting_guide_kontext_i2i
+  - https://docs.comfy.org/tutorials/flux/flux-1-kontext-dev
+  - https://docs.comfy.org/tutorials/flux/flux-1-kontext-dev#flux-kontext-prompt-techniques
+  - https://github.com/Yanick112/ComfyUI-ToSVG
+  - https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve/main/split_files/vae/ae.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/flux1-kontext-dev_ComfyUI/resolve/main/split_files/diffusion_models/flux1-dev-kontext_fp8_scaled.safetensors
+  - https://huggingface.co/Pixaroma/flux-kontext-loras/resolve/main/vector_silhouette.safetensors?download=true
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn_scaled.safetensors
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  node_count: 27
+  node_types:
+  - CLIPTextEncode
+  - ConditioningZeroOut
+  - DualCLIPLoader
+  - FluxGuidance
+  - FluxKontextImageScale
+  - Image Comparer (rgthree)
+  - KSampler
+  - Label (rgthree)
+  - LoadImage
+  - MarkdownNote
+  - Note
+  - Power Lora Loader (rgthree)
+  - ReferenceLatent
+  - SaveImage
+  - TS_ImageQuantize
+  - TS_ImageToSVGStringBW_Vtracer
+  - TS_SVGStringToImage
+  - TS_SaveSVGString
+  - UNETLoader
+  - VAEDecode
+  - VAEEncode
+  - VAELoader
+selection_metadata:
+  family: txt2img
+  resource_profile: low
+  complexity_score: 1
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: 20

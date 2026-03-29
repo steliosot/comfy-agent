@@ -1,0 +1,82 @@
+name: curated_vibevoice_1_5b_6gb_vram
+description: Curated workflow wrapper for VibeVoice 1.5B - 6GB VRAM.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes:
+  - vibevoice-comfyui
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://github.com/Enemyx-net/VibeVoice-ComfyUI
+  - https://huggingface.co/Qwen/Qwen2.5-1.5B/tree/main
+  - https://huggingface.co/microsoft/VibeVoice-1.5B/tree/main
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - audio
+  output_modalities:
+  - audio/wav
+  model_families:
+  - other
+  node_count: 4
+  node_types:
+  - LoadAudio
+  - MarkdownNote
+  - SaveAudio
+  - VibeVoiceSingleSpeakerNode
+selection_metadata:
+  family: audio
+  resource_profile: medium
+  complexity_score: 3
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - Audio generation may take longer on CPU-only or low-VRAM servers.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: null

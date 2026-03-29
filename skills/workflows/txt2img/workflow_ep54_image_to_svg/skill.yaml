@@ -1,0 +1,85 @@
+name: workflow_ep54_image_to_svg
+description: Workflow wrapper for EP54 Image to SVG.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes:
+  - comfyui-tosvg
+  - rgthree-comfy
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://github.com/Yanick112/ComfyUI-ToSVG
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 11
+  node_types:
+  - Image Comparer (rgthree)
+  - Label (rgthree)
+  - LoadImage
+  - MarkdownNote
+  - SaveImage
+  - TS_ImageQuantize
+  - TS_ImageToSVGStringBW_Vtracer
+  - TS_SVGStringToImage
+  - TS_SaveSVGString
+selection_metadata:
+  family: txt2img
+  resource_profile: low
+  complexity_score: 1
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: null

@@ -1,6 +1,6 @@
 import os
 
-from skills.generate_video_clip.skill import build
+from skills.workflows.video_t2v_i2v_avatar.generate_video_clip.skill import build
 
 
 wf = build(

@@ -4,9 +4,9 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from skills.download_image.skill import run as download_run
-from skills.generate_flux_multi_input_img2img.skill import run
-from skills.upload_image.skill import run as upload_run
+from skills.infra.download_image.skill import run as download_run
+from skills.workflows.img2img_inpaint_outpaint.generate_flux_multi_input_img2img.skill import run
+from skills.infra.upload_image.skill import run as upload_run
 
 
 image1 = os.getenv("COMFY_REF_IMAGE1", "/Users/stelios/Downloads/St-Pauls-Cathedral.png")

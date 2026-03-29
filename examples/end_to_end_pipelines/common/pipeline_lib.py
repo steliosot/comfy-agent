@@ -4,16 +4,16 @@ from pathlib import Path
 from time import perf_counter
 
 from comfy_agent.config import ComfyConfig
-from skills.download_image.skill import run as download_image_run
-from skills.download_video.skill import run as download_video_run
-from skills.generate_flux_multi_input_img2img.skill import build as build_still
-from skills.generate_flux_multi_input_img2img.skill import run as generate_still_run
-from skills.generate_ltxv_img2video.skill import build as build_video
-from skills.generate_ltxv_img2video.skill import run as generate_video_run
-from skills.get_progress.skill import run as get_progress_run
-from skills.get_queue_status.skill import run as get_queue_status_run
-from skills.get_server_status.skill import run as get_server_status_run
-from skills.upload_image.skill import run as upload_image_run
+from skills.infra.download_image.skill import run as download_image_run
+from skills.infra.download_video.skill import run as download_video_run
+from skills.workflows.img2img_inpaint_outpaint.generate_flux_multi_input_img2img.skill import build as build_still
+from skills.workflows.img2img_inpaint_outpaint.generate_flux_multi_input_img2img.skill import run as generate_still_run
+from skills.workflows.video_t2v_i2v_avatar.generate_ltxv_img2video.skill import build as build_video
+from skills.workflows.video_t2v_i2v_avatar.generate_ltxv_img2video.skill import run as generate_video_run
+from skills.infra.get_progress.skill import run as get_progress_run
+from skills.infra.get_queue_status.skill import run as get_queue_status_run
+from skills.infra.get_server_status.skill import run as get_server_status_run
+from skills.infra.upload_image.skill import run as upload_image_run
 
 
 def _now_iso():

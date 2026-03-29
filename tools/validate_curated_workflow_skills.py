@@ -6,11 +6,11 @@ import yaml
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-ROOT = REPO_ROOT / "skills" / "curated_workflows"
+ROOT = REPO_ROOT / "skills" / "workflows"
 
 
 def main():
-    manifest_path = ROOT / "manifest.json"
+    manifest_path = ROOT / "curated_manifest.json"
     if not manifest_path.exists():
         raise SystemExit("manifest.json is missing")
 

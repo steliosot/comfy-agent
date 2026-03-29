@@ -1,0 +1,59 @@
+name: generate_video_clip
+description: Generate a WAN 2.1 video clip using EmptyHunyuanLatentVideo and VHS_VideoCombine
+  (video/h264-mp4).
+inputs:
+  prompt:
+    type: string
+    default: cinematic product video clip, smooth camera motion, high detail
+  negative_prompt:
+    type: string
+    default: Overexposure, static, blurred details, low quality, artifacts
+  width:
+    type: integer
+    default: 848
+  height:
+    type: integer
+    default: 480
+  length:
+    type: integer
+    default: 25
+  batch_size:
+    type: integer
+    default: 1
+  steps:
+    type: integer
+    default: 10
+  cfg:
+    type: number
+    default: 8
+  frame_rate:
+    type: integer
+    default: 16
+  filename_prefix:
+    type: string
+    default: video_clip_h264
+outputs:
+  animation: string
+requirements:
+  models: []
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - application/json
+  model_families:
+  - other
+  node_count: null
+  node_types: []
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: unknown
+  complexity_score: null
+  estimated_runtime: depends on runtime parameters and server resources
+  warnings:
+  - Hand-authored skill (no embedded workflow.json); metadata is inferred and may
+    be approximate.
+  max_width: null
+  max_height: null
+  max_steps: null

@@ -1,0 +1,98 @@
+name: workflow_flux_fp16_with_styles
+description: Workflow wrapper for Flux fp16 with styles.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  - type: diffusion_model
+    name: flux1-dev.safetensors
+    target_folder: models/diffusion_models
+  custom_nodes: []
+  links:
+  - https://comfyanonymous.github.io/ComfyUI_examples/flux/
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  - sd3
+  node_count: 21
+  node_types:
+  - BasicGuider
+  - BasicScheduler
+  - CLIPTextEncode
+  - DualCLIPLoader
+  - EmptySD3LatentImage
+  - FluxGuidance
+  - KSamplerSelect
+  - ModelSamplingFlux
+  - Note
+  - PrimitiveNode
+  - Prompt Multiple Styles Selector
+  - RandomNoise
+  - SamplerCustomAdvanced
+  - SaveImage
+  - Text Concatenate
+  - UNETLoader
+  - VAEDecode
+  - VAELoader
+  - easy positive
+selection_metadata:
+  family: editing_restyle
+  resource_profile: low
+  complexity_score: 2
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Medium-high resolution detected; expect moderate extra runtime.
+  max_width: 1024
+  max_height: 1024
+  max_steps: null

@@ -11,6 +11,8 @@ Examples:
 - `example_agentic_single_skill.py`: generate a Coke bottle image with one skill
 - `example_agentic_generate_then_crop.py`: generate a Coke bottle and then crop to widescreen in one workflow run
 - `example_agentic_video_clip.py`: route to generic WAN video clip skill (`video/h264-mp4`)
+- `example_agentic_plan_then_execute.py`: explicit two-step flow (`agentic_plan` then `agentic_execute`)
+- `example_agentic_slash_commands.py`: slash-indicator helper flow (`/plan`, `/execute`)
 - `example_reasonings_agentic.py`: reasoning-only matrix with multiple prompts
 - `example_upload_crop_download.py`: upload local image -> crop skill -> download outputs
 - `example_agentic_compose_two_images.py`: compose single-purpose skills with two refs
@@ -28,6 +30,8 @@ export EXAMPLE_INPUT_IMAGE=/absolute/path/to/redhead_portrait.png
 PYTHONPATH=. python3 examples/agents_agentic/example_agentic_single_skill.py
 PYTHONPATH=. python3 examples/agents_agentic/example_agentic_generate_then_crop.py
 PYTHONPATH=. python3 examples/agents_agentic/example_agentic_video_clip.py
+PYTHONPATH=. python3 examples/agents_agentic/example_agentic_plan_then_execute.py
+PYTHONPATH=. python3 examples/agents_agentic/example_agentic_slash_commands.py
 PYTHONPATH=. python3 examples/agents_agentic/example_reasonings_agentic.py
 PYTHONPATH=. python3 examples/agents_agentic/example_upload_crop_download.py
 PYTHONPATH=. python3 examples/agents_agentic/example_agentic_compose_two_images.py

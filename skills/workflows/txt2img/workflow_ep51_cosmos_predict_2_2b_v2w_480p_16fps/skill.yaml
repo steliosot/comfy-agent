@@ -1,0 +1,98 @@
+name: workflow_ep51_cosmos_predict_2_2b_v2w_480p_16fps
+description: Workflow wrapper for EP51 Cosmos Predict 2 2B v2w 480p 16fps.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: diffusion_model
+    name: cosmos_predict2_2B_video2world_480p_16fps.safetensors
+    target_folder: models/diffusion_models
+  - type: clip
+    name: oldt5_xxl_fp8_e4m3fn_scaled.safetensors
+    target_folder: models/clip
+  - type: vae
+    name: wan_2.1_vae.safetensors
+    target_folder: models/vae
+  custom_nodes: []
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/Comfy-Org/Cosmos_Predict2_repackaged/resolve/main/cosmos_predict2_2B_video2world_480p_16fps.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/Cosmos_Predict2_repackaged/tree/main
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors
+  - https://huggingface.co/comfyanonymous/cosmos_1.0_text_encoder_and_VAE_ComfyUI/resolve/main/text_encoders/oldt5_xxl_fp8_e4m3fn_scaled.safetensors
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - video/mp4
+  model_families:
+  - wan
+  node_count: 13
+  node_types:
+  - CLIPLoader
+  - CLIPTextEncode
+  - CosmosPredict2ImageToVideoLatent
+  - CreateVideo
+  - KSampler
+  - LoadImage
+  - MarkdownNote
+  - SaveVideo
+  - UNETLoader
+  - VAEDecode
+  - VAELoader
+selection_metadata:
+  family: txt2img
+  resource_profile: low
+  complexity_score: 2
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  max_width: null
+  max_height: null
+  max_steps: 35

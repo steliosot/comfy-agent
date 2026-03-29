@@ -1,4 +1,4 @@
-from skills.generate_sd15_crop_then_img2img.skill import run
+from skills.workflows.img2img_inpaint_outpaint.generate_sd15_crop_then_img2img.skill import run
 
 result = run(
     image="woman.png",

@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from skills.download_model.skill import run as download_model
+from skills.infra.download_model.skill import run as download_model
 
 # Optional:
 # export COMFY_URL=http://34.30.216.121

@@ -50,5 +50,5 @@ Skill implementations live under `skills/` and now include:
 Run a skill directly from CLI:
 
 ```bash
-python3 skills/generate_sd15_image/scripts/run.py --args '{"prompt":"cinematic robot"}' --pretty
+python3 skills/workflows/generate_sd15_image/scripts/run.py --args '{"prompt":"cinematic robot"}' --pretty
 ```

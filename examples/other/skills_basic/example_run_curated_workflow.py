@@ -4,8 +4,8 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from skills.match_curated_workflow.skill import run as match_workflow
-from skills.run_curated_workflow.skill import run as run_workflow
+from skills.infra.match_curated_workflow.skill import run as match_workflow
+from skills.workflows.txt2img.run_curated_workflow.skill import run as run_workflow
 
 
 matches = match_workflow(prompt="cinematic portrait photo", top_k=1)

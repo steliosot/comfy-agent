@@ -1,0 +1,112 @@
+name: workflow_creart_nunchaku_with_upscaler
+description: Workflow wrapper for CreArt (Nunchaku) with Upscaler.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: upscale_model
+    name: 4x_NMKD-Siax_200k.pth
+    target_folder: models/upscale_models
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  custom_nodes:
+  - ComfyUI-TiledDiffusion
+  - ComfyUI-nunchaku
+  - comfyui-easy-use
+  - controlaltai-nodes
+  links:
+  - https://civitai.com/models/1545303?modelVersionId=1861654
+  - https://discord.com/invite/gggpkVgBf3
+  - https://github.com/Tavris1/ComfyUI-Easy-Install/tree/Windows-Nunchaku
+  - https://github.com/mit-han-lab/ComfyUI-nunchaku
+  - https://huggingface.co/Akumetsu971/SD_Anime_Futuristic_Armor/resolve/main/4x_NMKD-Siax_200k.pth?download=true
+  - https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve/main/split_files/vae/ae.safetensors?download=true
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn_scaled.safetensors?download=true
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  - sd3
+  node_count: 27
+  node_types:
+  - CLIPTextEncode
+  - EmptySD3LatentImage
+  - Fast Groups Muter (rgthree)
+  - FluxGuidance
+  - FluxResolutionNode
+  - ImageScaleBy
+  - ImageUpscaleWithModel
+  - KSampler
+  - Label (rgthree)
+  - MarkdownNote
+  - NunchakuFluxDiTLoader
+  - NunchakuTextEncoderLoaderV2
+  - SaveImage
+  - TiledDiffusion
+  - UpscaleModelLoader
+  - VAEDecode
+  - VAEEncode
+  - VAELoader
+  - easy cleanGpuUsed
+selection_metadata:
+  family: upscaling
+  resource_profile: medium
+  complexity_score: 4
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - Medium-high resolution detected; expect moderate extra runtime.
+  - Multiple custom nodes required; verify node installation/version compatibility.
+  max_width: 1024
+  max_height: 1024
+  max_steps: 10

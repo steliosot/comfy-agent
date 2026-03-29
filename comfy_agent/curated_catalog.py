@@ -8,7 +8,7 @@ def _repo_root():
 
 
 def curated_manifest_path():
-    return _repo_root() / "skills" / "curated_workflows" / "manifest.json"
+    return _repo_root() / "skills" / "workflows" / "curated_manifest.json"
 
 
 def load_curated_manifest():
@@ -75,6 +75,8 @@ def match_curated_entries(
     requested_model_family = str(model_family).lower() if model_family else None
     requested_input = str(input_modality).lower() if input_modality else None
     requested_output = str(output_modality).lower() if output_modality else None
+    prefer_fast = any(k in prompt_text for k in ("fast", "quick", "lightweight", "low vram", "cheap"))
+    prefer_quality = any(k in prompt_text for k in ("best quality", "high quality", "cinematic", "ultra"))
 
     ranked = []
     for entry in entries:
@@ -118,6 +120,21 @@ def match_curated_entries(
             score += 0.06
         if "upscale" in prompt_text and entry_family == "upscaling":
             score += 0.1
+
+        resource_profile = str(entry.get("resource_profile") or "").lower()
+        complexity_score = entry.get("complexity_score")
+        if prefer_fast:
+            if resource_profile in {"low", "medium"}:
+                score += 0.08
+                reasons.append("Boosted for faster/lower-resource profile.")
+            elif resource_profile in {"high", "very_high"}:
+                score -= 0.06
+                reasons.append("Penalized for heavier resource profile when prompt asks for speed.")
+            if isinstance(complexity_score, (int, float)) and complexity_score <= 4:
+                score += 0.04
+        if prefer_quality and resource_profile in {"high", "very_high"}:
+            score += 0.05
+            reasons.append("Boosted for higher-complexity workflow likely suited for quality-focused prompts.")
 
         asks_for_explicit_input = any(
             key in prompt_text

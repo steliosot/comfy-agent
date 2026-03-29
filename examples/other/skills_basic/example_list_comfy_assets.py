@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from skills.list_comfy_assets.skill import run
+from skills.infra.list_comfy_assets.skill import run
 
 
 result = run(include_files=True)

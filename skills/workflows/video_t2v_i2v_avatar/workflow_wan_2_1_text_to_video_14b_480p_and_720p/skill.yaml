@@ -1,0 +1,98 @@
+name: workflow_wan_2_1_text_to_video_14b_480p_and_720p
+description: Workflow wrapper for Wan 2.1 Text to Video 14B 480p and 720p.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: clip
+    name: umt5_xxl_fp8_e4m3fn_scaled.safetensors
+    target_folder: models/clip
+  - type: diffusion_model
+    name: wan2.1-t2v-14b-Q8_0.gguf
+    target_folder: models/diffusion_models
+  - type: vae
+    name: wan_2.1_vae.safetensors
+    target_folder: models/vae
+  custom_nodes:
+  - comfyui-videohelpersuite
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors?download=true
+  - https://huggingface.co/city96/Wan2.1-T2V-14B-gguf/resolve/main/wan2.1-t2v-14b-Q8_0.gguf?download=true
+  - https://huggingface.co/city96/Wan2.1-T2V-14B-gguf/tree/main
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - video/mp4
+  model_families:
+  - wan
+  node_count: 11
+  node_types:
+  - CLIPLoader
+  - CLIPTextEncode
+  - EmptyHunyuanLatentVideo
+  - KSampler
+  - MarkdownNote
+  - UnetLoaderGGUF
+  - VAEDecode
+  - VAELoader
+  - VHS_VideoCombine
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: high
+  complexity_score: 8
+  estimated_runtime: slow (often 2-6 min depending on model/server load)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  - 'Video workflow: usually slower and VRAM-intensive than still-image workflows.'
+  max_width: 832
+  max_height: 480
+  max_steps: 30

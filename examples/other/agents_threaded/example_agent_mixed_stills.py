@@ -1,7 +1,7 @@
 from comfy_agent.job import Job, Executor
-from skills.generate_sd15_cinematic_portrait.skill import run as portrait
-from skills.generate_sd15_landscape_batch.skill import run as landscape_batch
-from skills.preview_sd15_fast_character.skill import run as fast_character_preview
+from skills.workflows.txt2img.generate_sd15_cinematic_portrait.skill import run as portrait
+from skills.workflows.txt2img.generate_sd15_landscape_batch.skill import run as landscape_batch
+from skills.workflows.txt2img.preview_sd15_fast_character.skill import run as fast_character_preview
 
 
 class MixedStillsAgent:

@@ -1,0 +1,101 @@
+name: curated_hidream_i1_full_fp8_text2image
+description: Curated workflow wrapper for HiDream i1 Full fp8 text2image.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  - type: diffusion_model
+    name: hidream_i1_full_fp8.safetensors
+    target_folder: models/diffusion_models
+  custom_nodes: []
+  links:
+  - https://blog.comfy.org/p/hidream-i1-native-support-in-comfyui
+  - https://comfyanonymous.github.io/ComfyUI_examples/hidream/
+  - https://discord.com/invite/gggpkVgBf3
+  - https://docs.comfy.org/tutorials/advanced/hidream
+  - https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/resolve/main/split_files/diffusion_models/hidream_i1_full_fp8.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/resolve/main/split_files/text_encoders/clip_g_hidream.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/resolve/main/split_files/text_encoders/clip_l_hidream.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/resolve/main/split_files/text_encoders/llama_3.1_8b_instruct_fp8_scaled.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/resolve/main/split_files/text_encoders/t5xxl_fp8_e4m3fn_scaled.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/resolve/main/split_files/vae/ae.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/tree/main/split_files/diffusion_models
+  - https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/tree/main/split_files/text_encoders
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - sd3
+  node_count: 11
+  node_types:
+  - CLIPTextEncode
+  - EmptySD3LatentImage
+  - KSampler
+  - MarkdownNote
+  - ModelSamplingSD3
+  - QuadrupleCLIPLoader
+  - SaveImage
+  - UNETLoader
+  - VAEDecode
+  - VAELoader
+selection_metadata:
+  family: txt2img
+  resource_profile: medium
+  complexity_score: 4
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - Medium-high resolution detected; expect moderate extra runtime.
+  - Moderate-high sampler steps detected (>=40); runtime may be longer.
+  max_width: 1024
+  max_height: 1024
+  max_steps: 50

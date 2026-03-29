@@ -1,5 +1,12 @@
 from .workflow import Workflow
-from .agentic import run_agentic, reason_skills, reasoning_agentic
+from .agentic import (
+    run_agentic,
+    reason_skills,
+    reasoning_agentic,
+    agentic_plan,
+    agentic_execute,
+    agentic_command,
+)
 from .config import ComfyConfig, load_comfy_env
 
 try:

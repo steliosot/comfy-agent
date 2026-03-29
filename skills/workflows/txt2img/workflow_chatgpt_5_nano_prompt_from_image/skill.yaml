@@ -1,0 +1,79 @@
+name: workflow_chatgpt_5_nano_prompt_from_image
+description: Workflow wrapper for ChatGPT 5 Nano - Prompt from Image.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes: []
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://docs.comfy.org/tutorials/api-nodes/pricing
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  output_modalities:
+  - application/json
+  model_families:
+  - wan
+  node_count: 6
+  node_types:
+  - Label (rgthree)
+  - LoadImage
+  - MarkdownNote
+  - OpenAIChatConfig
+  - OpenAIChatNode
+  - PreviewAny
+selection_metadata:
+  family: txt2img
+  resource_profile: low
+  complexity_score: 0
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings: []
+  max_width: null
+  max_height: null
+  max_steps: null

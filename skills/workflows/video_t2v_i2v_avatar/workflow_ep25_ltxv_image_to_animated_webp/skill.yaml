@@ -1,0 +1,92 @@
+name: workflow_ep25_ltxv_image_to_animated_webp
+description: Workflow wrapper for Ep25 LTXV Image to Animated WebP.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: clip
+    name: t5xxl_fp16.safetensors
+    target_folder: models/clip
+  - type: checkpoint
+    name: ltx-video-2b-v0.9.safetensors
+    target_folder: models/checkpoints
+  custom_nodes: []
+  links:
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - application/json
+  model_families:
+  - ltx
+  node_count: 14
+  node_types:
+  - CLIPLoader
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - KSamplerSelect
+  - LTXVConditioning
+  - LTXVImgToVideo
+  - LTXVScheduler
+  - LoadImage
+  - Note
+  - SamplerCustom
+  - SaveAnimatedWEBP
+  - VAEDecode
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: high
+  complexity_score: 6
+  estimated_runtime: slow (often 2-6 min depending on model/server load)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - 'Video workflow: usually slower and VRAM-intensive than still-image workflows.'
+  max_width: null
+  max_height: null
+  max_steps: null

@@ -1,0 +1,90 @@
+name: workflow_ep12_sdxl_txt2img_with_upscaler
+description: Workflow wrapper for Ep12 SDXL TXT2IMG with Upscaler.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: upscale_model
+    name: 4x_NMKD-Siax_200k.pth
+    target_folder: models/upscale_models
+  - type: checkpoint
+    name: Juggernaut_X_RunDiffusion.safetensors
+    target_folder: models/checkpoints
+  custom_nodes: []
+  links:
+  - https://civitai.com/models/133005?modelVersionId=456194
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  node_count: 30
+  node_types:
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - EmptyLatentImage
+  - FluxResolutionNode
+  - ImageScaleBy
+  - ImageUpscaleWithModel
+  - KSampler
+  - Label (rgthree)
+  - Note
+  - SaveImage
+  - UpscaleModelLoader
+  - VAEDecode
+  - VAEEncode
+selection_metadata:
+  family: upscaling
+  resource_profile: low
+  complexity_score: 0
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings: []
+  max_width: 512
+  max_height: 512
+  max_steps: 30

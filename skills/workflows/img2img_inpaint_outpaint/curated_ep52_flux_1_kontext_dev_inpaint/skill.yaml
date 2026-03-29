@@ -1,0 +1,110 @@
+name: curated_ep52_flux_1_kontext_dev_inpaint
+description: Curated workflow wrapper for EP52 Flux 1 Kontext Dev - Inpaint.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: diffusion_model
+    name: flux1-dev-kontext_fp8_scaled.safetensors
+    target_folder: models/diffusion_models
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  custom_nodes:
+  - comfyui-easy-use
+  - comfyui-inpaint-cropandstitch
+  links:
+  - https://bfl.ai/models/flux-kontext
+  - https://discord.com/invite/gggpkVgBf3
+  - https://docs.bfl.ai/guides/prompting_guide_kontext_i2i
+  - https://docs.comfy.org/tutorials/flux/flux-1-kontext-dev
+  - https://docs.comfy.org/tutorials/flux/flux-1-kontext-dev#flux-kontext-prompt-techniques
+  - https://huggingface.co/Akumetsu971/SD_Anime_Futuristic_Armor/resolve/main/4x_NMKD-Siax_200k.pth?download=true
+  - https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve/main/split_files/vae/ae.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/flux1-kontext-dev_ComfyUI/resolve/main/split_files/diffusion_models/flux1-dev-kontext_fp8_scaled.safetensors
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn_scaled.safetensors
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  node_count: 24
+  node_types:
+  - CLIPTextEncode
+  - DualCLIPLoader
+  - FluxGuidance
+  - InpaintCropImproved
+  - InpaintModelConditioning
+  - InpaintStitchImproved
+  - KSampler
+  - Label (rgthree)
+  - LoadImage
+  - MarkdownNote
+  - PreviewImage
+  - ReferenceLatent
+  - SaveImage
+  - UNETLoader
+  - VAEDecode
+  - VAEEncode
+  - VAELoader
+  - easy cleanGpuUsed
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: low
+  complexity_score: 1
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: 30

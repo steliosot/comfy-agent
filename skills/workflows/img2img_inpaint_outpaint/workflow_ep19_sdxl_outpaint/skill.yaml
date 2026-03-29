@@ -1,0 +1,84 @@
+name: workflow_ep19_sdxl_outpaint
+description: Workflow wrapper for EP19 SDXL OUTPAINT.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: checkpoint
+    name: juggernautXL_versionXInpaint.safetensors
+    target_folder: models/checkpoints
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 12
+  node_types:
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - InpaintCrop
+  - InpaintExtendOutpaint
+  - InpaintModelConditioning
+  - InpaintStitch
+  - KSampler
+  - LoadImage
+  - PreviewImage
+  - VAEDecode
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: low
+  complexity_score: 0
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings: []
+  max_width: null
+  max_height: null
+  max_steps: 30

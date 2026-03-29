@@ -1,0 +1,114 @@
+name: workflow_nunchaku_flux_dev_img2img_upscaler
+description: Workflow wrapper for Nunchaku Flux Dev img2img + Upscaler.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  - type: upscale_model
+    name: 4xNomos2_hq_dat2.safetensors
+    target_folder: models/upscale_models
+  custom_nodes:
+  - ComfyUI-TiledDiffusion
+  - ComfyUI-nunchaku
+  - comfyui-easy-use
+  - rgthree-comfy
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://github.com/Tavris1/ComfyUI-Easy-Install
+  - https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve/main/split_files/vae/ae.safetensors?download=true
+  - https://huggingface.co/Phips/4xNomos2_hq_dat2
+  - https://huggingface.co/Phips/4xNomos2_hq_dat2/resolve/main/4xNomos2_hq_dat2.safetensors?download=true
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn_scaled.safetensors?download=true
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main
+  - https://huggingface.co/mit-han-lab/nunchaku-flux.1-dev/resolve/main/svdq-fp4_r32-flux.1-dev.safetensors?download=true
+  - https://huggingface.co/mit-han-lab/nunchaku-flux.1-dev/resolve/main/svdq-int4_r32-flux.1-dev.safetensors?download=true
+  - https://huggingface.co/mit-han-lab/nunchaku-flux.1-dev/tree/main
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  node_count: 30
+  node_types:
+  - CLIPTextEncode
+  - Fast Groups Muter (rgthree)
+  - FluxGuidance
+  - Image Comparer (rgthree)
+  - ImageScaleBy
+  - ImageScaleToTotalPixels
+  - ImageUpscaleWithModel
+  - KSampler
+  - Label (rgthree)
+  - LoadImage
+  - MarkdownNote
+  - NunchakuFluxDiTLoader
+  - NunchakuTextEncoderLoaderV2
+  - SaveImage
+  - TiledDiffusion
+  - UpscaleModelLoader
+  - VAEDecode
+  - VAEEncode
+  - VAELoader
+  - easy cleanGpuUsed
+selection_metadata:
+  family: upscaling
+  resource_profile: low
+  complexity_score: 2
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Multiple custom nodes required; verify node installation/version compatibility.
+  max_width: null
+  max_height: null
+  max_steps: 30

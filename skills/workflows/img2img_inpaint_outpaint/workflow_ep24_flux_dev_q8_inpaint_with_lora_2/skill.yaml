@@ -1,0 +1,103 @@
+name: workflow_ep24_flux_dev_q8_inpaint_with_lora_2
+description: Workflow wrapper for EP24 Flux Dev Q8 INPAINT with Lora-2.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: clip
+    name: t5-v1_1-xxl-encoder-Q8_0.gguf
+    target_folder: models/clip
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  - type: diffusion_model
+    name: flux1-dev-Q8_0.gguf
+    target_folder: models/diffusion_models
+  custom_nodes:
+  - comfyui-easy-use
+  - comfyui-gguf
+  - comfyui-inpaint-cropandstitch
+  - pr-was-node-suite-comfyui-47064894
+  - rgthree-comfy
+  links: []
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  node_count: 18
+  node_types:
+  - CLIPTextEncode
+  - DualCLIPLoaderGGUF
+  - FluxGuidance
+  - InpaintCropImproved
+  - InpaintModelConditioning
+  - InpaintStitchImproved
+  - KSampler
+  - LoadImage
+  - Power Lora Loader (rgthree)
+  - PreviewImage
+  - SaveImage
+  - Text Concatenate
+  - UnetLoaderGGUF
+  - VAEDecode
+  - VAELoader
+  - easy positive
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: medium
+  complexity_score: 5
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Multiple custom nodes required; verify node installation/version compatibility.
+  max_width: null
+  max_height: null
+  max_steps: 12

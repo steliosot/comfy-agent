@@ -1,0 +1,119 @@
+name: curated_wan_2_2_i2v_14b_gguf_lora
+description: Curated workflow wrapper for Wan 2.2 I2V 14b GGUF + Lora.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: vae
+    name: wan_2.1_vae.safetensors
+    target_folder: models/vae
+  - type: diffusion_model
+    name: wan2.2_i2v_low_noise_14B_Q4_K_M.gguf
+    target_folder: models/diffusion_models
+  - type: diffusion_model
+    name: wan2.2_i2v_high_noise_14B_Q4_K_M.gguf
+    target_folder: models/diffusion_models
+  - type: lora
+    name: Wan2.2-Lightning_I2V-A14B-4steps-lora_LOW_fp16.safetensors
+    target_folder: models/loras
+  - type: lora
+    name: Wan2.2-Lightning_I2V-A14B-4steps-lora_HIGH_fp16.safetensors
+    target_folder: models/loras
+  - type: clip
+    name: umt5_xxl_fp8_e4m3fn_scaled.safetensors
+    target_folder: models/clip
+  custom_nodes:
+  - ComfyUI-GGUF
+  - comfyui-videohelpersuite
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://docs.comfy.org/tutorials/video/wan/wan2_2
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors?download=true
+  - https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22-Lightning/old/Wan2.2-Lightning_I2V-A14B-4steps-lora_HIGH_fp16.safetensors?download=true
+  - https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22-Lightning/old/Wan2.2-Lightning_I2V-A14B-4steps-lora_LOW_fp16.safetensors?download=true
+  - https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B
+  - https://huggingface.co/bullerwins/Wan2.2-I2V-A14B-GGUF/resolve/main/wan2.2_i2v_high_noise_14B_Q4_K_M.gguf?download=true
+  - https://huggingface.co/bullerwins/Wan2.2-I2V-A14B-GGUF/resolve/main/wan2.2_i2v_low_noise_14B_Q4_K_M.gguf?download=true
+  - https://huggingface.co/bullerwins/Wan2.2-I2V-A14B-GGUF/tree/main
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - video/mp4
+  model_families:
+  - sd3
+  - wan
+  node_count: 20
+  node_types:
+  - CLIPLoader
+  - CLIPTextEncode
+  - KSamplerAdvanced
+  - Label (rgthree)
+  - LoadImage
+  - LoraLoaderModelOnly
+  - MarkdownNote
+  - ModelSamplingSD3
+  - UnetLoaderGGUF
+  - VAEDecode
+  - VAELoader
+  - VHS_VideoCombine
+  - WanImageToVideo
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: very_high
+  complexity_score: 9
+  estimated_runtime: heavy (can exceed 6 min; best on high-VRAM GPU)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  - 'Video workflow: usually slower and VRAM-intensive than still-image workflows.'
+  max_width: null
+  max_height: null
+  max_steps: null

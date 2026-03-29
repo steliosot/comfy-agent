@@ -1,0 +1,92 @@
+name: workflow_ep11_flux_1_dev_fp8_txt2img_with_florence2_pompt_from_image_workflow
+description: Workflow wrapper for EP11 Flux 1 Dev FP8 TXT2IMG with Florence2 Pompt
+  from Image Workflow.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: checkpoint
+    name: flux1-dev-fp8.safetensors
+    target_folder: models/checkpoints
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  - sd3
+  - wan
+  node_count: 15
+  node_types:
+  - Any Switch (rgthree)
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - DownloadAndLoadFlorence2Model
+  - EmptySD3LatentImage
+  - Fast Groups Muter (rgthree)
+  - Florence2Run
+  - FluxGuidance
+  - KSampler
+  - LoadImage
+  - SaveImage
+  - VAEDecode
+  - easy positive
+  - easy showAnything
+selection_metadata:
+  family: txt2img
+  resource_profile: low
+  complexity_score: 2
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Medium-high resolution detected; expect moderate extra runtime.
+  max_width: 1024
+  max_height: 1024
+  max_steps: 20

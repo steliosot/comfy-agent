@@ -1,0 +1,87 @@
+name: workflow_flux_upscaler_compact
+description: Workflow wrapper for Flux Upscaler COMPACT.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes:
+  - rgthree-comfy
+  links:
+  - https://civitai.com/api/download/models/1377767?type=Model&format=SafeTensor&size=full&fp=fp32
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/Akumetsu971/SD_Anime_Futuristic_Armor/resolve/main/4x_NMKD-Siax_200k.pth?download=true
+  - https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors?download=true
+  - https://huggingface.co/city96/FLUX.1-dev-gguf/resolve/main/flux1-dev-Q8_0.gguf?download=true
+  - https://huggingface.co/city96/FLUX.1-dev-gguf/tree/main
+  - https://huggingface.co/city96/t5-v1_1-xxl-encoder-gguf/resolve/main/t5-v1_1-xxl-encoder-Q8_0.gguf?download=true
+  - https://huggingface.co/city96/t5-v1_1-xxl-encoder-gguf/tree/main
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 9
+  node_types:
+  - Image Comparer (rgthree)
+  - Label (rgthree)
+  - LoadImage
+  - MarkdownNote
+  - SaveImage
+  - workflow>img2img upscale
+selection_metadata:
+  family: upscaling
+  resource_profile: low
+  complexity_score: 1
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: null

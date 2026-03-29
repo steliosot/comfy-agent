@@ -1,0 +1,92 @@
+name: curated_ep42_sdxl_outpaint_juggernaut
+description: Curated workflow wrapper for EP42 SDXL OUTPAINT Juggernaut.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: checkpoint
+    name: juggernautXL_versionXInpaint.safetensors
+    target_folder: models/checkpoints
+  custom_nodes:
+  - comfyui-inpaint-cropandstitch
+  links:
+  - https://civitai.com/api/download/models/456538?type=Model&format=SafeTensor&size=pruned&fp=fp16
+  - https://civitai.com/models/403361?modelVersionId=456538
+  - https://discord.com/invite/gggpkVgBf3
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 13
+  node_types:
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - InpaintCropImproved
+  - InpaintModelConditioning
+  - InpaintStitchImproved
+  - KSampler
+  - LoadImage
+  - MarkdownNote
+  - Note
+  - PreviewImage
+  - SaveImage
+  - VAEDecode
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: low
+  complexity_score: 1
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: 30

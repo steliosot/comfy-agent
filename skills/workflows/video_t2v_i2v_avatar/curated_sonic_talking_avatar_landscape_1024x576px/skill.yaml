@@ -1,0 +1,99 @@
+name: curated_sonic_talking_avatar_landscape_1024x576px
+description: Curated workflow wrapper for Sonic Talking Avatar Landscape 1024x576px.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes:
+  - comfyui-easy-use
+  - comfyui-videohelpersuite
+  - pr-was-node-suite-comfyui-47064894
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://drive.google.com/drive/folders/1QIIDvCDU-rp1ZB8qDA6NQqVn8F9WYMhE
+  - https://drive.google.com/drive/folders/1jI32B-2JX17seSGG0-MnZgUhCMHCEZlx
+  - https://drive.google.com/drive/folders/1oe8VTPUy0-MHHW2a_NJ1F8xL-0VN5G7W
+  - https://github.com/smthemex/ComfyUI_Sonic
+  - https://huggingface.co/openai/whisper-tiny/tree/main
+  - https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt-1-1/tree/main
+  - https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt/tree/main
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - audio
+  - image
+  output_modalities:
+  - image/png
+  - video/mp4
+  model_families:
+  - other
+  node_count: 13
+  node_types:
+  - Image Resize
+  - ImageOnlyCheckpointLoader
+  - LoadAudio
+  - LoadImage
+  - MarkdownNote
+  - Note
+  - PreviewImage
+  - SONICSampler
+  - SONICTLoader
+  - SONIC_PreData
+  - VHS_VideoCombine
+  - easy cleanGpuUsed
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: high
+  complexity_score: 7
+  estimated_runtime: slow (often 2-6 min depending on model/server load)
+  warnings:
+  - Audio generation may take longer on CPU-only or low-VRAM servers.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  - 'Video workflow: usually slower and VRAM-intensive than still-image workflows.'
+  max_width: null
+  max_height: null
+  max_steps: null

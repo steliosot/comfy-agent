@@ -1,7 +1,7 @@
 from comfy_agent.job import Executor, Job
-from skills.generate_sd15_cinematic_portrait.skill import build as build_portrait
-from skills.generate_sd15_image.skill import build as build_image
-from skills.generate_sd15_landscape_batch.skill import build as build_landscape
+from skills.workflows.txt2img.generate_sd15_cinematic_portrait.skill import build as build_portrait
+from skills.workflows.txt2img.generate_sd15_image.skill import build as build_image
+from skills.workflows.txt2img.generate_sd15_landscape_batch.skill import build as build_landscape
 
 
 def run_overridden_portrait():

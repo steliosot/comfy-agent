@@ -1,0 +1,77 @@
+name: workflow_image_to_vector_svg
+description: Workflow wrapper for Image To Vector SVG.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - image
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 10
+  node_types:
+  - ConvertRasterToVectorBW
+  - ConvertRasterToVectorColor
+  - ConvertVectorToRaster
+  - Fast Groups Muter (rgthree)
+  - LoadImage
+  - SaveImage
+  - SaveSVG
+selection_metadata:
+  family: txt2img
+  resource_profile: low
+  complexity_score: 0
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings: []
+  max_width: null
+  max_height: null
+  max_steps: null

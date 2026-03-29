@@ -1,7 +1,7 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-from skills.generate_video_clip.skill import run
+from skills.workflows.video_t2v_i2v_avatar.generate_video_clip.skill import run
 
 
 def submit(prompt):

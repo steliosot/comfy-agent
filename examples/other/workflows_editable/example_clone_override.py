@@ -1,4 +1,4 @@
-from skills.generate_sd15_image.skill import build
+from skills.workflows.txt2img.generate_sd15_image.skill import build
 
 
 wf = build(prompt="cinematic robot portrait")

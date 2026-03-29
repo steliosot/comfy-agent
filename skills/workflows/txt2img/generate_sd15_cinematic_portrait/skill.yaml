@@ -1,0 +1,46 @@
+name: generate_sd15_cinematic_portrait
+description: Generate a cinematic SD1.5 portrait image.
+inputs:
+  prompt:
+    type: string
+    default: cinematic portrait of a weathered space courier
+  negative_prompt:
+    type: string
+    default: watermark, text, logo, blurry, deformed hands, extra fingers
+  width:
+    type: integer
+    default: 512
+  height:
+    type: integer
+    default: 768
+  steps:
+    type: integer
+    default: 35
+  seed:
+    type: integer
+    default: 904210331245118
+outputs:
+  image: string
+requirements:
+  models: []
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - application/json
+  model_families:
+  - other
+  node_count: null
+  node_types: []
+selection_metadata:
+  family: txt2img
+  resource_profile: unknown
+  complexity_score: null
+  estimated_runtime: depends on runtime parameters and server resources
+  warnings:
+  - Hand-authored skill (no embedded workflow.json); metadata is inferred and may
+    be approximate.
+  max_width: null
+  max_height: null
+  max_steps: null

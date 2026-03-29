@@ -1,0 +1,100 @@
+name: curated_ep18_sdxl_animationcartoon_img2img_with_controlnet
+description: Curated workflow wrapper for EP18 SDXL AnimationCartoon IMG2IMG with
+  ControlNet.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: controlnet
+    name: diffusion_pytorch_model_promax.safetensors
+    target_folder: models/controlnet
+  - type: checkpoint
+    name: wildcardxXLANIMATION_wildcardxXLANIMATION.safetensors
+    target_folder: models/checkpoints
+  custom_nodes: []
+  links:
+  - https://civitai.com/models/297501?modelVersionId=357959
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  - wan
+  node_count: 28
+  node_types:
+  - AIO_Preprocessor
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - ControlNetApplyAdvanced
+  - ControlNetLoader
+  - FluxResolutionNode
+  - Image Comparer (rgthree)
+  - Image Resize
+  - KSampler
+  - Label (rgthree)
+  - LoadImage
+  - Note
+  - PreviewImage
+  - SaveImage
+  - Text Concatenate
+  - VAEDecode
+  - VAEEncode
+  - easy positive
+  - easy showAnything
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: low
+  complexity_score: 2
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  max_width: null
+  max_height: null
+  max_steps: 30

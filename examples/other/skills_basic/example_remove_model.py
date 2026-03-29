@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from skills.remove_model.skill import run as remove_model
+from skills.infra.remove_model.skill import run as remove_model
 
 # Optional:
 # export COMFY_URL=http://34.30.216.121

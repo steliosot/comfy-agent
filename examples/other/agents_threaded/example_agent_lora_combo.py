@@ -1,7 +1,7 @@
 from comfy_agent.job import Job, Executor
-from skills.generate_sd15_lora.skill import run as lora_image
-from skills.generate_sd15_image.skill import run as base_image
-from skills.preview_sd15_image.skill import run as preview_image
+from skills.workflows.txt2img.generate_sd15_lora.skill import run as lora_image
+from skills.workflows.txt2img.generate_sd15_image.skill import run as base_image
+from skills.workflows.txt2img.preview_sd15_image.skill import run as preview_image
 
 
 class LoraComboAgent:

@@ -1,0 +1,91 @@
+name: workflow_video_upscale_landscape_2k_from_832x480px_to_2560x1440px
+description: Workflow wrapper for Video Upscale Landscape 2K from 832x480px to 2560x1440px.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: upscale_model
+    name: 4x_NMKD-Siax_200k.pth
+    target_folder: models/upscale_models
+  custom_nodes:
+  - comfyui-easy-use
+  - comfyui-videohelpersuite
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/Akumetsu971/SD_Anime_Futuristic_Armor/resolve/main/4x_NMKD-Siax_200k.pth?download=true
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - video
+  output_modalities:
+  - video/mp4
+  model_families:
+  - wan
+  node_count: 13
+  node_types:
+  - ImageScale
+  - ImageScaleBy
+  - ImageUpscaleWithModel
+  - Label (rgthree)
+  - MarkdownNote
+  - UpscaleModelLoader
+  - VHS_BatchManager
+  - VHS_LoadVideo
+  - VHS_VideoCombine
+  - VHS_VideoInfo
+  - easy showAnything
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: medium
+  complexity_score: 5
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  - 'Video workflow: usually slower and VRAM-intensive than still-image workflows.'
+  max_width: null
+  max_height: null
+  max_steps: null

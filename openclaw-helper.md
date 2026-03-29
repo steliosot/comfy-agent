@@ -97,24 +97,24 @@ python3 skills/<skill_name>/scripts/run.py --args '{"key":"value"}' --pretty
 Examples:
 
 ```bash
-python3 skills/get_server_status/scripts/run.py --args '{}' --pretty
-python3 skills/get_queue_status/scripts/run.py --args '{}' --pretty
-python3 skills/get_progress/scripts/run.py --args '{"prompt_id":"<id>"}' --pretty
+python3 skills/infra/get_server_status/scripts/run.py --args '{}' --pretty
+python3 skills/infra/get_queue_status/scripts/run.py --args '{}' --pretty
+python3 skills/infra/get_progress/scripts/run.py --args '{"prompt_id":"<id>"}' --pretty
 
-python3 skills/upload_image/scripts/run.py --args '{"image_path":"tmp/inputs/woman.png"}' --pretty
-python3 skills/download_image/scripts/run.py --args '{"prompt_id":"<id>","run_id":"demo"}' --pretty
+python3 skills/infra/upload_image/scripts/run.py --args '{"image_path":"tmp/inputs/woman.png"}' --pretty
+python3 skills/infra/download_image/scripts/run.py --args '{"prompt_id":"<id>","run_id":"demo"}' --pretty
 
-python3 skills/download_video/scripts/run.py --args '{"prompt_id":"<id>","run_id":"demo"}' --pretty
-python3 skills/delete_image_job/scripts/run.py --args '{"prompt_id":"<id>"}' --pretty
-python3 skills/delete_video_job/scripts/run.py --args '{"prompt_id":"<id>"}' --pretty
+python3 skills/infra/download_video/scripts/run.py --args '{"prompt_id":"<id>","run_id":"demo"}' --pretty
+python3 skills/infra/delete_image_job/scripts/run.py --args '{"prompt_id":"<id>"}' --pretty
+python3 skills/infra/delete_video_job/scripts/run.py --args '{"prompt_id":"<id>"}' --pretty
 
 # dependency auto-repair
-python3 skills/assess_server_resources/scripts/run.py --args '{}' --pretty
-python3 skills/download_model/scripts/run.py --args '{"source":"huggingface","model_id_or_url":"owner/repo","filename":"sd1.5/model.safetensors","model_type":"checkpoint"}' --pretty
-python3 skills/install_custom_node/scripts/run.py --args '{"repo_url":"https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite","expected_node_classes":["VHS_VideoCombine"]}' --pretty
-python3 skills/prepare_workflow_dependencies/scripts/run.py --args '{"requirements":{"models":[],"custom_nodes":[]}}' --pretty
-python3 skills/model_folder_guide/scripts/run.py --args '{"model_type":"diffusion_model"}' --pretty
-python3 skills/remove_model/scripts/run.py --args '{"filename":"example_light_lora.safetensors","model_type":"lora"}' --pretty
+python3 skills/infra/assess_server_resources/scripts/run.py --args '{}' --pretty
+python3 skills/infra/download_model/scripts/run.py --args '{"source":"huggingface","model_id_or_url":"owner/repo","filename":"sd1.5/model.safetensors","model_type":"checkpoint"}' --pretty
+python3 skills/infra/install_custom_node/scripts/run.py --args '{"repo_url":"https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite","expected_node_classes":["VHS_VideoCombine"]}' --pretty
+python3 skills/infra/prepare_workflow_dependencies/scripts/run.py --args '{"requirements":{"models":[],"custom_nodes":[]}}' --pretty
+python3 skills/infra/model_folder_guide/scripts/run.py --args '{"model_type":"diffusion_model"}' --pretty
+python3 skills/infra/remove_model/scripts/run.py --args '{"filename":"example_light_lora.safetensors","model_type":"lora"}' --pretty
 ```
 
 ## 5) Skill Composition Pattern (Recommended)
@@ -217,7 +217,7 @@ This is the easiest path because wrappers are stable and uniform.
 Run:
 
 ```bash
-python3 skills/list_comfy_assets/scripts/run.py --args '{}' --pretty
+python3 skills/infra/list_comfy_assets/scripts/run.py --args '{}' --pretty
 ```
 
 Then match model names in generation skill args.
@@ -239,15 +239,15 @@ Lower `length`, `steps`, or output resolution.
 
 ```bash
 # status
-python3 skills/get_server_status/scripts/run.py --args '{}' --pretty
-python3 skills/get_queue_status/scripts/run.py --args '{}' --pretty
+python3 skills/infra/get_server_status/scripts/run.py --args '{}' --pretty
+python3 skills/infra/get_queue_status/scripts/run.py --args '{}' --pretty
 
 # progress
-python3 skills/get_progress/scripts/run.py --args '{"prompt_id":"<id>"}' --pretty
+python3 skills/infra/get_progress/scripts/run.py --args '{"prompt_id":"<id>"}' --pretty
 
 # delete jobs
-python3 skills/delete_image_job/scripts/run.py --args '{"prompt_id":"<image_job_id>"}' --pretty
-python3 skills/delete_video_job/scripts/run.py --args '{"prompt_id":"<video_job_id>"}' --pretty
+python3 skills/infra/delete_image_job/scripts/run.py --args '{"prompt_id":"<image_job_id>"}' --pretty
+python3 skills/infra/delete_video_job/scripts/run.py --args '{"prompt_id":"<video_job_id>"}' --pretty
 
 # full monitored pipeline
 PYTHONPATH=. python3 examples/end_to_end_pipelines/birkbeck_monitored/example_birkbeck_monitored_pipeline.py

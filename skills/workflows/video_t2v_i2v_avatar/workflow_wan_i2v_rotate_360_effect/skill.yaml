@@ -1,0 +1,110 @@
+name: workflow_wan_i2v_rotate_360_effect
+description: Workflow wrapper for Wan i2v + Rotate 360 Effect.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: diffusion_model
+    name: wan2.1_i2v_480p_14B_fp8_scaled.safetensors
+    target_folder: models/diffusion_models
+  - type: clip
+    name: umt5_xxl_fp8_e4m3fn_scaled.safetensors
+    target_folder: models/clip
+  - type: vae
+    name: wan_2.1_vae.safetensors
+    target_folder: models/vae
+  - type: lora
+    name: rotate_20_epochs.safetensors
+    target_folder: models/loras
+  custom_nodes:
+  - comfyui-videohelpersuite
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_480p_14B_fp8_scaled.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/tree/main/split_files/diffusion_models
+  - https://huggingface.co/Remade-AI/Rotate/resolve/main/rotate_20_epochs.safetensors?download=true
+  - https://huggingface.co/collections/Remade-AI/wan21-14b-480p-i2v-loras-67d0e26f08092436b585919b
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - video/mp4
+  model_families:
+  - wan
+  node_count: 17
+  node_types:
+  - CLIPLoader
+  - CLIPTextEncode
+  - CLIPVisionEncode
+  - CLIPVisionLoader
+  - KSampler
+  - LoadImage
+  - LoraLoaderModelOnly
+  - MarkdownNote
+  - Note
+  - UNETLoader
+  - VAEDecode
+  - VAELoader
+  - VHS_VideoCombine
+  - WanImageToVideo
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: high
+  complexity_score: 8
+  estimated_runtime: slow (often 2-6 min depending on model/server load)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  - 'Video workflow: usually slower and VRAM-intensive than still-image workflows.'
+  max_width: null
+  max_height: null
+  max_steps: 30

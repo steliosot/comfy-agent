@@ -1,0 +1,103 @@
+name: workflow_ep46_juggernaut_xl_ragnarok_img2img_upscaler
+description: Workflow wrapper for EP46 Juggernaut XL Ragnarok IMG2IMG Upscaler.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: upscale_model
+    name: 4x_NMKD-Siax_200k.pth
+    target_folder: models/upscale_models
+  - type: checkpoint
+    name: juggernautXL_ragnarokBy.safetensors
+    target_folder: models/checkpoints
+  custom_nodes:
+  - ComfyUI-TiledDiffusion
+  - comfyui-easy-use
+  - rgthree-comfy
+  links:
+  - https://civitai.com/api/download/models/1759168?type=Model&format=SafeTensor&size=full&fp=fp16
+  - https://civitai.com/models/133005?modelVersionId=1759168
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/Akumetsu971/SD_Anime_Futuristic_Armor/resolve/main/4x_NMKD-Siax_200k.pth?download=true
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 26
+  node_types:
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - Image Comparer (rgthree)
+  - ImageScaleBy
+  - ImageUpscaleWithModel
+  - KSampler
+  - Label (rgthree)
+  - LoadImage
+  - MarkdownNote
+  - PreviewImage
+  - SaveImage
+  - TiledDiffusion
+  - UpscaleModelLoader
+  - VAEDecode
+  - VAEEncode
+  - easy cleanGpuUsed
+  - easy imageScaleDownToSize
+selection_metadata:
+  family: upscaling
+  resource_profile: low
+  complexity_score: 1
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: 30

@@ -1,0 +1,59 @@
+name: generate_sd15_compat_combo
+description: Run a broader SD1.5 compatibility workflow with load, crop, preview,
+  and save.
+inputs:
+  image:
+    type: string
+    default: agentic_1773257438367_00001_.png
+  prompt:
+    type: string
+    default: cinematic redesign of the source image
+  negative_prompt:
+    type: string
+    default: watermark, text, blurry, artifacts, low quality, distorted anatomy
+  x:
+    type: integer
+    default: 64
+  y:
+    type: integer
+    default: 64
+  width:
+    type: integer
+    default: 512
+  height:
+    type: integer
+    default: 512
+  steps:
+    type: integer
+    default: 20
+  denoise:
+    type: float
+    default: 0.5
+  seed:
+    type: integer
+    default: 845102994511
+outputs:
+  image: string
+requirements:
+  models: []
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - application/json
+  model_families:
+  - other
+  node_count: null
+  node_types: []
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: unknown
+  complexity_score: null
+  estimated_runtime: depends on runtime parameters and server resources
+  warnings:
+  - Hand-authored skill (no embedded workflow.json); metadata is inferred and may
+    be approximate.
+  max_width: null
+  max_height: null
+  max_steps: null

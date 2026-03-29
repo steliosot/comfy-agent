@@ -1,4 +1,4 @@
-from skills.generate_sd15_img2img_remix.skill import build
+from skills.workflows.img2img_inpaint_outpaint.generate_sd15_img2img_remix.skill import build
 
 
 wf = build(

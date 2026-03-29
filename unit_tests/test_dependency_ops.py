@@ -69,7 +69,7 @@ class DependencyOpsTests(unittest.TestCase):
         self.assertIn("model_install", result["supported_operations"])
 
     def test_assess_server_resources_warn_and_block_modes(self):
-        from skills.assess_server_resources.skill import run
+        from skills.infra.assess_server_resources.skill import run
 
         stats_payload = {
             "ok": True,
@@ -80,8 +80,8 @@ class DependencyOpsTests(unittest.TestCase):
         }
         queue_payload = {"ok": True, "running": [1], "pending": [2]}
 
-        with patch("skills.assess_server_resources.skill.fetch_system_stats", return_value=stats_payload), patch(
-            "skills.assess_server_resources.skill.fetch_queue", return_value=queue_payload
+        with patch("skills.infra.assess_server_resources.skill.fetch_system_stats", return_value=stats_payload), patch(
+            "skills.infra.assess_server_resources.skill.fetch_queue", return_value=queue_payload
         ):
             warn_result = run(min_vram_mb=2048, min_storage_gb=5, warn_only=True, server="x")
             block_result = run(min_vram_mb=2048, min_storage_gb=5, warn_only=False, server="x")
@@ -92,7 +92,7 @@ class DependencyOpsTests(unittest.TestCase):
         self.assertGreater(len(block_result["blockers"]), 0)
 
     def test_download_model_success(self):
-        from skills.download_model.skill import run
+        from skills.infra.download_model.skill import run
 
         fake_cfg = SimpleNamespace(
             server="http://127.0.0.1:8000",
@@ -120,10 +120,10 @@ class DependencyOpsTests(unittest.TestCase):
             def __init__(self, *args, **kwargs):
                 self.registry = fake_registry
 
-        with patch("skills.download_model.skill.ComfyConfig.from_env", return_value=fake_cfg), patch(
-            "skills.download_model.skill.manager_install",
+        with patch("skills.infra.download_model.skill.ComfyConfig.from_env", return_value=fake_cfg), patch(
+            "skills.infra.download_model.skill.manager_install",
             return_value={"ok": True, "manager_available": True, "endpoint": "/model/install"},
-        ), patch("skills.download_model.skill.Workflow", FakeWorkflow):
+        ), patch("skills.infra.download_model.skill.Workflow", FakeWorkflow):
             result = run(
                 source="huggingface",
                 model_id_or_url="owner/repo",
@@ -137,7 +137,7 @@ class DependencyOpsTests(unittest.TestCase):
         self.assertTrue(result["token_used"])
 
     def test_download_model_diffusion_model_maps_to_diffusion_models_folder(self):
-        from skills.download_model.skill import run
+        from skills.infra.download_model.skill import run
 
         fake_cfg = SimpleNamespace(
             server="http://127.0.0.1:8000",
@@ -169,10 +169,10 @@ class DependencyOpsTests(unittest.TestCase):
             def __init__(self, *args, **kwargs):
                 self.registry = fake_registry
 
-        with patch("skills.download_model.skill.ComfyConfig.from_env", return_value=fake_cfg), patch(
-            "skills.download_model.skill.manager_install",
+        with patch("skills.infra.download_model.skill.ComfyConfig.from_env", return_value=fake_cfg), patch(
+            "skills.infra.download_model.skill.manager_install",
             return_value={"ok": True, "manager_available": True, "endpoint": "/model/install"},
-        ) as install_mock, patch("skills.download_model.skill.Workflow", FakeWorkflow):
+        ) as install_mock, patch("skills.infra.download_model.skill.Workflow", FakeWorkflow):
             result = run(
                 source="huggingface",
                 model_id_or_url="owner/repo",
@@ -188,7 +188,7 @@ class DependencyOpsTests(unittest.TestCase):
         self.assertEqual(payload["subfolder"], "models/diffusion_models")
 
     def test_install_custom_node_success(self):
-        from skills.install_custom_node.skill import run
+        from skills.infra.install_custom_node.skill import run
 
         fake_cfg = SimpleNamespace(
             server="http://127.0.0.1:8000",
@@ -207,10 +207,10 @@ class DependencyOpsTests(unittest.TestCase):
             def __init__(self, *args, **kwargs):
                 self.registry = {**FAKE_REGISTRY, "VHS_VideoCombine": {"output": [], "output_name": []}}
 
-        with patch("skills.install_custom_node.skill.ComfyConfig.from_env", return_value=fake_cfg), patch(
-            "skills.install_custom_node.skill.manager_install",
+        with patch("skills.infra.install_custom_node.skill.ComfyConfig.from_env", return_value=fake_cfg), patch(
+            "skills.infra.install_custom_node.skill.manager_install",
             return_value={"ok": True, "manager_available": True, "endpoint": "/custom_nodes/install"},
-        ), patch("skills.install_custom_node.skill.Workflow", FakeWorkflow):
+        ), patch("skills.infra.install_custom_node.skill.Workflow", FakeWorkflow):
             result = run(
                 repo_url="https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite",
                 expected_node_classes=["VHS_VideoCombine"],
@@ -220,7 +220,7 @@ class DependencyOpsTests(unittest.TestCase):
         self.assertTrue(result["verification"]["verified"])
 
     def test_model_folder_guide_for_unet(self):
-        from skills.model_folder_guide.skill import run
+        from skills.infra.model_folder_guide.skill import run
 
         result = run(model_type="unet")
         self.assertEqual(result["status"], "ok")
@@ -228,7 +228,7 @@ class DependencyOpsTests(unittest.TestCase):
         self.assertEqual(result["entry"]["loader"], "UNETLoader")
 
     def test_remove_model_success(self):
-        from skills.remove_model.skill import run
+        from skills.infra.remove_model.skill import run
 
         fake_cfg = SimpleNamespace(
             server="http://127.0.0.1:8000",
@@ -256,10 +256,10 @@ class DependencyOpsTests(unittest.TestCase):
             def __init__(self, *args, **kwargs):
                 self.registry = fake_registry
 
-        with patch("skills.remove_model.skill.ComfyConfig.from_env", return_value=fake_cfg), patch(
-            "skills.remove_model.skill.manager_install",
+        with patch("skills.infra.remove_model.skill.ComfyConfig.from_env", return_value=fake_cfg), patch(
+            "skills.infra.remove_model.skill.manager_install",
             return_value={"ok": True, "manager_available": True, "endpoint": "/model/remove"},
-        ), patch("skills.remove_model.skill.Workflow", FakeWorkflow):
+        ), patch("skills.infra.remove_model.skill.Workflow", FakeWorkflow):
             result = run(
                 filename="missing_now.safetensors",
                 model_type="lora",
@@ -271,7 +271,7 @@ class DependencyOpsTests(unittest.TestCase):
         self.assertTrue(result["verification"]["verified_removed"])
 
     def test_prepare_workflow_dependencies_all_present(self):
-        from skills.prepare_workflow_dependencies.skill import run
+        from skills.infra.prepare_workflow_dependencies.skill import run
 
         class FakeWorkflow:
             def __init__(self, *args, **kwargs):
@@ -293,8 +293,8 @@ class DependencyOpsTests(unittest.TestCase):
             }
         }
 
-        with patch("skills.prepare_workflow_dependencies.skill.Workflow", FakeWorkflow), patch(
-            "skills.prepare_workflow_dependencies.skill.assess_resources",
+        with patch("skills.infra.prepare_workflow_dependencies.skill.Workflow", FakeWorkflow), patch(
+            "skills.infra.prepare_workflow_dependencies.skill.assess_resources",
             return_value={"warnings": [], "blockers": [], "ready_for_install": True},
         ):
             result = run(workflow_payload=workflow_payload, auto_fix=False)
@@ -304,7 +304,7 @@ class DependencyOpsTests(unittest.TestCase):
         self.assertEqual(result["still_missing"]["custom_nodes"], [])
 
     def test_prepare_workflow_dependencies_missing_both_then_fixed(self):
-        from skills.prepare_workflow_dependencies.skill import run
+        from skills.infra.prepare_workflow_dependencies.skill import run
 
         registry_before = {
             **FAKE_REGISTRY,
@@ -350,14 +350,14 @@ class DependencyOpsTests(unittest.TestCase):
             ],
         }
 
-        with patch("skills.prepare_workflow_dependencies.skill.Workflow", side_effect=fake_workflow), patch(
-            "skills.prepare_workflow_dependencies.skill.assess_resources",
+        with patch("skills.infra.prepare_workflow_dependencies.skill.Workflow", side_effect=fake_workflow), patch(
+            "skills.infra.prepare_workflow_dependencies.skill.assess_resources",
             return_value={"warnings": [], "blockers": [], "ready_for_install": True},
         ), patch(
-            "skills.prepare_workflow_dependencies.skill.download_model",
+            "skills.infra.prepare_workflow_dependencies.skill.download_model",
             return_value={"status": "ok", "verification": {"verified": True}},
         ), patch(
-            "skills.prepare_workflow_dependencies.skill.install_custom_node",
+            "skills.infra.prepare_workflow_dependencies.skill.install_custom_node",
             return_value={"status": "ok"},
         ):
             result = run(workflow_payload=workflow_payload, requirements=requirements, auto_fix=True)
@@ -369,9 +369,9 @@ class DependencyOpsTests(unittest.TestCase):
         self.assertGreaterEqual(len(result["fixed"]["custom_nodes"]), 1)
 
     def test_prepare_workflow_dependencies_handles_connectivity_error(self):
-        from skills.prepare_workflow_dependencies.skill import run
+        from skills.infra.prepare_workflow_dependencies.skill import run
 
-        with patch("skills.prepare_workflow_dependencies.skill.Workflow", side_effect=RuntimeError("offline")):
+        with patch("skills.infra.prepare_workflow_dependencies.skill.Workflow", side_effect=RuntimeError("offline")):
             result = run(auto_fix=False)
 
         self.assertEqual(result["status"], "error")
@@ -380,7 +380,7 @@ class DependencyOpsTests(unittest.TestCase):
 
     def test_run_agentic_preflight_error_is_actionable(self):
         with mocked_comfy_api(), patch(
-            "skills.prepare_workflow_dependencies.skill.run",
+            "skills.infra.prepare_workflow_dependencies.skill.run",
             return_value={"ready_for_run": False, "status": "degraded", "warnings": ["manager unavailable"]},
         ):
             result = run_agentic(prompt="generate an image of a robot", print_reasoning=False)
@@ -392,7 +392,7 @@ class DependencyOpsTests(unittest.TestCase):
 
     def test_run_agentic_preflight_warn_path_proceeds(self):
         with mocked_comfy_api(), patch(
-            "skills.prepare_workflow_dependencies.skill.run",
+            "skills.infra.prepare_workflow_dependencies.skill.run",
             return_value={"ready_for_run": True, "status": "ok", "warnings": ["low vram"]},
         ):
             result = run_agentic(prompt="generate an image of a robot", print_reasoning=False)

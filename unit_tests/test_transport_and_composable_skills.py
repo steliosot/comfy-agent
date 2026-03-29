@@ -59,9 +59,9 @@ class TransportAndComposableSkillsTests(unittest.TestCase):
         self.assertEqual(posted[-1]["url"].endswith("/upload/image"), True)
 
     def test_upload_and_download_skills_chain_with_shared_run_id(self):
-        from skills.crop_image.skill import run as crop_run
-        from skills.download_image.skill import run as download_run
-        from skills.upload_image.skill import run as upload_run
+        from skills.workflows.img2img_inpaint_outpaint.crop_image.skill import run as crop_run
+        from skills.infra.download_image.skill import run as download_run
+        from skills.infra.upload_image.skill import run as upload_run
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             image_path = Path(tmp_dir) / "source.png"
@@ -90,7 +90,7 @@ class TransportAndComposableSkillsTests(unittest.TestCase):
             self.assertTrue(download_result["artifacts"][0]["downloaded_path"].endswith(".png"))
 
     def test_download_skill_requires_image_meta_or_prompt_id(self):
-        from skills.download_image.skill import run as download_run
+        from skills.infra.download_image.skill import run as download_run
 
         with self.assertRaises(ValueError):
             download_run()

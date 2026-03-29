@@ -1,0 +1,44 @@
+name: crop_image
+description: Crop a region from an image using ComfyUI.
+inputs:
+  image:
+    type: string
+    description: Input image filename (must exist in ComfyUI input folder)
+  x:
+    type: integer
+    default: 0
+  y:
+    type: integer
+    default: 0
+  width:
+    type: integer
+    default: 256
+  height:
+    type: integer
+    default: 256
+outputs:
+  image:
+    type: string
+requirements:
+  models: []
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - application/json
+  model_families:
+  - other
+  node_count: null
+  node_types: []
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: unknown
+  complexity_score: null
+  estimated_runtime: depends on runtime parameters and server resources
+  warnings:
+  - Hand-authored skill (no embedded workflow.json); metadata is inferred and may
+    be approximate.
+  max_width: null
+  max_height: null
+  max_steps: null

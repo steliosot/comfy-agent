@@ -1,0 +1,104 @@
+name: curated_ltx_0_95_image2video_with_middle_and_end_frame
+description: Curated workflow wrapper for LTX 0.95 image2video with Middle and End
+  Frame.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: clip
+    name: t5xxl_fp16.safetensors
+    target_folder: models/clip
+  - type: checkpoint
+    name: ltx-video-2b-v0.9.5.safetensors
+    target_folder: models/checkpoints
+  custom_nodes:
+  - comfyui-videohelpersuite
+  links:
+  - https://blog.comfy.org/p/ltx-video-095-day-1-support-in-comfyui
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/Comfy-Org/mochi_preview_repackaged/resolve/main/split_files/text_encoders/t5xxl_fp16.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/mochi_preview_repackaged/resolve/main/split_files/text_encoders/t5xxl_fp8_e4m3fn_scaled.safetensors?download=true
+  - https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltx-video-2b-v0.9.5.safetensors?download=true
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - video/mp4
+  model_families:
+  - ltx
+  node_count: 25
+  node_types:
+  - CLIPLoader
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - EmptyLTXVLatentVideo
+  - KSamplerSelect
+  - LTXVAddGuide
+  - LTXVConditioning
+  - LTXVCropGuides
+  - LTXVPreprocess
+  - LTXVScheduler
+  - LoadImage
+  - MarkdownNote
+  - Note
+  - SamplerCustom
+  - VAEDecode
+  - VHS_VideoCombine
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: high
+  complexity_score: 7
+  estimated_runtime: slow (often 2-6 min depending on model/server load)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  - 'Video workflow: usually slower and VRAM-intensive than still-image workflows.'
+  max_width: null
+  max_height: null
+  max_steps: null

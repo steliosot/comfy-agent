@@ -17,7 +17,7 @@ from comfy_agent.curated_workflow_runtime import slugify
 
 
 SOURCE_DIR = REPO_ROOT / "comfy-data" / "workflows"
-DEST_ROOT = REPO_ROOT / "skills" / "curated_workflows"
+DEST_ROOT = REPO_ROOT / "skills" / "workflows"
 
 FAMILY_QUOTAS = {
     "txt2img": 28,
@@ -474,7 +474,7 @@ def run(
 """
 
     run_py = f"""#!/usr/bin/env python3
-\"\"\"CLI wrapper for skills.curated_workflows.{family}.{skill_name}.skill.run\"\"\"
+\"\"\"CLI wrapper for skills.workflows.{family}.{skill_name}.skill.run\"\"\"
 
 import argparse
 import json
@@ -487,7 +487,7 @@ REPO_ROOT = THIS.parents[4]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from skills.curated_workflows.{family}.{skill_name}.skill import run
+from skills.workflows.{family}.{skill_name}.skill import run
 
 
 def main():
@@ -539,7 +539,7 @@ def _write_catalog(selected):
         for item in sorted(by_family[family], key=lambda x: x["title"].lower()):
             lines.append(f"- `{item['id']}`: {item['title']}")
         lines.append("")
-    (DEST_ROOT / "README.md").write_text("\n".join(lines).strip() + "\n", encoding="utf-8")
+    (DEST_ROOT / "curated_README.md").write_text("\n".join(lines).strip() + "\n", encoding="utf-8")
 
     manifest = {
         "generated_count": len(selected),
@@ -547,7 +547,7 @@ def _write_catalog(selected):
         "destination_root": str(DEST_ROOT),
         "entries": selected,
     }
-    (DEST_ROOT / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    (DEST_ROOT / "curated_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
 
 def reindex_existing():
@@ -557,7 +557,7 @@ def reindex_existing():
             continue
         family = family_dir.name
         for skill_dir in sorted(family_dir.iterdir()):
-            if not skill_dir.is_dir():
+            if not skill_dir.is_dir() or skill_dir.name.startswith("_") or not skill_dir.name.startswith("curated_"):
                 continue
             skill_id = skill_dir.name
             source_name = None

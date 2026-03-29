@@ -1,0 +1,85 @@
+name: curated_ep15_sdxl_txt2img_with_multi_styles_and_text_overlay
+description: Curated workflow wrapper for Ep15 SDXL TXT2IMG with Multi Styles and
+  Text Overlay.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: checkpoint
+    name: Juggernaut_X_RunDiffusion.safetensors
+    target_folder: models/checkpoints
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 16
+  node_types:
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - EmptyLatentImage
+  - KSampler
+  - Label (rgthree)
+  - Note
+  - SaveImage
+  - VAEDecode
+  - iToolsAddOverlay
+  - iToolsPromptStylerExtra
+selection_metadata:
+  family: editing_restyle
+  resource_profile: low
+  complexity_score: 2
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Medium-high resolution detected; expect moderate extra runtime.
+  max_width: 1024
+  max_height: 1024
+  max_steps: 30

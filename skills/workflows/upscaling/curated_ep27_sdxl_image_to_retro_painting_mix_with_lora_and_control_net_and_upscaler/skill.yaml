@@ -1,0 +1,103 @@
+name: curated_ep27_sdxl_image_to_retro_painting_mix_with_lora_and_control_net_and_upscaler
+description: Curated workflow wrapper for EP27 SDXL Image to Retro Painting Mix with
+  Lora and Control Net and UPSCALER.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: upscale_model
+    name: 4x_NMKD-Siax_200k.pth
+    target_folder: models/upscale_models
+  - type: checkpoint
+    name: Juggernaut_X_RunDiffusion.safetensors
+    target_folder: models/checkpoints
+  - type: lora
+    name: Retro_Illustration.safetensors
+    target_folder: models/loras
+  - type: controlnet
+    name: diffusion_pytorch_model_promax.safetensors
+    target_folder: models/controlnet
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 28
+  node_types:
+  - AIO_Preprocessor
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - ControlNetApplyAdvanced
+  - ControlNetLoader
+  - Fast Groups Muter (rgthree)
+  - ImageScaleBy
+  - ImageScaleToTotalPixels
+  - ImageUpscaleWithModel
+  - KSampler
+  - LoadImage
+  - LoraLoader
+  - PreviewImage
+  - SaveImage
+  - Text Concatenate
+  - UpscaleModelLoader
+  - VAEDecodeTiled
+  - VAEEncode
+  - easy positive
+selection_metadata:
+  family: upscaling
+  resource_profile: low
+  complexity_score: 0
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings: []
+  max_width: null
+  max_height: null
+  max_steps: 30

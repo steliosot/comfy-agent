@@ -7,7 +7,7 @@ from unit_tests.test_helpers import FAKE_REGISTRY
 
 class PredictJobSuccessLikelihoodTests(unittest.TestCase):
     def test_predict_high_likelihood_with_good_dependencies_and_history(self):
-        from skills.predict_job_success_likelihood.skill import run
+        from skills.infra.predict_job_success_likelihood.skill import run
 
         fake_registry = {
             **FAKE_REGISTRY,
@@ -43,16 +43,16 @@ class PredictJobSuccessLikelihoodTests(unittest.TestCase):
         }
 
         with patch(
-            "skills.predict_job_success_likelihood.skill.Workflow",
+            "skills.infra.predict_job_success_likelihood.skill.Workflow",
             return_value=SimpleNamespace(registry=fake_registry),
         ), patch(
-            "skills.predict_job_success_likelihood.skill.fetch_json",
+            "skills.infra.predict_job_success_likelihood.skill.fetch_json",
             return_value={"ok": True, **history_payload},
         ), patch(
-            "skills.predict_job_success_likelihood.skill.fetch_queue",
+            "skills.infra.predict_job_success_likelihood.skill.fetch_queue",
             return_value={"ok": True, "running": [], "pending": []},
         ), patch(
-            "skills.predict_job_success_likelihood.skill.fetch_system_stats",
+            "skills.infra.predict_job_success_likelihood.skill.fetch_system_stats",
             return_value={
                 "ok": True,
                 "stats": {"devices": [{"vram_free": 8 * 1024 * 1024 * 1024}]},
@@ -65,7 +65,7 @@ class PredictJobSuccessLikelihoodTests(unittest.TestCase):
         self.assertEqual(result["recommendation"], "safe_to_run")
 
     def test_predict_low_likelihood_when_dependencies_missing(self):
-        from skills.predict_job_success_likelihood.skill import run
+        from skills.infra.predict_job_success_likelihood.skill import run
 
         fake_registry = {
             **FAKE_REGISTRY,
@@ -88,16 +88,16 @@ class PredictJobSuccessLikelihoodTests(unittest.TestCase):
         }
 
         with patch(
-            "skills.predict_job_success_likelihood.skill.Workflow",
+            "skills.infra.predict_job_success_likelihood.skill.Workflow",
             return_value=SimpleNamespace(registry=fake_registry),
         ), patch(
-            "skills.predict_job_success_likelihood.skill.fetch_json",
+            "skills.infra.predict_job_success_likelihood.skill.fetch_json",
             return_value={"ok": True, "data": {}},
         ), patch(
-            "skills.predict_job_success_likelihood.skill.fetch_queue",
+            "skills.infra.predict_job_success_likelihood.skill.fetch_queue",
             return_value={"ok": True, "running": [], "pending": []},
         ), patch(
-            "skills.predict_job_success_likelihood.skill.fetch_system_stats",
+            "skills.infra.predict_job_success_likelihood.skill.fetch_system_stats",
             return_value={
                 "ok": True,
                 "stats": {"devices": [{"vram_free": 4 * 1024 * 1024 * 1024}]},

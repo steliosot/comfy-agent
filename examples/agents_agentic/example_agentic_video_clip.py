@@ -1,4 +1,4 @@
-from skills.generate_video_clip.skill import run
+from skills.workflows.video_t2v_i2v_avatar.generate_video_clip.skill import run
 
 
 prompt = "Create a cinematic product video clip and export as video/h264-mp4."

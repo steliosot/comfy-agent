@@ -1,0 +1,77 @@
+name: workflow_ep26_liveportrait_image_to_video_with_no_driving_video
+description: Workflow wrapper for Ep26 LivePortrait Image to Video with NO Driving
+  Video.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - image
+  output_modalities:
+  - video/mp4
+  model_families:
+  - other
+  node_count: 15
+  node_types:
+  - AdvancedLivePortrait
+  - ExpressionEditor
+  - LoadImage
+  - Note
+  - VHS_VideoCombine
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: medium
+  complexity_score: 4
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - 'Video workflow: usually slower and VRAM-intensive than still-image workflows.'
+  max_width: null
+  max_height: null
+  max_steps: null

@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from skills.match_curated_workflow.skill import run
+from skills.infra.match_curated_workflow.skill import run
 
 
 result = run(

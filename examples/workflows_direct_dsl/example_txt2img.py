@@ -1,4 +1,4 @@
-from skills.generate_sd15_image.skill import run
+from skills.workflows.txt2img.generate_sd15_image.skill import run
 
 result = run(
     prompt="photo of a rusty robot, cinematic lighting, shallow depth of field",

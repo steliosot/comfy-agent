@@ -1,0 +1,113 @@
+name: curated_qwen_image_edit_restore_photo
+description: Curated workflow wrapper for Qwen Image Edit - Restore Photo.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: vae
+    name: qwen_image_vae.safetensors
+    target_folder: models/vae
+  - type: diffusion_model
+    name: Qwen_Image_Edit-Q8_0.gguf
+    target_folder: models/diffusion_models
+  - type: clip
+    name: qwen_2.5_vl_7b_fp8_scaled.safetensors
+    target_folder: models/clip
+  - type: lora
+    name: Qwen-Image-Edit-Lightning-8steps-V1.0.safetensors
+    target_folder: models/loras
+  custom_nodes:
+  - ComfyUI-GGUF
+  - rgthree-comfy
+  links:
+  - https://blog.comfy.org/p/qwen-image-in-comfyui-new-era-of
+  - https://discord.com/invite/gggpkVgBf3
+  - https://github.com/ModelTC/Qwen-Image-Lightning/
+  - https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors
+  - https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors
+  - https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/tree/main/split_files/text_encoders
+  - https://huggingface.co/QuantStack/Qwen-Image-Edit-GGUF
+  - https://huggingface.co/QuantStack/Qwen-Image-Edit-GGUF/tree/main
+  - https://huggingface.co/lightx2v/Qwen-Image-Lightning/resolve/main/Qwen-Image-Edit-Lightning-8steps-V1.0.safetensors?download=true
+  - https://huggingface.co/lightx2v/Qwen-Image-Lightning/tree/main
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  output_modalities:
+  - image/png
+  model_families:
+  - qwen
+  node_count: 18
+  node_types:
+  - CFGNorm
+  - CLIPLoader
+  - Image Comparer (rgthree)
+  - ImageScaleToTotalPixels
+  - KSampler
+  - Label (rgthree)
+  - LoadImage
+  - LoraLoaderModelOnly
+  - MarkdownNote
+  - ModelSamplingAuraFlow
+  - SaveImage
+  - TextEncodeQwenImageEdit
+  - UnetLoaderGGUF
+  - VAEDecode
+  - VAEEncode
+  - VAELoader
+selection_metadata:
+  family: editing_restyle
+  resource_profile: medium
+  complexity_score: 3
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: 8

@@ -1,0 +1,48 @@
+name: agentic_plan
+description: Build a structured non-executing plan for agentic generation/crop/video flows.
+
+inputs:
+  prompt:
+    type: string
+    required: true
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  ckpt_name:
+    type: string
+    required: false
+  auto_prepare:
+    type: boolean
+    required: false
+  dependency_requirements:
+    type: object
+    required: false
+
+outputs:
+  status:
+    type: string
+  plan_version:
+    type: string
+  prompt:
+    type: string
+  generation_prompt:
+    type: string
+  choices:
+    type: array
+  steps:
+    type: array
+  params:
+    type: object
+  preflight:
+    type: object
+  warnings:
+    type: array

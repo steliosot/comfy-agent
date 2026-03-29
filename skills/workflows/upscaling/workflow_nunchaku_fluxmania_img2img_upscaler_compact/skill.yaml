@@ -1,0 +1,79 @@
+name: workflow_nunchaku_fluxmania_img2img_upscaler_compact
+description: Workflow wrapper for Nunchaku Fluxmania img2img + Upscaler COMPACT.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes:
+  - rgthree-comfy
+  links: []
+  input_modalities:
+  - image
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 9
+  node_types:
+  - 0feddd95-9af0-4015-a496-e834b940aa53
+  - Fast Groups Muter (rgthree)
+  - Image Comparer (rgthree)
+  - Label (rgthree)
+  - LoadImage
+  - SaveImage
+  - c6270336-0d83-4e19-a528-4b32c37cb30c
+selection_metadata:
+  family: upscaling
+  resource_profile: low
+  complexity_score: 1
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: null
+  max_height: null
+  max_steps: null

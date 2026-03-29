@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from skills.crop_image.skill import run as crop_run
-from skills.download_image.skill import run as download_run
-from skills.generate_flux_multi_input_img2img.skill import run as generate_flux_multi_input_run
-from skills.upload_image.skill import run as upload_run
+from skills.workflows.img2img_inpaint_outpaint.crop_image.skill import run as crop_run
+from skills.infra.download_image.skill import run as download_run
+from skills.workflows.img2img_inpaint_outpaint.generate_flux_multi_input_img2img.skill import run as generate_flux_multi_input_run
+from skills.infra.upload_image.skill import run as upload_run
 
 
 def _remote_name(run_id, index, image_path):

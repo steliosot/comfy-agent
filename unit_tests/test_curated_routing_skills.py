@@ -1,9 +1,9 @@
 import unittest
 from unittest.mock import patch
 
-from skills.list_curated_workflows.skill import run as list_curated_workflows
-from skills.match_curated_workflow.skill import run as match_curated_workflow
-from skills.run_curated_workflow.skill import run as run_curated_workflow
+from skills.infra.list_curated_workflows.skill import run as list_curated_workflows
+from skills.infra.match_curated_workflow.skill import run as match_curated_workflow
+from skills.workflows.txt2img.run_curated_workflow.skill import run as run_curated_workflow
 
 
 class CuratedRoutingSkillsTests(unittest.TestCase):
@@ -24,7 +24,7 @@ class CuratedRoutingSkillsTests(unittest.TestCase):
         skill_id = matches["matches"][0]["id"]
 
         with patch(
-            "skills.run_curated_workflow.skill._run_curated",
+            "skills.workflows.txt2img.run_curated_workflow.skill._run_curated",
             return_value={"status": "done", "prompt_id": "test-prompt", "output_images": []},
         ):
             result = run_curated_workflow(skill_id=skill_id, prompt="portrait photo")

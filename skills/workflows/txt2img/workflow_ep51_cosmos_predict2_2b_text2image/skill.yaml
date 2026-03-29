@@ -1,0 +1,97 @@
+name: workflow_ep51_cosmos_predict2_2b_text2image
+description: Workflow wrapper for EP51 Cosmos Predict2 2B Text2Image.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: vae
+    name: wan_2.1_vae.safetensors
+    target_folder: models/vae
+  - type: clip
+    name: oldt5_xxl_fp8_e4m3fn_scaled.safetensors
+    target_folder: models/clip
+  - type: diffusion_model
+    name: cosmos_predict2_2B_t2i.safetensors
+    target_folder: models/diffusion_models
+  custom_nodes: []
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/Comfy-Org/Cosmos_Predict2_repackaged/resolve/main/cosmos_predict2_2B_t2i.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/Cosmos_Predict2_repackaged/tree/main
+  - https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors
+  - https://huggingface.co/comfyanonymous/cosmos_1.0_text_encoder_and_VAE_ComfyUI/resolve/main/text_encoders/oldt5_xxl_fp8_e4m3fn_scaled.safetensors
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - sd3
+  - wan
+  node_count: 10
+  node_types:
+  - CLIPLoader
+  - CLIPTextEncode
+  - EmptySD3LatentImage
+  - KSampler
+  - MarkdownNote
+  - SaveImage
+  - UNETLoader
+  - VAEDecode
+  - VAELoader
+selection_metadata:
+  family: txt2img
+  resource_profile: medium
+  complexity_score: 4
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Medium-high resolution detected; expect moderate extra runtime.
+  max_width: 1024
+  max_height: 1024
+  max_steps: 35

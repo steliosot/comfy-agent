@@ -203,7 +203,7 @@ New ops skills are available for dependency preflight and remediation:
 Example preflight call:
 
 ```python
-from skills.prepare_workflow_dependencies.skill import run
+from skills.infra.prepare_workflow_dependencies.skill import run
 
 result = run(
     requirements={
@@ -231,7 +231,7 @@ print(result)
 Check where a model type should be installed:
 
 ```python
-from skills.model_folder_guide.skill import run
+from skills.infra.model_folder_guide.skill import run
 
 print(run(model_type="lora"))
 print(run(model_type="unet"))  # maps to models/diffusion_models
@@ -240,7 +240,7 @@ print(run(model_type="unet"))  # maps to models/diffusion_models
 Remove an installed model by type + filename:
 
 ```python
-from skills.remove_model.skill import run
+from skills.infra.remove_model.skill import run
 
 print(run(filename="my_lora.safetensors", model_type="lora"))
 ```
@@ -248,7 +248,7 @@ print(run(filename="my_lora.safetensors", model_type="lora"))
 Route a prompt to best curated workflows:
 
 ```python
-from skills.match_curated_workflow.skill import run
+from skills.infra.match_curated_workflow.skill import run
 
 result = run(
     prompt="cinematic product video with smooth camera movement",
@@ -260,7 +260,7 @@ print(result)
 Then execute one:
 
 ```python
-from skills.run_curated_workflow.skill import run
+from skills.workflows.txt2img.run_curated_workflow.skill import run
 
 result = run(
     skill_id="curated_ltx_0_95_text2video",
@@ -272,7 +272,7 @@ print(result)
 Get model/dependency links directly from workflow notes:
 
 ```python
-from skills.get_workflow_download_links.skill import run
+from skills.infra.get_workflow_download_links.skill import run
 
 # by curated skill id
 print(run(skill_id="curated_ltx_0_95_text2video"))
@@ -284,7 +284,7 @@ print(run(workflow_path="comfy-data/workflows/example.json"))
 Predict execution likelihood before submitting:
 
 ```python
-from skills.predict_job_success_likelihood.skill import run
+from skills.infra.predict_job_success_likelihood.skill import run
 
 result = run(skill_id="curated_ltx_0_95_text2video")
 print(result["likelihood"], result["recommendation"])
@@ -294,16 +294,20 @@ Skill organization is now documented in:
 
 - `skills/README.md`
 - `skills/infra/README.md`
-- `skills/workflow/README.md`
+- `skills/workflows/README.md`
 
-Workflow subcategories:
+Workflow capability folders:
 
-- `skills/workflow/text2image/README.md`
-- `skills/workflow/image2image/README.md`
-- `skills/workflow/text2video/README.md`
-- `skills/workflow/image2video/README.md`
-- `skills/workflow/preview_and_post/README.md`
-- `skills/workflow/curated/README.md`
+- `skills/workflows/audio/`
+- `skills/workflows/txt2img/`
+- `skills/workflows/img2img_inpaint_outpaint/`
+- `skills/workflows/editing_restyle/`
+- `skills/workflows/video_t2v_i2v_avatar/`
+- `skills/workflows/upscaling/`
+
+Curated workflow catalog (human-readable library):
+
+- [CURATED_WORKFLOWS.md](CURATED_WORKFLOWS.md)
 
 Infra subcategories:
 
@@ -322,6 +326,30 @@ result = run_agentic(
     auto_prepare=True,
 )
 print(result)
+```
+
+Two-step agentic flow is also available when you want to inspect the plan before execution:
+
+```python
+from comfy_agent import agentic_plan, agentic_execute
+
+plan = agentic_plan(
+    prompt="generate a bottle of Coca-Cola and then crop it to wide screen 1280x720",
+    auto_prepare=True,
+)
+print(plan)
+
+result = agentic_execute(plan_payload=plan)
+print(result)
+```
+
+Slash indicator helper:
+
+```python
+from comfy_agent import agentic_command
+
+plan = agentic_command("/plan cinematic product photo of a bottle of Coca-Cola")
+result = agentic_command("/execute", plan_payload=plan)
 ```
 
 ## Recommended KSampler Settings
@@ -390,9 +418,13 @@ These examples are useful if you want a simpler authoring style while keeping th
 
 The [skills_basic](examples/other/skills_basic) folder shows how workflows can be wrapped as reusable skills.
 
-Curated imported workflow skills are available under:
+Curated imported workflow skills are indexed in:
 
-- `skills/curated_workflows/`
+- `skills/workflows/curated_manifest.json`
+
+All imported workflow wrappers are indexed in:
+
+- `skills/workflows/all_workflows_manifest.json`
 
 They are generated from `comfy-data/workflows` with:
 
@@ -418,7 +450,7 @@ Each skill folder now follows a consistent package structure:
 Example:
 
 ```bash
-python3 skills/generate_sd15_image/scripts/run.py \
+python3 skills/workflows/generate_sd15_image/scripts/run.py \
   --args '{"prompt":"cinematic robot"}' \
   --pretty
 ```
@@ -464,6 +496,8 @@ Included examples:
 
 - `example_agentic_single_skill.py` (generate a Coke bottle image)
 - `example_agentic_generate_then_crop.py` (generate then crop to `1280x720`)
+- `example_agentic_plan_then_execute.py` (explicit two-step flow)
+- `example_agentic_slash_commands.py` (`/plan` and `/execute` helper flow)
 - `example_upload_crop_download.py` (upload local image -> run skill -> download locally)
 
 ## Running in Parallel

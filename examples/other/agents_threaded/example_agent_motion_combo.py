@@ -1,7 +1,7 @@
 from comfy_agent.job import Job, Executor
-from skills.generate_sd15_animated_webp.skill import run as animated_webp
-from skills.generate_sd15_stelios_shoe_ad.skill import run as shoe_ad
-from skills.generate_sd15_cinematic_portrait.skill import run as portrait
+from skills.workflows.video_t2v_i2v_avatar.generate_sd15_animated_webp.skill import run as animated_webp
+from skills.workflows.txt2img.generate_sd15_stelios_shoe_ad.skill import run as shoe_ad
+from skills.workflows.txt2img.generate_sd15_cinematic_portrait.skill import run as portrait
 
 
 class MotionComboAgent:

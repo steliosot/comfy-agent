@@ -1,0 +1,73 @@
+name: workflow_nunchaku_qwen_lightning_outpainting_ultra_compact
+description: Workflow wrapper for Nunchaku Qwen Lightning - Outpainting Ultra Compact.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models: []
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - image
+  output_modalities:
+  - image/png
+  model_families:
+  - other
+  node_count: 3
+  node_types:
+  - 8982aacd-5dbe-4a6b-a5f1-33bfc1f21eb0
+  - LoadImage
+  - SaveImage
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: low
+  complexity_score: 0
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings: []
+  max_width: null
+  max_height: null
+  max_steps: null

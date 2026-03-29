@@ -1,0 +1,131 @@
+name: workflow_flux_txt2img_with_cn_depth_and_upscaler_2k_landscape_16_9
+description: Workflow wrapper for Flux txt2img with CN Depth and Upscaler - 2K Landscape
+  16-9.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: upscale_model
+    name: 4x_NMKD-Siax_200k.pth
+    target_folder: models/upscale_models
+  - type: clip
+    name: t5-v1_1-xxl-encoder-Q8_0.gguf
+    target_folder: models/clip
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  - type: controlnet
+    name: flux-cn-pro-2.safetensors
+    target_folder: models/controlnet
+  - type: diffusion_model
+    name: flux1-dev-Q8_0.gguf
+    target_folder: models/diffusion_models
+  custom_nodes:
+  - ComfyUI-TiledDiffusion
+  - comfyui-easy-use
+  - comfyui-gguf
+  - comfyui_controlnet_aux
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/Akumetsu971/SD_Anime_Futuristic_Armor/resolve/main/4x_NMKD-Siax_200k.pth?download=true
+  - https://huggingface.co/Shakker-Labs/FLUX.1-dev-ControlNet-Union-Pro-2.0/resolve/main/diffusion_pytorch_model.safetensors?download=true
+  - https://huggingface.co/black-forest-labs/FLUX.1-schnell
+  - https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors?download=true
+  - https://huggingface.co/city96/FLUX.1-dev-gguf/resolve/main/flux1-dev-Q8_0.gguf?download=true
+  - https://huggingface.co/city96/FLUX.1-dev-gguf/tree/main
+  - https://huggingface.co/city96/t5-v1_1-xxl-encoder-gguf/resolve/main/t5-v1_1-xxl-encoder-Q8_0.gguf?download=true
+  - https://huggingface.co/city96/t5-v1_1-xxl-encoder-gguf/tree/main
+  - https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  - sd3
+  node_count: 35
+  node_types:
+  - AIO_Preprocessor
+  - CLIPTextEncode
+  - ControlNetApplyAdvanced
+  - ControlNetLoader
+  - DualCLIPLoaderGGUF
+  - EmptySD3LatentImage
+  - Fast Groups Muter (rgthree)
+  - FluxGuidance
+  - ImageScale
+  - ImageScaleBy
+  - ImageUpscaleWithModel
+  - KSampler
+  - Label (rgthree)
+  - LoadImage
+  - MarkdownNote
+  - PreviewImage
+  - SaveImage
+  - SetUnionControlNetType
+  - TiledDiffusion
+  - UnetLoaderGGUF
+  - UpscaleModelLoader
+  - VAEDecode
+  - VAEEncode
+  - VAELoader
+  - easy cleanGpuUsed
+selection_metadata:
+  family: upscaling
+  resource_profile: high
+  complexity_score: 7
+  estimated_runtime: slow (often 2-6 min depending on model/server load)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Medium-high resolution detected; expect moderate extra runtime.
+  - Multiple custom nodes required; verify node installation/version compatibility.
+  max_width: 1344
+  max_height: 768
+  max_steps: 30

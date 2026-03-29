@@ -1,0 +1,172 @@
+{
+  "id": "d2ac2fc2-e47a-42ef-9d28-144a44b4fd41",
+  "revision": 0,
+  "last_node_id": 20,
+  "last_link_id": 18,
+  "nodes": [
+    {
+      "id": 19,
+      "type": "Label (rgthree)",
+      "pos": [
+        -156.47634887695312,
+        103.37527465820312
+      ],
+      "size": [
+        441.8701171875,
+        30
+      ],
+      "flags": {
+        "allow_interaction": true
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "ByteDance Seedream 4 - txt2img",
+      "properties": {
+        "fontSize": 30,
+        "fontFamily": "Arial",
+        "fontColor": "#f8a742",
+        "textAlign": "center",
+        "backgroundColor": "transparent",
+        "padding": 0,
+        "borderRadius": 0
+      },
+      "color": "#fff0",
+      "bgcolor": "#fff0"
+    },
+    {
+      "id": 14,
+      "type": "SaveImage",
+      "pos": [
+        665.4642944335938,
+        188.17861938476562
+      ],
+      "size": [
+        405.0212097167969,
+        445.1070251464844
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 18
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "ComfyUI"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "ByteDanceSeedreamNode",
+      "pos": [
+        248.54653930664062,
+        188.17861938476562
+      ],
+      "size": [
+        394.49041748046875,
+        434.7287902832031
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            18
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "ByteDanceSeedreamNode"
+      },
+      "widgets_values": [
+        "seedream-4-0-250828",
+        "a 3D render of an adorable white bunny with fluffy soft fur, oversized glossy black eyes, a tiny pink nose, and chubby cheeks, sitting happily in a bright green meadow filled with colorful wildflowers, the bunny wearing a cute straw hat slightly tilted to one side, rendered in a Pixar-style with smooth rounded shapes and highly detailed fur texture, the background showing rolling hills under a clear blue sky with fluffy white clouds, sunlight warm and diffused to create a soft cheerful atmosphere, composition centered with the bunny looking up with an innocent happy expression",
+        "2048x2048 (1:1)",
+        2048,
+        2048,
+        "disabled",
+        1,
+        782219087,
+        "randomize",
+        false
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 18,
+      "type": "MarkdownNote",
+      "pos": [
+        -154.5359344482422,
+        188.17861938476562
+      ],
+      "size": [
+        380.6551513671875,
+        115.64735412597656
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "👑 Pixaroma - Note - START HERE (Episode 63)",
+      "properties": {},
+      "widgets_values": [
+        "## 📚 Resources  \n🎥 **Tutorials:** [Pixaroma YouTube Channel](https://www.youtube.com/@pixaroma)  \n💬 **Community Discord:** [Join Here](https://discord.com/invite/gggpkVgBf3)\n\nComfyUI API Prices [HERE](https://docs.comfy.org/tutorials/api-nodes/pricing)"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      18,
+      20,
+      0,
+      14,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1.4641000000000026,
+      "offset": [
+        242.92145204030135,
+        -62.66820146173849
+      ]
+    },
+    "frontendVersion": "1.26.11",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

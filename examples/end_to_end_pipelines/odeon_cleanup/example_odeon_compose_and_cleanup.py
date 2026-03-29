@@ -3,13 +3,13 @@ from pathlib import Path
 from time import perf_counter, time
 
 from comfy_agent.config import ComfyConfig
-from skills.delete_image_job.skill import run as delete_image_job_run
-from skills.delete_video_job.skill import run as delete_video_job_run
-from skills.download_image.skill import run as download_image_run
-from skills.download_video.skill import run as download_video_run
-from skills.generate_flux_multi_input_img2img.skill import run as generate_image_run
-from skills.generate_ltxv_img2video.skill import run as generate_video_run
-from skills.upload_image.skill import run as upload_image_run
+from skills.infra.delete_image_job.skill import run as delete_image_job_run
+from skills.infra.delete_video_job.skill import run as delete_video_job_run
+from skills.infra.download_image.skill import run as download_image_run
+from skills.infra.download_video.skill import run as download_video_run
+from skills.workflows.img2img_inpaint_outpaint.generate_flux_multi_input_img2img.skill import run as generate_image_run
+from skills.workflows.video_t2v_i2v_avatar.generate_ltxv_img2video.skill import run as generate_video_run
+from skills.infra.upload_image.skill import run as upload_image_run
 
 
 def _now_iso():

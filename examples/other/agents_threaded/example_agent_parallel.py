@@ -1,5 +1,5 @@
 from comfy_agent.job import Job, Executor
-from skills.generate_sd15_image.skill import run as generate_image
+from skills.workflows.txt2img.generate_sd15_image.skill import run as generate_image
 
 
 class ImageAgent:

@@ -1,0 +1,100 @@
+name: workflow_ep18_flux_dev_q8_img2img_with_cute_3d_lora
+description: Workflow wrapper for EP18 Flux Dev Q8 IMG2IMG with Cute 3D Lora.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: diffusion_model
+    name: flux1-dev-Q8_0.gguf
+    target_folder: models/diffusion_models
+  - type: clip
+    name: clip_l.safetensors
+    target_folder: models/clip
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  custom_nodes: []
+  links:
+  - https://civitai.com/models/677725/cute-3d-cartoon-flux
+  - https://huggingface.co/alimama-creative/FLUX.1-Turbo-Alpha/resolve/main/diffusion_pytorch_model.safetensors?download=true
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - flux
+  node_count: 22
+  node_types:
+  - CLIPTextEncode
+  - DualCLIPLoaderGGUF
+  - FluxGuidance
+  - Image Comparer (rgthree)
+  - KSampler
+  - Label (rgthree)
+  - LoadImage
+  - Note
+  - Power Lora Loader (rgthree)
+  - SaveImage
+  - Text Concatenate
+  - UnetLoaderGGUF
+  - VAEDecode
+  - VAEEncode
+  - VAELoader
+  - easy imageScaleDownToSize
+  - easy positive
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: low
+  complexity_score: 2
+  estimated_runtime: fast (usually under 30s on modern GPU)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  max_width: null
+  max_height: null
+  max_steps: 8

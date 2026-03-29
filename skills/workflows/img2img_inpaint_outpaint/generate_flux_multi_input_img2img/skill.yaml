@@ -1,0 +1,62 @@
+name: generate_flux_multi_input_img2img
+description: Generate one image from 2 or 3 already-uploaded Comfy input images using
+  a FLUX multi-reference img2img pipeline.
+inputs:
+  prompt:
+    type: string
+    description: Main prompt text used for CLIP encoding.
+  images:
+    type: array
+    required: false
+    description: List of 2 or 3 Comfy input filenames from upload_image.
+  image1:
+    type: string
+    required: false
+    description: Comfy input filename from upload_image.
+  image2:
+    type: string
+    required: false
+    description: Comfy input filename from upload_image.
+  image3:
+    type: string
+    required: false
+    description: Comfy input filename from upload_image.
+outputs:
+  status:
+    type: string
+  run_id:
+    type: string
+  prompt_id:
+    type: string
+  filename_prefix:
+    type: string
+  output_images:
+    type: array
+  artifacts:
+    type: array
+  engine:
+    type: string
+    description: 'Selected backend engine: flux or checkpoint.'
+requirements:
+  models: []
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - application/json
+  model_families:
+  - other
+  node_count: null
+  node_types: []
+selection_metadata:
+  family: img2img_inpaint_outpaint
+  resource_profile: unknown
+  complexity_score: null
+  estimated_runtime: depends on runtime parameters and server resources
+  warnings:
+  - Hand-authored skill (no embedded workflow.json); metadata is inferred and may
+    be approximate.
+  max_width: null
+  max_height: null
+  max_steps: null

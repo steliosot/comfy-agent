@@ -1,0 +1,113 @@
+name: curated_ltxv_13b_0_9_7_fp8_i2v_extend_landscape_768x512px
+description: Curated workflow wrapper for LTXV 13b 0.9.7-FP8 i2v EXTEND Landscape
+  768x512px.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: clip
+    name: t5xxl_fp16.safetensors
+    target_folder: models/clip
+  - type: checkpoint
+    name: ltxv-13b-0.9.7-distilled-fp8.safetensors
+    target_folder: models/checkpoints
+  custom_nodes:
+  - ComfyUI-LTXVideo
+  - comfyui-easy-use
+  - comfyui-kjnodes
+  - comfyui-videohelpersuite
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://github.com/Lightricks/ComfyUI-LTXVideo/
+  - https://huggingface.co/Comfy-Org/mochi_preview_repackaged/resolve/main/split_files/text_encoders/t5xxl_fp16.safetensors?download=true
+  - https://huggingface.co/Comfy-Org/mochi_preview_repackaged/resolve/main/split_files/text_encoders/t5xxl_fp8_e4m3fn_scaled.safetensors?download=true
+  - https://huggingface.co/Lightricks/LTX-Video
+  - https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltxv-13b-0.9.7-distilled-fp8.safetensors?download=true
+  - https://huggingface.co/Lightricks/LTX-Video/tree/main
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - video/mp4
+  model_families:
+  - ltx
+  node_count: 26
+  node_types:
+  - CLIPLoader
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - Fast Groups Muter (rgthree)
+  - FloatToSigmas
+  - KSamplerSelect
+  - LTXVBaseSampler
+  - LTXVConditioning
+  - LTXVExtendSampler
+  - Label (rgthree)
+  - LoadImage
+  - MarkdownNote
+  - Note
+  - RandomNoise
+  - STGGuiderAdvanced
+  - Set VAE Decoder Noise
+  - StringToFloatList
+  - VAEDecode
+  - VHS_VideoCombine
+  - easy cleanGpuUsed
+selection_metadata:
+  family: video_t2v_i2v_avatar
+  resource_profile: very_high
+  complexity_score: 9
+  estimated_runtime: heavy (can exceed 6 min; best on high-VRAM GPU)
+  warnings:
+  - Large model(s) detected; ensure enough VRAM and disk space.
+  - Multiple custom nodes required; verify node installation/version compatibility.
+  - 'Video workflow: usually slower and VRAM-intensive than still-image workflows.'
+  max_width: null
+  max_height: null
+  max_steps: null

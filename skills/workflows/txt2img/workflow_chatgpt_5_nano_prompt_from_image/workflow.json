@@ -1,0 +1,265 @@
+{
+  "id": "d2ac2fc2-e47a-42ef-9d28-144a44b4fd41",
+  "revision": 0,
+  "last_node_id": 22,
+  "last_link_id": 21,
+  "nodes": [
+    {
+      "id": 18,
+      "type": "MarkdownNote",
+      "pos": [
+        -159.4816131591797,
+        176.15257263183594
+      ],
+      "size": [
+        380.6551513671875,
+        115.64735412597656
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "👑 Pixaroma - Note - START HERE (Episode 63)",
+      "properties": {},
+      "widgets_values": [
+        "## 📚 Resources  \n🎥 **Tutorials:** [Pixaroma YouTube Channel](https://www.youtube.com/@pixaroma)  \n💬 **Community Discord:** [Join Here](https://discord.com/invite/gggpkVgBf3)\n\nComfyUI API Prices [HERE](https://docs.comfy.org/tutorials/api-nodes/pricing)"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 15,
+      "type": "LoadImage",
+      "pos": [
+        239.2674560546875,
+        175.59228515625
+      ],
+      "size": [
+        290.0580749511719,
+        397.1956481933594
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            19
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "Bunny.png",
+        "image"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "PreviewAny",
+      "pos": [
+        963.9343872070312,
+        174.76522827148438
+      ],
+      "size": [
+        469.07598876953125,
+        169.16305541992188
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 20
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 19,
+      "type": "Label (rgthree)",
+      "pos": [
+        -156.47634887695312,
+        103.37527465820312
+      ],
+      "size": [
+        513.515625,
+        30
+      ],
+      "flags": {
+        "allow_interaction": true
+      },
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "ChatGPT 5 Nano - Prompt from Image",
+      "properties": {
+        "fontSize": 30,
+        "fontFamily": "Arial",
+        "fontColor": "#f8a742",
+        "textAlign": "center",
+        "backgroundColor": "transparent",
+        "padding": 0,
+        "borderRadius": 0
+      },
+      "color": "#fff0",
+      "bgcolor": "#fff0"
+    },
+    {
+      "id": 22,
+      "type": "OpenAIChatConfig",
+      "pos": [
+        -150.1855926513672,
+        617.0390625
+      ],
+      "size": [
+        680.8064575195312,
+        341.3724670410156
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "OPENAI_CHAT_CONFIG",
+          "type": "OPENAI_CHAT_CONFIG",
+          "links": [
+            21
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "OpenAIChatConfig"
+      },
+      "widgets_values": [
+        "auto",
+        4096,
+        "You write one single text-to-image prompt that recreates the provided image as literally as possible.\n\nOutput rules:\n- Output only the prompt as one comma-separated line. No preface, no labels, no lists, no metadata, no quotes.\n- Do not invent or remove elements. If unsure, use neutral terms like \"unbranded\", \"unknown\".\n- No artist names, model names, camera brands, or quality boosters.\n- English only. Keep it concise and concrete.\n\nContent order to follow:\n1) main subject and clothing/accessories  \n2) background and setting (must explicitly state plain background or white seamless backdrop if seen)  \n3) composition and camera view (shot size, angle, depth of field)  \n4) lighting and shadows (type, direction, softness)  \n5) color palette and textures/materials  \n6) time of day or weather and mood (if visible)  \n7) visible text exactly as seen  \n8) medium or style only if clearly evident (photo, illustration, 3D render, watercolor, etc)\n\nTarget length: 150 words.\n"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "OpenAIChatNode",
+      "pos": [
+        543.2482299804688,
+        174.44970703125
+      ],
+      "size": [
+        398.7877197265625,
+        781.818115234375
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 19
+        },
+        {
+          "name": "files",
+          "shape": 7,
+          "type": "OPENAI_INPUT_FILES",
+          "link": null
+        },
+        {
+          "name": "advanced_options",
+          "shape": 7,
+          "type": "OPENAI_CHAT_CONFIG",
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            20
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "OpenAIChatNode"
+      },
+      "widgets_values": [
+        "Describe the uploaded image as a single, comma-separated text-to-image prompt that follows the system rules and returns only the prompt.\n",
+        false,
+        "gpt-5-nano"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      19,
+      15,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      20,
+      20,
+      0,
+      21,
+      0,
+      "*"
+    ],
+    [
+      21,
+      22,
+      0,
+      20,
+      2,
+      "OPENAI_CHAT_CONFIG"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1.1,
+      "offset": [
+        300.11783041184526,
+        -56.69572905148254
+      ]
+    },
+    "frontendVersion": "1.26.11",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

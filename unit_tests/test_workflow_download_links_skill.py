@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from skills.get_workflow_download_links.skill import run as get_workflow_download_links
+from skills.infra.get_workflow_download_links.skill import run as get_workflow_download_links
 
 
 class WorkflowDownloadLinksSkillTests(unittest.TestCase):
@@ -37,7 +37,7 @@ class WorkflowDownloadLinksSkillTests(unittest.TestCase):
             self.assertIn("github", result["links_by_provider"])
 
     def test_extract_links_from_curated_skill_id(self):
-        manifest_path = Path(__file__).resolve().parents[1] / "skills" / "curated_workflows" / "manifest.json"
+        manifest_path = Path(__file__).resolve().parents[1] / "skills" / "workflows" / "curated_manifest.json"
         if not manifest_path.exists():
             self.skipTest("curated manifest not found")
 

@@ -1,0 +1,556 @@
+{
+  "id": "c5beec59-2b88-4f3f-ba35-7640a58a9ba6",
+  "revision": 0,
+  "last_node_id": 195,
+  "last_link_id": 235,
+  "nodes": [
+    {
+      "id": 191,
+      "type": "ModelSamplingAuraFlow",
+      "pos": [
+        -357.5198763316576,
+        199.7729592891799
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 233
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            225
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "ModelSamplingAuraFlow"
+      },
+      "widgets_values": [
+        3
+      ]
+    },
+    {
+      "id": 190,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        -51.25410885325098,
+        568.2360922319655
+      ],
+      "size": [
+        197.712890625,
+        26
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 219
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            220
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "ConditioningZeroOut"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 163,
+      "type": "KSampler",
+      "pos": [
+        -51.25801933433452,
+        248.92014540270492
+      ],
+      "size": [
+        296.2197989449314,
+        262
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 225
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 223
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 220
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 186
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            187
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.27",
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        378448116214032,
+        "randomize",
+        5,
+        1,
+        "dpmpp_sde",
+        "beta",
+        1
+      ]
+    },
+    {
+      "id": 162,
+      "type": "EmptySD3LatentImage",
+      "pos": [
+        -340.4409160713849,
+        654.9742912083202
+      ],
+      "size": [
+        250.61128906920487,
+        106
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            186
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.32",
+        "Node name for S&R": "EmptySD3LatentImage"
+      },
+      "widgets_values": [
+        1920,
+        1088,
+        1
+      ],
+      "color": "#323",
+      "bgcolor": "#535"
+    },
+    {
+      "id": 164,
+      "type": "VAEDecode",
+      "pos": [
+        283.1206551369837,
+        160.69852458673026
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 187
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 235
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            231
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.32",
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 193,
+      "type": "ImageCrop",
+      "pos": [
+        445.91238179335215,
+        81.75587354926313
+      ],
+      "size": [
+        270,
+        130
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 231
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            232
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "ImageCrop"
+      },
+      "widgets_values": [
+        1920,
+        1080,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 171,
+      "type": "SaveImage",
+      "pos": [
+        272.75735860123734,
+        271.8787131606198
+      ],
+      "size": [
+        1001.1115487386137,
+        628.0686130805794
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 232
+        }
+      ],
+      "outputs": [],
+      "title": "Save Image Original",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.27",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "img"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -510.6173893074787,
+        301.16852260814346
+      ],
+      "size": [
+        424.42708333333337,
+        293.02083333333337
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 234
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            219,
+            223
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.27",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "portrait photo of a rusty old robot forged from sun-scorched steel, closeup with dynamic action, its glowing red eyes locked forward as one heavily corroded hand thrusts toward the viewer, fingers made of pitted metal segments and sand-scarred joints reaching as if to seize something just beyond the frame, cracked facial plates flaring with fiery reflections from the harsh desert sun, layers of rust peeling like ancient armor, cinematic backlight igniting a halo of drifting grit around the robot’s outline, heat distortion shimmering across the background, intense shadows and blazing highlights shaping the moment into a raw Mad Max–style confrontation, Nikon D850 with a 35mm f/1.4 lens"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 194,
+      "type": "MarkdownNote",
+      "pos": [
+        -1062.2314130345874,
+        402.12021385935395
+      ],
+      "size": [
+        509.64713135260695,
+        371.73536948265496
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "👑 Pixaroma - Note - START HERE (Episode 72)",
+      "properties": {},
+      "widgets_values": [
+        "# MODELS AND NODES USED IN THIS WORKFLOW  \n\n---\n\n## 🟣 Load Checkpoint\n### Download **z-image-turbo-fp8-aio.safetensors** ~10GB from [HERE](https://huggingface.co/SeeSee21/Z-Image-Turbo-AIO/resolve/main/z-image-turbo-fp8-aio.safetensors?download=true)\n\n### Or \n\n### Download **z-image-turbo-bf16-aio.safetensors** ~20 GB from [HERE](https://huggingface.co/SeeSee21/Z-Image-Turbo-AIO/resolve/main/z-image-turbo-bf16-aio.safetensors?download=true)\n\n📁 **Place in:** `ComfyUI/models/checkpoints` \n\nMore info about the AIO models [HERE](https://huggingface.co/SeeSee21/Z-Image-Turbo-AIO)\n\n---\n\n## 🧩 Nodes Installed from Manager  \n\n- None\n\n---\n\n## 📚 Resources  \n🎥 **Tutorials:** [Pixaroma YouTube Channel](https://www.youtube.com/@pixaroma)  \n💬 **Community Discord:** [Join Here](https://discord.com/invite/gggpkVgBf3)\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 195,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        -998.5363949070351,
+        260.65663882538763
+      ],
+      "size": [
+        441.385348559052,
+        98
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            233
+          ]
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            234
+          ]
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            235
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "z-image-turbo-fp8-aio.safetensors"
+      ]
+    },
+    {
+      "id": 192,
+      "type": "Note",
+      "pos": [
+        -876.8914078228354,
+        820.1133649255731
+      ],
+      "size": [
+        321.9885322309368,
+        223.68759328945544
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Settings",
+      "properties": {},
+      "widgets_values": [
+        "EmptySD3LatentImage:\n- Width & height between 1024–2048\n- Examples: 1440x1440, 1920x1088\n\nKSampler:\n- Steps: 5–9\n- CFG:\n  - 1.0 = default\n  - 0.8 = more desaturated\n  - 1–3 = more saturated but slower\n\nSampler + Scheduler Combinations:\n- dpmpp_sde        + beta    → 5 steps\n- res_multistep    + simple  → 9 steps\n- euler_ancestral  + beta    → 9 steps\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      186,
+      162,
+      0,
+      163,
+      3,
+      "LATENT"
+    ],
+    [
+      187,
+      163,
+      0,
+      164,
+      0,
+      "LATENT"
+    ],
+    [
+      219,
+      6,
+      0,
+      190,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      220,
+      190,
+      0,
+      163,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      223,
+      6,
+      0,
+      163,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      225,
+      191,
+      0,
+      163,
+      0,
+      "MODEL"
+    ],
+    [
+      231,
+      164,
+      0,
+      193,
+      0,
+      "IMAGE"
+    ],
+    [
+      232,
+      193,
+      0,
+      171,
+      0,
+      "IMAGE"
+    ],
+    [
+      233,
+      195,
+      0,
+      191,
+      0,
+      "MODEL"
+    ],
+    [
+      234,
+      195,
+      1,
+      6,
+      0,
+      "CLIP"
+    ],
+    [
+      235,
+      195,
+      2,
+      164,
+      1,
+      "VAE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1.0152559799477094,
+      "offset": [
+        1141.5688622302628,
+        72.55658299512335
+      ]
+    },
+    "frontendVersion": "1.33.10",
+    "node_versions": {
+      "ComfyUI-GGUF": "8098c7149fa4ff14991eb3347a5585051ceeafbe",
+      "comfy-core": "v0.3.10-37-gd055325",
+      "rgthree-comfy": "5d771b8b56a343c24a26e8cea1f0c87c3d58102f"
+    },
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true,
+    "workflowRendererVersion": "LG"
+  },
+  "version": 0.4
+}

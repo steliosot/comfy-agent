@@ -1,0 +1,95 @@
+name: workflow_03_z_image_turbo_txt2img_aio_fp8_or_bf16_2560x1440px_2k
+description: Workflow wrapper for 03-Z Image Turbo txt2img AIO FP8 or BF16 2560x1440px
+  2K.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: checkpoint
+    name: z-image-turbo-fp8-aio.safetensors
+    target_folder: models/checkpoints
+  custom_nodes:
+  - rgthree-comfy
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://huggingface.co/SeeSee21/Z-Image-Turbo-AIO
+  - https://huggingface.co/SeeSee21/Z-Image-Turbo-AIO/resolve/main/z-image-turbo-bf16-aio.safetensors?download=true
+  - https://huggingface.co/SeeSee21/Z-Image-Turbo-AIO/resolve/main/z-image-turbo-fp8-aio.safetensors?download=true
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - image/png
+  model_families:
+  - sd3
+  node_count: 16
+  node_types:
+  - CLIPTextEncode
+  - CheckpointLoaderSimple
+  - ConditioningZeroOut
+  - EmptySD3LatentImage
+  - Image Comparer (rgthree)
+  - ImageScale
+  - KSampler
+  - MarkdownNote
+  - ModelSamplingAuraFlow
+  - Note
+  - SaveImage
+  - VAEDecode
+  - VAEEncode
+selection_metadata:
+  family: txt2img
+  resource_profile: medium
+  complexity_score: 3
+  estimated_runtime: moderate (about 30-120s depending on server)
+  warnings:
+  - Medium-high resolution detected; expect moderate extra runtime.
+  - Uses custom nodes; missing nodes can cause validation/runtime failures.
+  max_width: 1280
+  max_height: 720
+  max_steps: 5
