@@ -1,0 +1,26 @@
+name: assess_server_resources
+description: Assess ComfyUI server queue, VRAM, and storage compatibility for workflow execution.
+
+inputs:
+  min_vram_mb:
+    type: number
+    required: false
+  min_storage_gb:
+    type: number
+    required: false
+  warn_only:
+    type: boolean
+    default: true
+  server:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  ready_for_install:
+    type: boolean
+  warnings:
+    type: array
+  blockers:
+    type: array

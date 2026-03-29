@@ -1,0 +1,22 @@
+name: remove_model
+description: Remove an installed model via ComfyUI-Manager API and verify removal.
+
+inputs:
+  filename:
+    type: string
+  model_type:
+    type: string
+  subfolder:
+    type: string
+    required: false
+  server:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  remove:
+    type: object
+  verification:
+    type: object

@@ -1,4 +1,8 @@
 import os
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[3]))
 
 from skills.download_image.skill import run as download_run
 from skills.generate_flux_multi_input_img2img.skill import run

@@ -1,0 +1,13 @@
+name: model_folder_guide
+description: Return canonical ComfyUI model type to folder/loader mapping.
+
+inputs:
+  model_type:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  mapping:
+    type: object

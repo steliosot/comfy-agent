@@ -97,6 +97,22 @@ export COMFY_URL=localhost:8000
 unset COMFY_AUTH_HEADER
 ```
 
+Optional env keys for dependency auto-repair:
+
+```bash
+export HF_TOKEN=
+export CIVITAI_API_KEY=
+export COMFY_MANAGER_API_PREFIX=/manager
+export COMFY_RESOURCE_MIN_FREE_VRAM_MB=
+export COMFY_RESOURCE_MIN_FREE_STORAGE_GB=
+```
+
+Provider token usage:
+
+- `HF_TOKEN` is used by `download_model` when `source="huggingface"`.
+- `CIVITAI_API_KEY` is used by `download_model` when `source="civitai"`.
+- You can still pass `token=...` directly per call to override env values.
+
 ## Your First Workflow
 
 Start with the direct workflow API. This is the lowest-level and most explicit way to build a ComfyUI graph.
@@ -294,6 +310,84 @@ from skills.generate_sd15_image.skill import run
 run(prompt="cinematic robot")
 ```
 
+## Curated Workflow Skills
+
+This repo now supports a curated migration path from raw ComfyUI-exported workflows into OpenClaw-ready skill packages.
+
+Build curated skills from `comfy-data/workflows`:
+
+```bash
+python3 tools/build_curated_workflow_skills.py --limit 120
+python3 tools/validate_curated_workflow_skills.py
+```
+
+Generated output lives in:
+
+- `skills/curated_workflows/<capability>/<skill_name>/`
+
+Each folder contains:
+
+- `workflow.json`
+- `SKILL.md`
+- `skill.yaml`
+- `skill.py`
+- `scripts/run.py`
+
+### Match and Run the Best Curated Workflow
+
+```python
+from skills.match_curated_workflow.skill import run as match_workflow
+from skills.run_curated_workflow.skill import run as run_workflow
+
+prompt = "cinematic product video of sneakers with smooth camera motion"
+
+matches = match_workflow(prompt=prompt, top_k=3)
+print(matches)
+
+best_id = matches["matches"][0]["id"]
+result = run_workflow(skill_id=best_id, prompt=prompt)
+print(result)
+```
+
+### Extract Correct Download Links From Workflow Notes
+
+```python
+from skills.get_workflow_download_links.skill import run
+
+links = run(skill_id="curated_ltx_0_95_text2video")
+print(links)
+```
+
+This reads URLs directly from note/content nodes inside `workflow.json` and groups them by provider:
+
+- `huggingface`
+- `civitai`
+- `github`
+- `comfy_docs`
+- `community`
+
+### Predict Whether a Job Is Likely to Succeed
+
+```python
+from skills.predict_job_success_likelihood.skill import run
+
+result = run(skill_id="curated_ltx_0_95_text2video")
+print(result["likelihood"], result["confidence"], result["recommendation"])
+```
+
+Prediction uses:
+
+- installed dependencies (required nodes/models vs current server)
+- similar historical runs from `/history`
+- current queue and resource pressure
+
+### Skills Organization
+
+To keep the repository easier to navigate:
+
+- Infra/ops skills are documented in `skills/infra/README.md`
+- Workflow/execution skills are documented in `skills/workflow/README.md`
+
 ## Extending a Skill Before Execution
 
 Because a skill returns a workflow, it can be edited before it runs.
@@ -318,6 +412,44 @@ This is the key idea behind editable skills:
 - skills are reusable
 - skills are not black boxes
 - skills can be inspected and modified by code or by agents
+
+## Dependency Skills: Download, Folder Guide, Remove
+
+Use `model_folder_guide` to check where each model should be installed:
+
+```python
+from skills.model_folder_guide.skill import run as folder_guide
+
+print(folder_guide(model_type="checkpoint"))      # models/checkpoints
+print(folder_guide(model_type="lora"))            # models/loras
+print(folder_guide(model_type="diffusion_model")) # models/diffusion_models
+```
+
+Download a model with provider-backed auth:
+
+```python
+from skills.download_model.skill import run as download_model
+
+result = download_model(
+    source="civitai",
+    model_id_or_url="https://civitai.com/api/download/models/12345",
+    filename="example_light_lora.safetensors",
+    model_type="lora",
+)
+print(result)
+```
+
+Remove a model if you need to roll back:
+
+```python
+from skills.remove_model.skill import run as remove_model
+
+result = remove_model(
+    filename="example_light_lora.safetensors",
+    model_type="lora",
+)
+print(result)
+```
 
 ## Cloning a Skill Workflow
 
@@ -550,6 +682,36 @@ result = run_agentic(
 print(result)
 ```
 
+Example (auto dependency preflight + remediation):
+
+```python
+from comfy_agent import run_agentic
+
+result = run_agentic(
+    prompt="cinematic product video clip of a bottle on a kitchen counter",
+    auto_prepare=True,
+    dependency_requirements={
+        "models": [
+            {
+                "name": "wan2.1/wan2.1_t2v_1.3B_fp16.safetensors",
+                "model_type": "unet",
+                "source": "huggingface",
+                "model_id_or_url": "Wan-AI/Wan2.1-T2V-1.3B",
+                "filename": "wan2.1/wan2.1_t2v_1.3B_fp16.safetensors",
+            }
+        ],
+        "custom_nodes": [
+            {
+                "repo_url": "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite",
+                "expected_node_classes": ["VHS_VideoCombine"],
+            }
+        ],
+    },
+)
+
+print(result)
+```
+
 Example (combined skills: generate image then crop):
 
 ```python
@@ -572,6 +734,17 @@ If your prompt asks for video and crop together, current behavior is:
 Try the ready-made examples in:
 
 - `examples/agents_agentic/`
+
+## Ops Skills for Dependency Management
+
+The project now includes dependency and resource ops skills:
+
+- `assess_server_resources`
+- `download_model`
+- `install_custom_node`
+- `prepare_workflow_dependencies`
+
+These are designed for agent workflows that need to auto-fix missing models and custom nodes.
 
 ## Testing
 

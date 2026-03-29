@@ -109,7 +109,7 @@ class TransportAndComposableSkillsTests(unittest.TestCase):
         self.assertEqual(result["context"]["run_id"], "agentic123")
         self.assertIn("artifacts", result)
         self.assertIn("preflight", result)
-        self.assertTrue(result["preflight"]["ok"])
+        self.assertTrue(result["preflight"]["ready_for_run"])
 
 
 if __name__ == "__main__":

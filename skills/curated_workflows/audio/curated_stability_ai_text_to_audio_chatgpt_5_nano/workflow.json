@@ -1,0 +1,317 @@
+{
+  "id": "d2ac2fc2-e47a-42ef-9d28-144a44b4fd41",
+  "revision": 0,
+  "last_node_id": 24,
+  "last_link_id": 22,
+  "nodes": [
+    {
+      "id": 20,
+      "type": "StabilityTextToAudio",
+      "pos": [
+        242.22137451171875,
+        182.4637451171875
+      ],
+      "size": [
+        406.0105285644531,
+        313.6849670410156
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            18
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "StabilityTextToAudio"
+      },
+      "widgets_values": [
+        "stable-audio-2.5",
+        "",
+        190,
+        3397615925,
+        "randomize",
+        8
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 18,
+      "type": "MarkdownNote",
+      "pos": [
+        -592.8399658203125,
+        188.8246612548828
+      ],
+      "size": [
+        380.6551513671875,
+        115.64735412597656
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "👑 Pixaroma - Note - START HERE (Episode 63)",
+      "properties": {},
+      "widgets_values": [
+        "## 📚 Resources  \n🎥 **Tutorials:** [Pixaroma YouTube Channel](https://www.youtube.com/@pixaroma)  \n💬 **Community Discord:** [Join Here](https://discord.com/invite/gggpkVgBf3)\n\nComfyUI API Prices [HERE](https://docs.comfy.org/tutorials/api-nodes/pricing)"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 23,
+      "type": "OpenAIChatConfig",
+      "pos": [
+        -592.8399658203125,
+        365.6845397949219
+      ],
+      "size": [
+        394.9802551269531,
+        360.1802673339844
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "OPENAI_CHAT_CONFIG",
+          "type": "OPENAI_CHAT_CONFIG",
+          "links": [
+            19
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "OpenAIChatConfig"
+      },
+      "widgets_values": [
+        "auto",
+        4096,
+        "You are a prompt generator specialized in Stable Audio 2.5. \nYour task is to generate one single text-to-audio prompt.\n\nOutput rules:\n- Output only the prompt as one natural descriptive sentence.\n- Do not include labels (no \"Genre:\", \"Mood:\", etc).\n- No explanations, no lists, no brackets, no quotes.\n- Style: comma-separated descriptors describing instruments, mood, atmosphere, tempo, BPM, duration if relevant.\n- Keep it between 20–40 words.\n- Example style: relaxing acoustic song, gentle fingerpicked guitar with warm tones, soft melodic piano chords, subtle ambient reverb, light atmospheric pads, soothing and calm atmosphere, mellow tempo, 70 BPM\n"
+      ]
+    },
+    {
+      "id": 24,
+      "type": "PreviewAny",
+      "pos": [
+        242.22137451171875,
+        555.479736328125
+      ],
+      "size": [
+        406.0105285644531,
+        166.9091339111328
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 22
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 22,
+      "type": "OpenAIChatNode",
+      "pos": [
+        -171.05186462402344,
+        189.92733764648438
+      ],
+      "size": [
+        380.6551513671875,
+        580
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "files",
+          "shape": 7,
+          "type": "OPENAI_INPUT_FILES",
+          "link": null
+        },
+        {
+          "name": "advanced_options",
+          "shape": 7,
+          "type": "OPENAI_CHAT_CONFIG",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            21,
+            22
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "OpenAIChatNode"
+      },
+      "widgets_values": [
+        "romantic guitar and piano song, love, passion",
+        false,
+        "gpt-5-nano",
+        ""
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 21,
+      "type": "SaveAudioMP3",
+      "pos": [
+        664.46044921875,
+        183.46551513671875
+      ],
+      "size": [
+        270,
+        136
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 18
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.59",
+        "Node name for S&R": "SaveAudioMP3"
+      },
+      "widgets_values": [
+        "audio/ComfyUI",
+        "V0"
+      ]
+    },
+    {
+      "id": 19,
+      "type": "Label (rgthree)",
+      "pos": [
+        -592.8399658203125,
+        101.72238159179688
+      ],
+      "size": [
+        594.462890625,
+        30
+      ],
+      "flags": {
+        "allow_interaction": true
+      },
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Stability AI Text To Audio + ChatGPT 5 Nano",
+      "properties": {
+        "fontSize": 30,
+        "fontFamily": "Arial",
+        "fontColor": "#f8a742",
+        "textAlign": "center",
+        "backgroundColor": "transparent",
+        "padding": 0,
+        "borderRadius": 0
+      },
+      "color": "#fff0",
+      "bgcolor": "#fff0"
+    }
+  ],
+  "links": [
+    [
+      18,
+      20,
+      0,
+      21,
+      0,
+      "AUDIO"
+    ],
+    [
+      19,
+      23,
+      0,
+      22,
+      2,
+      "OPENAI_CHAT_CONFIG"
+    ],
+    [
+      21,
+      22,
+      0,
+      20,
+      0,
+      "STRING"
+    ],
+    [
+      22,
+      22,
+      0,
+      24,
+      0,
+      "*"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1.2100000000000006,
+      "offset": [
+        747.7761113653755,
+        20.002409708579318
+      ]
+    },
+    "frontendVersion": "1.26.11",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

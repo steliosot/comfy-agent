@@ -1,4 +1,8 @@
 from pprint import pprint
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[3]))
 
 from skills.list_comfy_assets.skill import run
 

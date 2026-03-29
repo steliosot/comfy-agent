@@ -28,6 +28,10 @@ All additional examples are grouped under `other/`:
   - Includes `4 WAN video clip.json` (video export via VHS).
 - `other/skills_basic/`
   - Basic skill usage examples.
+  - Includes dependency ops examples (`model_folder_guide`, `download_model`, `remove_model`).
+  - Includes curated workflow routing examples (`match_curated_workflow`, `run_curated_workflow`).
+  - Includes workflow-note link extraction example (`get_workflow_download_links`).
+  - Includes execution likelihood prediction example (`predict_job_success_likelihood`).
 - `other/skills_buildable/`
   - Build-first skill examples where `build(...)` returns a workflow.
   - Includes WAN 2.1 h264-mp4 animation skill examples.

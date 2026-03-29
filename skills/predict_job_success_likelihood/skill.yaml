@@ -1,0 +1,37 @@
+name: predict_job_success_likelihood
+description: Predict probability that a workflow job will succeed based on installed dependencies, server resources, and similar history.
+
+inputs:
+  skill_id:
+    type: string
+    required: false
+  workflow_path:
+    type: string
+    required: false
+  workflow_payload:
+    type: object
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+  recent_history_limit:
+    type: integer
+    default: 200
+
+outputs:
+  status:
+    type: string
+  likelihood:
+    type: number
+  confidence:
+    type: number
+  recommendation:
+    type: string
+  breakdown:
+    type: object

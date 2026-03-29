@@ -140,6 +140,16 @@ COMFY_INPUT_DIR=/absolute/path/to/local/input
 COMFY_OUTPUT_DIR=/absolute/path/to/local/output
 ```
 
+Optional keys for dependency auto-repair skills:
+
+```bash
+HF_TOKEN=
+CIVITAI_API_KEY=
+COMFY_MANAGER_API_PREFIX=/manager
+COMFY_RESOURCE_MIN_FREE_VRAM_MB=
+COMFY_RESOURCE_MIN_FREE_STORAGE_GB=
+```
+
 Validate config and endpoints in one command:
 
 ```bash
@@ -173,6 +183,146 @@ wf = Workflow(
 ```
 
 If your Nginx proxy exposes ComfyUI under `/api`, `Workflow(...)` now auto-detects that path.
+
+## Dependency Auto-Repair Skills
+
+New ops skills are available for dependency preflight and remediation:
+
+- `assess_server_resources`
+- `download_model`
+- `install_custom_node`
+- `prepare_workflow_dependencies`
+- `model_folder_guide`
+- `remove_model`
+- `list_curated_workflows`
+- `match_curated_workflow`
+- `run_curated_workflow`
+- `get_workflow_download_links`
+- `predict_job_success_likelihood`
+
+Example preflight call:
+
+```python
+from skills.prepare_workflow_dependencies.skill import run
+
+result = run(
+    requirements={
+        "models": [
+            {
+                "name": "sd1.5/juggernaut_reborn.safetensors",
+                "model_type": "checkpoint",
+                "source": "huggingface",
+                "model_id_or_url": "runwayml/stable-diffusion-v1-5",
+                "filename": "sd1.5/juggernaut_reborn.safetensors",
+            }
+        ],
+        "custom_nodes": [
+            {
+                "repo_url": "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite",
+                "expected_node_classes": ["VHS_VideoCombine"],
+            }
+        ],
+    },
+    auto_fix=True,
+)
+print(result)
+```
+
+Check where a model type should be installed:
+
+```python
+from skills.model_folder_guide.skill import run
+
+print(run(model_type="lora"))
+print(run(model_type="unet"))  # maps to models/diffusion_models
+```
+
+Remove an installed model by type + filename:
+
+```python
+from skills.remove_model.skill import run
+
+print(run(filename="my_lora.safetensors", model_type="lora"))
+```
+
+Route a prompt to best curated workflows:
+
+```python
+from skills.match_curated_workflow.skill import run
+
+result = run(
+    prompt="cinematic product video with smooth camera movement",
+    top_k=3,
+)
+print(result)
+```
+
+Then execute one:
+
+```python
+from skills.run_curated_workflow.skill import run
+
+result = run(
+    skill_id="curated_ltx_0_95_text2video",
+    prompt="cinematic drone shot of a Greek island",
+)
+print(result)
+```
+
+Get model/dependency links directly from workflow notes:
+
+```python
+from skills.get_workflow_download_links.skill import run
+
+# by curated skill id
+print(run(skill_id="curated_ltx_0_95_text2video"))
+
+# or by any local workflow path
+print(run(workflow_path="comfy-data/workflows/example.json"))
+```
+
+Predict execution likelihood before submitting:
+
+```python
+from skills.predict_job_success_likelihood.skill import run
+
+result = run(skill_id="curated_ltx_0_95_text2video")
+print(result["likelihood"], result["recommendation"])
+```
+
+Skill organization is now documented in:
+
+- `skills/README.md`
+- `skills/infra/README.md`
+- `skills/workflow/README.md`
+
+Workflow subcategories:
+
+- `skills/workflow/text2image/README.md`
+- `skills/workflow/image2image/README.md`
+- `skills/workflow/text2video/README.md`
+- `skills/workflow/image2video/README.md`
+- `skills/workflow/preview_and_post/README.md`
+- `skills/workflow/curated/README.md`
+
+Infra subcategories:
+
+- `skills/infra/dependencies/README.md`
+- `skills/infra/server_monitoring/README.md`
+- `skills/infra/transfer_and_cleanup/README.md`
+- `skills/infra/catalog_and_routing/README.md`
+
+`run_agentic(...)` now supports automatic dependency preflight:
+
+```python
+from comfy_agent import run_agentic
+
+result = run_agentic(
+    prompt="cinematic product video clip of a bottle on a kitchen counter",
+    auto_prepare=True,
+)
+print(result)
+```
 
 ## Recommended KSampler Settings
 
@@ -239,6 +389,17 @@ These examples are useful if you want a simpler authoring style while keeping th
 ## Skill Examples
 
 The [skills_basic](examples/other/skills_basic) folder shows how workflows can be wrapped as reusable skills.
+
+Curated imported workflow skills are available under:
+
+- `skills/curated_workflows/`
+
+They are generated from `comfy-data/workflows` with:
+
+```bash
+python3 tools/build_curated_workflow_skills.py --limit 120
+python3 tools/validate_curated_workflow_skills.py
+```
 
 The [skills](skills) folder contains the actual skill definitions, including:
 

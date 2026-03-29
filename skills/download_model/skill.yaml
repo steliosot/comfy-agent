@@ -1,0 +1,34 @@
+name: download_model
+description: Download/install a model via ComfyUI-Manager API using HuggingFace or Civitai source metadata.
+
+inputs:
+  source:
+    type: string
+    description: huggingface | civitai
+  model_id_or_url:
+    type: string
+  filename:
+    type: string
+  model_type:
+    type: string
+    description: checkpoint | vae | clip | lora | unet | custom
+  revision:
+    type: string
+    required: false
+  subfolder:
+    type: string
+    required: false
+  token:
+    type: string
+    required: false
+  server:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  install:
+    type: object
+  verification:
+    type: object

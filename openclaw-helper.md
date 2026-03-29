@@ -44,7 +44,12 @@ Typical remote config:
 ```env
 COMFY_URL=http://34.27.83.101
 COMFY_API_PREFIX=/api
+COMFY_MANAGER_API_PREFIX=/manager
 COMFY_AUTH_HEADER=YOUR_AUTH_KEY
+HF_TOKEN=
+CIVITAI_API_KEY=
+COMFY_RESOURCE_MIN_FREE_VRAM_MB=
+COMFY_RESOURCE_MIN_FREE_STORAGE_GB=
 COMFY_INPUT_DIR=tmp/inputs
 COMFY_OUTPUT_DIR=tmp/outputs
 ```
@@ -52,6 +57,7 @@ COMFY_OUTPUT_DIR=tmp/outputs
 Notes:
 
 - `COMFY_API_PREFIX` is usually `/api` for proxied deployments.
+- `COMFY_MANAGER_API_PREFIX` defaults to `/manager`.
 - `COMFY_INPUT_DIR` and `COMFY_OUTPUT_DIR` are local folders used by scripts.
 - Skills load `.env` automatically through `ComfyConfig.from_env(...)`.
 
@@ -101,6 +107,14 @@ python3 skills/download_image/scripts/run.py --args '{"prompt_id":"<id>","run_id
 python3 skills/download_video/scripts/run.py --args '{"prompt_id":"<id>","run_id":"demo"}' --pretty
 python3 skills/delete_image_job/scripts/run.py --args '{"prompt_id":"<id>"}' --pretty
 python3 skills/delete_video_job/scripts/run.py --args '{"prompt_id":"<id>"}' --pretty
+
+# dependency auto-repair
+python3 skills/assess_server_resources/scripts/run.py --args '{}' --pretty
+python3 skills/download_model/scripts/run.py --args '{"source":"huggingface","model_id_or_url":"owner/repo","filename":"sd1.5/model.safetensors","model_type":"checkpoint"}' --pretty
+python3 skills/install_custom_node/scripts/run.py --args '{"repo_url":"https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite","expected_node_classes":["VHS_VideoCombine"]}' --pretty
+python3 skills/prepare_workflow_dependencies/scripts/run.py --args '{"requirements":{"models":[],"custom_nodes":[]}}' --pretty
+python3 skills/model_folder_guide/scripts/run.py --args '{"model_type":"diffusion_model"}' --pretty
+python3 skills/remove_model/scripts/run.py --args '{"filename":"example_light_lora.safetensors","model_type":"lora"}' --pretty
 ```
 
 ## 5) Skill Composition Pattern (Recommended)
@@ -247,4 +261,3 @@ PYTHONPATH=. python3 examples/end_to_end_pipelines/birkbeck_monitored/example_bi
 - shared monitoring/cleanup helpers:
   - `comfy_agent/monitoring.py`
   - `comfy_agent/cleanup.py`
-

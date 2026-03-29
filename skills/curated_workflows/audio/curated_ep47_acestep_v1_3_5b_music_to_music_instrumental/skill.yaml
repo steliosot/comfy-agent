@@ -1,0 +1,67 @@
+name: curated_ep47_acestep_v1_3_5b_music_to_music_instrumental
+description: Curated workflow wrapper for EP47 AceStep V1 3.5b music to music - Instrumental.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: checkpoint
+    name: ace_step_v1_3.5b.safetensors
+    target_folder: models/checkpoints
+  custom_nodes: []
+  links:
+  - https://discord.com/invite/gggpkVgBf3
+  - https://docs.comfy.org/tutorials/audio/ace-step/ace-step-v1
+  - https://docs.comfy.org/tutorials/audio/ace-step/ace-step-v1#multilingual-support
+  - https://github.com/ace-step/ACE-Step
+  - https://huggingface.co/ACE-Step/ACE-Step-v1-3.5B
+  - https://huggingface.co/Comfy-Org/ACE-Step_ComfyUI_repackaged/resolve/main/all_in_one/ace_step_v1_3.5b.safetensors?download=true
+  - https://www.youtube.com/@pixaroma
+  input_modalities:
+  - text_prompt
+  output_modalities:
+  - audio/wav

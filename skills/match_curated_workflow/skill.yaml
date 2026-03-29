@@ -1,0 +1,27 @@
+name: match_curated_workflow
+description: Match the most appropriate curated workflow skill(s) from prompt intent and optional filters.
+
+inputs:
+  prompt:
+    type: string
+  top_k:
+    type: integer
+    default: 5
+  family:
+    type: string
+    required: false
+  input_modality:
+    type: string
+    required: false
+  output_modality:
+    type: string
+    required: false
+  model_family:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  matches:
+    type: array

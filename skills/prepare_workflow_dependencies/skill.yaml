@@ -1,0 +1,40 @@
+name: prepare_workflow_dependencies
+description: Detect and auto-fix missing models/custom nodes before workflow execution.
+
+inputs:
+  requirements:
+    type: object
+    required: false
+  workflow_payload:
+    type: object
+    required: false
+  workflow_path:
+    type: string
+    required: false
+  auto_fix:
+    type: boolean
+    default: true
+  warn_only:
+    type: boolean
+    default: true
+  min_vram_mb:
+    type: number
+    required: false
+  min_storage_gb:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  fixed:
+    type: object
+  still_missing:
+    type: object
+  warnings:
+    type: array
+  ready_for_run:
+    type: boolean

@@ -1,0 +1,20 @@
+name: install_custom_node
+description: Install a custom node package from a git repo URL via ComfyUI-Manager API.
+
+inputs:
+  repo_url:
+    type: string
+  expected_node_classes:
+    type: array
+    required: false
+  server:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  install:
+    type: object
+  verification:
+    type: object

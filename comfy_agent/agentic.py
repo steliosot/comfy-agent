@@ -66,6 +66,50 @@ def _preflight_required_assets(inventory, skill_names, ckpt_name):
     }
 
 
+def _build_agentic_dependency_requirements(skill_names, ckpt_name, dependency_requirements=None):
+    user = dependency_requirements if isinstance(dependency_requirements, dict) else {}
+    models = list(user.get("models", [])) if isinstance(user.get("models"), list) else []
+    custom_nodes = (
+        list(user.get("custom_nodes", [])) if isinstance(user.get("custom_nodes"), list) else []
+    )
+
+    # Ensure core requirements are present for the current plan.
+    if "generate_video_clip" in skill_names:
+        defaults = [
+            {"name": "wan2.1/wan2.1_t2v_1.3B_fp16.safetensors", "model_type": "unet"},
+            {"name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors", "model_type": "clip"},
+            {"name": "wan_2.1_vae.safetensors", "model_type": "vae"},
+        ]
+        for item in defaults:
+            if not any(
+                isinstance(existing, dict)
+                and str(existing.get("name", "")).lower() == item["name"].lower()
+                for existing in models
+            ):
+                models.append(item)
+        if not any(
+            isinstance(entry, dict)
+            and "VHS_VideoCombine" in (entry.get("expected_node_classes") or [])
+            for entry in custom_nodes
+        ):
+            custom_nodes.append({"repo_url": None, "expected_node_classes": ["VHS_VideoCombine"]})
+    else:
+        if not any(
+            isinstance(existing, dict)
+            and str(existing.get("name", "")).lower() == ckpt_name.lower()
+            for existing in models
+        ):
+            models.append({"name": ckpt_name, "model_type": "checkpoint"})
+
+    merged = {
+        "models": models,
+        "custom_nodes": custom_nodes,
+        "min_vram_mb": user.get("min_vram_mb"),
+        "min_storage_gb": user.get("min_storage_gb"),
+    }
+    return merged
+
+
 def _extract_crop_params(prompt):
     text = prompt.lower()
     params = {"x": 0, "y": 0, "width": 256, "height": 256}
@@ -126,9 +170,9 @@ def reason_skills(prompt):
     if wants_video:
         choices.append(
             SkillChoice(
-                name="list_comfy_assets",
-                confidence=0.88,
-                reason="Preflight asset validation before generation.",
+                name="prepare_workflow_dependencies",
+                confidence=0.9,
+                reason="Preflight dependency validation and auto-fix.",
             )
         )
         choices.append(
@@ -149,9 +193,9 @@ def reason_skills(prompt):
     elif wants_generate:
         choices.append(
             SkillChoice(
-                name="list_comfy_assets",
-                confidence=0.88,
-                reason="Preflight asset validation before generation.",
+                name="prepare_workflow_dependencies",
+                confidence=0.9,
+                reason="Preflight dependency validation and auto-fix.",
             )
         )
         choices.append(
@@ -174,9 +218,9 @@ def reason_skills(prompt):
     if not choices:
         choices.append(
             SkillChoice(
-                name="list_comfy_assets",
-                confidence=0.75,
-                reason="Preflight asset validation before fallback generation.",
+                name="prepare_workflow_dependencies",
+                confidence=0.78,
+                reason="Preflight dependency validation before fallback generation.",
             )
         )
         choices.append(
@@ -198,7 +242,7 @@ def reasoning_agentic(prompt, print_output=True):
 
     if video:
         plan = {
-            "steps": ["list_comfy_assets", "generate_video_clip"],
+            "steps": ["prepare_workflow_dependencies", "generate_video_clip"],
             "generation_prompt": _extract_generation_prompt(prompt),
         }
         if "crop_image" in skill_names:
@@ -209,13 +253,13 @@ def reasoning_agentic(prompt, print_output=True):
     elif chain:
         crop_params = _extract_crop_params(prompt)
         plan = {
-            "steps": ["list_comfy_assets", "generate_sd15_image", "crop_image"],
+            "steps": ["prepare_workflow_dependencies", "generate_sd15_image", "crop_image"],
             "crop": crop_params,
             "generation_prompt": _extract_generation_prompt(prompt),
         }
     else:
         plan = {
-            "steps": ["list_comfy_assets", "generate_sd15_image"],
+            "steps": ["prepare_workflow_dependencies", "generate_sd15_image"],
             "generation_prompt": _extract_generation_prompt(prompt),
         }
 
@@ -268,6 +312,8 @@ def run_agentic(
     run_id=None,
     context=None,
     asset_preflight=True,
+    auto_prepare=True,
+    dependency_requirements=None,
 ):
     reasoning = reasoning_agentic(prompt, print_output=print_reasoning)
     choices = reason_skills(prompt)
@@ -275,10 +321,40 @@ def run_agentic(
     resolved_run_id = ensure_run_id(context.get("run_id") or run_id)
     context["run_id"] = resolved_run_id
 
-    wf = Workflow(server=server, headers=headers, api_prefix=api_prefix)
     skill_names = [choice.name for choice in choices]
     preflight = None
-    if asset_preflight:
+    if auto_prepare:
+        from skills.prepare_workflow_dependencies.skill import run as prepare_dependencies
+
+        prepare_requirements = _build_agentic_dependency_requirements(
+            skill_names=skill_names,
+            ckpt_name=ckpt_name,
+            dependency_requirements=dependency_requirements,
+        )
+        preflight = prepare_dependencies(
+            requirements=prepare_requirements,
+            auto_fix=True,
+            warn_only=True,
+            server=server,
+            headers=headers,
+            api_prefix=api_prefix,
+        )
+        context["dependency_preflight"] = preflight
+        if not preflight.get("ready_for_run", False):
+            return {
+                "status": "error",
+                "skill": "prepare_workflow_dependencies",
+                "run_id": resolved_run_id,
+                "error": "dependencies_not_ready",
+                "message": (
+                    "Workflow dependencies are not ready. Provide model/custom-node install specs "
+                    "or verify ComfyUI-Manager availability."
+                ),
+                "preflight": preflight,
+                "context": context,
+            }
+    elif asset_preflight:
+        wf = Workflow(server=server, headers=headers, api_prefix=api_prefix)
         inventory = _build_asset_inventory(wf)
         preflight = _preflight_required_assets(inventory, skill_names, ckpt_name)
         preflight["inventory"] = inventory
@@ -293,6 +369,7 @@ def run_agentic(
                 "preflight": preflight,
                 "context": context,
             }
+    wf = Workflow(server=server, headers=headers, api_prefix=api_prefix)
 
     generation_prompt = _extract_generation_prompt(prompt)
     if "generate_video_clip" in skill_names:
@@ -356,7 +433,7 @@ def run_agentic(
         output = {
             "status": "done",
             "run_id": resolved_run_id,
-            "plan": ["list_comfy_assets", "generate_video_clip"],
+            "plan": ["prepare_workflow_dependencies", "generate_video_clip"],
             "prompt_id": run_result.get("prompt_id"),
             "filename_prefix": make_stage_prefix(resolved_run_id, "video"),
             "output_images": output_images,
@@ -423,7 +500,7 @@ def run_agentic(
         return {
             "status": "done",
             "run_id": resolved_run_id,
-            "plan": ["list_comfy_assets", "generate_sd15_image", "crop_image"],
+            "plan": ["prepare_workflow_dependencies", "generate_sd15_image", "crop_image"],
             "prompt_id": run_result.get("prompt_id"),
             "filename_prefix": crop_prefix,
             "output_images": output_images,

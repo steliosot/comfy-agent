@@ -1,0 +1,20 @@
+name: get_workflow_download_links
+description: Extract download and dependency URLs from note/content nodes inside workflow.json.
+
+inputs:
+  skill_id:
+    type: string
+    required: false
+  workflow_path:
+    type: string
+    required: false
+
+outputs:
+  status:
+    type: string
+  total_links:
+    type: integer
+  links_by_provider:
+    type: object
+  links:
+    type: array

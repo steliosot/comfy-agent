@@ -1,0 +1,21 @@
+name: list_curated_workflows
+description: List curated workflow skills with optional filtering.
+
+inputs:
+  family:
+    type: string
+    required: false
+  model_family:
+    type: string
+    required: false
+  limit:
+    type: integer
+    default: 100
+
+outputs:
+  status:
+    type: string
+  count:
+    type: integer
+  items:
+    type: array

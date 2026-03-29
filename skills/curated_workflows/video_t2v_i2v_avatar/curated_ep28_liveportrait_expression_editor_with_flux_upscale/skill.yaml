@@ -1,0 +1,71 @@
+name: curated_ep28_liveportrait_expression_editor_with_flux_upscale
+description: Curated workflow wrapper for Ep28 LivePortrait Expression Editor with
+  Flux Upscale.json
+inputs:
+  prompt:
+    type: string
+    required: false
+  negative_prompt:
+    type: string
+    required: false
+  width:
+    type: integer
+    required: false
+  height:
+    type: integer
+    required: false
+  seed:
+    type: integer
+    required: false
+  steps:
+    type: integer
+    required: false
+  cfg:
+    type: number
+    required: false
+  sampler_name:
+    type: string
+    required: false
+  scheduler:
+    type: string
+    required: false
+  denoise:
+    type: number
+    required: false
+  server:
+    type: string
+    required: false
+  headers:
+    type: object
+    required: false
+  api_prefix:
+    type: string
+    required: false
+outputs:
+  status:
+    type: string
+  prompt_id:
+    type: string
+  output_images:
+    type: array
+requirements:
+  models:
+  - type: clip
+    name: t5-v1_1-xxl-encoder-Q8_0.gguf
+    target_folder: models/clip
+  - type: diffusion_model
+    name: flux1-dev-Q8_0.gguf
+    target_folder: models/diffusion_models
+  - type: vae
+    name: ae.safetensors
+    target_folder: models/vae
+  - type: upscale_model
+    name: 4x_NMKD-Siax_200k.pth
+    target_folder: models/upscale_models
+  custom_nodes: []
+  links: []
+  input_modalities:
+  - image
+  - text_prompt
+  output_modalities:
+  - image/png
