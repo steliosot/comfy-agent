@@ -1,137 +1,177 @@
-# Workflow Models Catalog
+# comfy-agent
 
-Generated from `skills/workflows/**/skill.yaml` to list every model currently used by workflow skills.
+A Python toolkit for running ComfyUI through reusable **skills**, workflow builders, and lightweight agentic planning/execution.
 
-- Total unique models: **99**
-- Total workflow skills scanned: **497**
-- CSV export: `comfy-data/models_catalog.csv`
+This repository is organized around practical automation:
+- infra skills (server selection, health, dependencies, upload/download, cleanup)
+- workflow skills (txt2img, img2img, video, upscaling, audio)
+- examples for direct, fluent, and agentic usage
 
-## Quick Breakdown
+## Repository Layout
 
-### By Model Type
-- `diffusion_model`: 39
-- `lora`: 22
-- `checkpoint`: 18
-- `clip`: 8
-- `controlnet`: 6
-- `vae`: 4
-- `upscale_model`: 2
+- `comfy_agent/` core library (`Workflow`, monitoring, config, agentic helpers)
+- `skills/infra/` operational skills
+- `skills/workflows/` generation/editing workflow skills
+- `examples/` runnable examples grouped by pattern
+- `unit_tests/` test suite
+- `documentation.md` deeper API/usage documentation
+- `COMFYUI-POOL.md` localhost + comfy-gate + multi-server setup
 
-### By Provider Platform
-- `huggingface`: 65
-- `unknown`: 34
+## Installation
 
-## Full Table
+### Option A: Use from GitHub
 
-| Model | Type | Class | Provider | Platform | Need key | Skills using it | Ideal usage | Pros | Cons | Expert recommendation |
-|---|---|---|---|---|---|---:|---|---|---|---|
-| `ae.safetensors` | `vae` | vae encoder/decoder | [Comfy-Org/HiDream-I1_ComfyUI](https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/resolve/main/split_files/vae/ae.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 216 | image generation and editing | Stable decode baseline across many workflows. | Less creative leverage than changing base model/LoRA. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `4x_NMKD-Siax_200k.pth` | `upscale_model` | upscaler | [Akumetsu971/SD_Anime_Futuristic_Armor](https://huggingface.co/Akumetsu971/SD_Anime_Futuristic_Armor/resolve/main/4x_NMKD-Siax_200k.pth?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 149 | video upscaling and delivery-quality enhancement | Fast quality gain without full re-generation. | Can amplify artifacts and often needs ratio/crop tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `t5-v1_1-xxl-encoder-Q8_0.gguf` | `clip` | text encoder | [city96/t5-v1_1-xxl-encoder-gguf](https://huggingface.co/city96/t5-v1_1-xxl-encoder-gguf/resolve/main/t5-v1_1-xxl-encoder-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 134 | prompt conditioning for image generation | Improves prompt adherence and semantic control. | Large encoders add load time and VRAM pressure. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `flux1-dev-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [city96/FLUX.1-dev-gguf](https://huggingface.co/city96/FLUX.1-dev-gguf/resolve/main/flux1-dev-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 114 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `qwen_2.5_vl_7b_fp8_scaled.safetensors` | `clip` | text encoder | [Comfy-Org/Qwen-Image_ComfyUI](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 50 | prompt conditioning for image generation | Improves prompt adherence and semantic control. | Large encoders add load time and VRAM pressure. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `qwen_image_vae.safetensors` | `vae` | vae encoder/decoder | [Comfy-Org/Qwen-Image_ComfyUI](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 50 | image generation and editing | Stable decode baseline across many workflows. | Less creative leverage than changing base model/LoRA. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan_2.1_vae.safetensors` | `vae` | vae encoder/decoder | [Comfy-Org/Wan_2.1_ComfyUI_repackaged](https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 35 | video generation and image-to-video pipelines | Stable decode baseline across many workflows. | Less creative leverage than changing base model/LoRA. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `flux-cn-pro-2.safetensors` | `controlnet` | control model | unknown | unknown | unknown | 32 | image generation and editing | Required for specific capability paths. | Version/folder mismatches can break workflow execution. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `Juggernaut_X_RunDiffusion.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 29 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `umt5_xxl_fp8_e4m3fn_scaled.safetensors` | `clip` | text encoder | [Comfy-Org/Wan_2.1_ComfyUI_repackaged](https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 29 | prompt conditioning for video generation workflows | Improves prompt adherence and semantic control. | Large encoders add load time and VRAM pressure. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `flux1-dev-kontext_fp8_scaled.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/flux1-kontext-dev_ComfyUI](https://huggingface.co/Comfy-Org/flux1-kontext-dev_ComfyUI/resolve/main/split_files/diffusion_models/flux1-dev-kontext_fp8_scaled.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 29 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `Qwen_Image_Edit-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | unknown | unknown | unknown | 23 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `Qwen-Image-Edit-Lightning-8steps-V1.0.safetensors` | `lora` | style/speed adapter | [lightx2v/Qwen-Image-Lightning](https://huggingface.co/lightx2v/Qwen-Image-Lightning/resolve/main/Qwen-Image-Edit-Lightning-8steps-V1.0.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 23 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `flux-dev-controlnet-union.safetensors` | `controlnet` | control model | unknown | unknown | unknown | 21 | image generation and editing | Required for specific capability paths. | Version/folder mismatches can break workflow execution. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `fluxmania_Legacy.safetensors` | `diffusion_model` | diffusion backbone (image/video) | unknown | unknown | unknown | 21 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `t5xxl_fp16.safetensors` | `clip` | text encoder | [Comfy-Org/mochi_preview_repackaged](https://huggingface.co/Comfy-Org/mochi_preview_repackaged/resolve/main/split_files/text_encoders/t5xxl_fp16.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 16 | prompt conditioning for video generation workflows | Improves prompt adherence and semantic control. | Large encoders add load time and VRAM pressure. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `qwen_3_4b.safetensors` | `clip` | text encoder | [Comfy-Org/z_image_turbo](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 14 | prompt conditioning for image generation | Improves prompt adherence and semantic control. | Large encoders add load time and VRAM pressure. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `diffusion_pytorch_model_promax.safetensors` | `controlnet` | control model | unknown | unknown | unknown | 14 | image generation and editing | Required for specific capability paths. | Version/folder mismatches can break workflow execution. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `z_image_turbo_bf16.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/z_image_turbo](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 14 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `z-image-turbo-fp8-aio.safetensors` | `checkpoint` | image generation base model | [SeeSee21/Z-Image-Turbo-AIO](https://huggingface.co/SeeSee21/Z-Image-Turbo-AIO/resolve/main/z-image-turbo-fp8-aio.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 13 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `clip_l.safetensors` | `clip` | text encoder | [comfyanonymous/flux_text_encoders](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 10 | prompt conditioning for image generation | Improves prompt adherence and semantic control. | Large encoders add load time and VRAM pressure. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `4xNomos2_hq_dat2.safetensors` | `upscale_model` | upscaler | [Phips/4xNomos2_hq_dat2](https://huggingface.co/Phips/4xNomos2_hq_dat2/resolve/main/4xNomos2_hq_dat2.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 10 | image upscaling and detail recovery | Fast quality gain without full re-generation. | Can amplify artifacts and often needs ratio/crop tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `flux1-dev-fp8.safetensors` | `checkpoint` | image generation base model | [Comfy-Org/flux1-dev](https://huggingface.co/Comfy-Org/flux1-dev/resolve/main/flux1-dev-fp8.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 8 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `Wan2.2-T2V-A14B-LowNoise-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [QuantStack/Wan2.2-T2V-A14B-GGUF](https://huggingface.co/QuantStack/Wan2.2-T2V-A14B-GGUF/resolve/main/LowNoise/Wan2.2-T2V-A14B-LowNoise-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 8 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `ltxv-13b-0.9.7-distilled-fp8.safetensors` | `checkpoint` | image generation base model | [Lightricks/LTX-Video](https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltxv-13b-0.9.7-distilled-fp8.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 7 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `oldt5_xxl_fp8_e4m3fn_scaled.safetensors` | `clip` | text encoder | [comfyanonymous/cosmos_1.0_text_encoder_and_VAE_ComfyUI](https://huggingface.co/comfyanonymous/cosmos_1.0_text_encoder_and_VAE_ComfyUI/resolve/main/text_encoders/oldt5_xxl_fp8_e4m3fn_scaled.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 6 | prompt conditioning for video generation workflows | Improves prompt adherence and semantic control. | Large encoders add load time and VRAM pressure. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan2.1_i2v_480p_14B_fp8_scaled.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/Wan_2.1_ComfyUI_repackaged](https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_480p_14B_fp8_scaled.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 6 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `juggernaut_reborn.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 5 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `juggernautXL_versionXInpaint.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 5 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `ltx-video-2b-v0.9.5.safetensors` | `checkpoint` | image generation base model | [Lightricks/LTX-Video](https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltx-video-2b-v0.9.5.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 5 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `Wan2.1-VACE-14B-Q4_K_M.gguf` | `diffusion_model` | diffusion backbone (image/video) | [QuantStack/Wan2.1-VACE-14B-GGUF](https://huggingface.co/QuantStack/Wan2.1-VACE-14B-GGUF/resolve/main/Wan2.1-VACE-14B-Q4_K_M.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 5 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `Juggernaut_X_RunDiffusion_Hyper.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 4 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `ltx-video-2b-v0.9.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 4 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `NetaYumev35_pretrained_all_in_one.safetensors` | `checkpoint` | image generation base model | [duongve/NetaYume-Lumina-Image-2.0](https://huggingface.co/duongve/NetaYume-Lumina-Image-2.0/resolve/main/NetaYumev35_pretrained_all_in_one.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 4 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `fluxmania_V.safetensors` | `diffusion_model` | diffusion backbone (image/video) | unknown | unknown | unknown | 4 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `ace_step_v1_3.5b.safetensors` | `checkpoint` | image generation base model | [Comfy-Org/ACE-Step_ComfyUI_repackaged](https://huggingface.co/Comfy-Org/ACE-Step_ComfyUI_repackaged/resolve/main/all_in_one/ace_step_v1_3.5b.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 3 | general workflow dependency | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `juggernautXL_ragnarokBy.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 3 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `Qwen-Image-InstantX-ControlNet-Inpainting.safetensors` | `controlnet` | control model | [Comfy-Org/Qwen-Image-InstantX-ControlNets](https://huggingface.co/Comfy-Org/Qwen-Image-InstantX-ControlNets/resolve/main/split_files/controlnet/Qwen-Image-InstantX-ControlNet-Inpainting.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 3 | image generation and editing | Required for specific capability paths. | Version/folder mismatches can break workflow execution. | Use detailed prompts and iterate prompt wording, not only seed changes, for better variation. |
-| `Qwen-Image-InstantX-ControlNet-Union.safetensors` | `controlnet` | control model | [Comfy-Org/Qwen-Image-InstantX-ControlNets](https://huggingface.co/Comfy-Org/Qwen-Image-InstantX-ControlNets/resolve/main/split_files/controlnet/Qwen-Image-InstantX-ControlNet-Union.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 3 | image generation and editing | Required for specific capability paths. | Version/folder mismatches can break workflow execution. | Use detailed prompts and iterate prompt wording, not only seed changes, for better variation. |
-| `wan2.1-i2v-14b-480p-Q4_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [city96/Wan2.1-I2V-14B-480P-gguf](https://huggingface.co/city96/Wan2.1-I2V-14B-480P-gguf/resolve/main/wan2.1-i2v-14b-480p-Q4_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 3 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `uso-flux1-dit-lora-v1.safetensors` | `lora` | style/speed adapter | [Comfy-Org/USO_1.0_Repackaged](https://huggingface.co/Comfy-Org/USO_1.0_Repackaged/resolve/main/split_files/loras/uso-flux1-dit-lora-v1.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 3 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `epicrealism_v10-inpainting.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `flux1-schnell-fp8.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `realcartoonXL_v7.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan2.2-rapid-mega-aio-v8.safetensors` | `checkpoint` | image generation base model | [Phr00t/WAN2.2-14B-Rapid-AllInOne](https://huggingface.co/Phr00t/WAN2.2-14B-Rapid-AllInOne/resolve/main/Mega-v8/wan2.2-rapid-mega-aio-v8.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wildcardxXLANIMATION_wildcardxXLANIMATION.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `t5xxl_fp8_e4m3fn_scaled.safetensors` | `clip` | text encoder | [Comfy-Org/mochi_preview_repackaged](https://huggingface.co/Comfy-Org/mochi_preview_repackaged/resolve/main/split_files/text_encoders/t5xxl_fp8_e4m3fn_scaled.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | prompt conditioning for video generation workflows | Improves prompt adherence and semantic control. | Large encoders add load time and VRAM pressure. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `cosmos-predict2-14b-t2i-ex3-q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [calcuis/cosmos-predict2-gguf](https://huggingface.co/calcuis/cosmos-predict2-gguf/resolve/main/cosmos-predict2-14b-t2i-ex3-q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `cosmos_predict2_2B_t2i.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/Cosmos_Predict2_repackaged](https://huggingface.co/Comfy-Org/Cosmos_Predict2_repackaged/resolve/main/cosmos_predict2_2B_t2i.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `flux1-dev.safetensors` | `diffusion_model` | diffusion backbone (image/video) | unknown | unknown | unknown | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `flux1-fill-dev-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [YarvixPA/FLUX.1-Fill-dev-gguf](https://huggingface.co/YarvixPA/FLUX.1-Fill-dev-gguf/resolve/main/flux1-fill-dev-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `flux1-fill-dev.safetensors` | `diffusion_model` | diffusion backbone (image/video) | unknown | unknown | unknown | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `flux1-krea-dev-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [QuantStack/FLUX.1-Krea-dev-GGUF](https://huggingface.co/QuantStack/FLUX.1-Krea-dev-GGUF/resolve/main/flux1-krea-dev-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `ltxv-13b-0.9.7-distilled-Q3_K_S.gguf` | `diffusion_model` | diffusion backbone (image/video) | unknown | unknown | unknown | 2 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `qwen-image-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [city96/Qwen-Image-gguf](https://huggingface.co/city96/Qwen-Image-gguf/resolve/main/qwen-image-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan2.2_i2v_high_noise_14B_Q4_K_M.gguf` | `diffusion_model` | diffusion backbone (image/video) | [bullerwins/Wan2.2-I2V-A14B-GGUF](https://huggingface.co/bullerwins/Wan2.2-I2V-A14B-GGUF/resolve/main/wan2.2_i2v_high_noise_14B_Q4_K_M.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan2.2_i2v_low_noise_14B_Q4_K_M.gguf` | `diffusion_model` | diffusion backbone (image/video) | [bullerwins/Wan2.2-I2V-A14B-GGUF](https://huggingface.co/bullerwins/Wan2.2-I2V-A14B-GGUF/resolve/main/wan2.2_i2v_low_noise_14B_Q4_K_M.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `Aether_Cloud_v1.safetensors` | `lora` | style/speed adapter | unknown | unknown | unknown | 2 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `Aether_Fire_v1_SDXL_LoRA.safetensors` | `lora` | style/speed adapter | unknown | unknown | unknown | 2 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `pixag1rlwh1t3.safetensors` | `lora` | style/speed adapter | [Pixaroma/experimental_loras](https://huggingface.co/Pixaroma/experimental_loras/resolve/main/pixag1rlwh1t3.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Use detailed prompts and iterate prompt wording, not only seed changes, for better variation. |
-| `ltxv-13b-0.9.7-vae-BF16.safetensors` | `vae` | vae encoder/decoder | [wsbagnsv1/ltxv-13b-0.9.7-dev-GGUF](https://huggingface.co/wsbagnsv1/ltxv-13b-0.9.7-dev-GGUF/resolve/main/ltxv-13b-0.9.7-vae-BF16.safetensors) | huggingface | maybe (public for most, some gated models require login/approval) | 2 | video generation and image-to-video pipelines | Stable decode baseline across many workflows. | Less creative leverage than changing base model/LoRA. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `sd3_medium_incl_clips.safetensors` | `checkpoint` | image generation base model | unknown | unknown | unknown | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `controlnet-openpose-sdxl.safetensors` | `controlnet` | control model | unknown | unknown | unknown | 1 | image generation and editing | Required for specific capability paths. | Version/folder mismatches can break workflow execution. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `cosmos-predict2-14b-t2i-ex3-q4_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [calcuis/cosmos-predict2-gguf](https://huggingface.co/calcuis/cosmos-predict2-gguf/resolve/main/cosmos-predict2-14b-t2i-ex3-q4_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `cosmos_predict2_2B_video2world_480p_16fps.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/Cosmos_Predict2_repackaged](https://huggingface.co/Comfy-Org/Cosmos_Predict2_repackaged/resolve/main/cosmos_predict2_2B_video2world_480p_16fps.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `flux1-canny-dev.safetensors` | `diffusion_model` | diffusion backbone (image/video) | unknown | unknown | unknown | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `flux1-depth-dev.safetensors` | `diffusion_model` | diffusion backbone (image/video) | unknown | unknown | unknown | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `flux1-kontext-dev-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [bullerwins/FLUX.1-Kontext-dev-GGUF](https://huggingface.co/bullerwins/FLUX.1-Kontext-dev-GGUF/resolve/main/flux1-kontext-dev-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `flux1-schnell-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | unknown | unknown | unknown | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `hidream-i1-dev-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [city96/HiDream-I1-Dev-gguf](https://huggingface.co/city96/HiDream-I1-Dev-gguf/resolve/main/hidream-i1-dev-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `hidream-i1-fast-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [city96/HiDream-I1-Fast-gguf](https://huggingface.co/city96/HiDream-I1-Fast-gguf/resolve/main/hidream-i1-fast-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `hidream-i1-full-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [city96/HiDream-I1-Full-gguf](https://huggingface.co/city96/HiDream-I1-Full-gguf/resolve/main/hidream-i1-full-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `hidream_i1_dev_fp8.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/HiDream-I1_ComfyUI](https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/resolve/main/split_files/diffusion_models/hidream_i1_dev_fp8.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `hidream_i1_fast_fp8.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/HiDream-I1_ComfyUI](https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/resolve/main/split_files/diffusion_models/hidream_i1_fast_fp8.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `hidream_i1_full_fp8.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/HiDream-I1_ComfyUI](https://huggingface.co/Comfy-Org/HiDream-I1_ComfyUI/resolve/main/split_files/diffusion_models/hidream_i1_full_fp8.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | image generation and editing | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `wan2.1-i2v-14b-720p-Q4_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [city96/Wan2.1-I2V-14B-720P-gguf](https://huggingface.co/city96/Wan2.1-I2V-14B-720P-gguf/resolve/main/wan2.1-i2v-14b-720p-Q4_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan2.1-t2v-14b-Q8_0.gguf` | `diffusion_model` | diffusion backbone (image/video) | [city96/Wan2.1-T2V-14B-gguf](https://huggingface.co/city96/Wan2.1-T2V-14B-gguf/resolve/main/wan2.1-t2v-14b-Q8_0.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan2.1_t2v_1.3B_fp16.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/Wan_2.1_ComfyUI_repackaged](https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_t2v_1.3B_fp16.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan2.2_i2v_A14b_high_noise_lightx2v_4step-Q6_K.gguf` | `diffusion_model` | diffusion backbone (image/video) | [jayn7/WAN2.2-I2V_A14B-DISTILL-LIGHTX2V-4STEP-GGUF](https://huggingface.co/jayn7/WAN2.2-I2V_A14B-DISTILL-LIGHTX2V-4STEP-GGUF/resolve/main/high_noise/wan2.2_i2v_A14b_high_noise_lightx2v_4step-Q6_K.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan2.2_i2v_A14b_low_noise_lightx2v_4step-Q6_K.gguf` | `diffusion_model` | diffusion backbone (image/video) | [jayn7/WAN2.2-I2V_A14B-DISTILL-LIGHTX2V-4STEP-GGUF](https://huggingface.co/jayn7/WAN2.2-I2V_A14B-DISTILL-LIGHTX2V-4STEP-GGUF/resolve/main/low_noise/wan2.2_i2v_A14b_low_noise_lightx2v_4step-Q6_K.gguf?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/Wan_2.2_ComfyUI_Repackaged](https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors` | `diffusion_model` | diffusion backbone (image/video) | [Comfy-Org/Wan_2.2_ComfyUI_Repackaged](https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video generation and image-to-video pipelines | Primary driver of quality, fidelity, and behavior. | Most expensive in VRAM/compute; wrong variant can be slow. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `aidmaHyperrealism-FLUX-V0.1.safetensors` | `lora` | style/speed adapter | unknown | unknown | unknown | 1 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `cakeify_16_epochs.safetensors` | `lora` | style/speed adapter | [Remade-AI/Cakeify](https://huggingface.co/Remade-AI/Cakeify/resolve/main/cakeify_16_epochs.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video style/motion adaptation without replacing base model | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `ClassipeintXL2.1.safetensors` | `lora` | style/speed adapter | unknown | unknown | unknown | 1 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `crush_20_epochs.safetensors` | `lora` | style/speed adapter | [Remade-AI/Crush](https://huggingface.co/Remade-AI/Crush/resolve/main/crush_20_epochs.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video style/motion adaptation without replacing base model | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `EldritchDigitalArt1.3.safetensors` | `lora` | style/speed adapter | unknown | unknown | unknown | 1 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `EldritchImpressionismXL1.5.safetensors` | `lora` | style/speed adapter | unknown | unknown | unknown | 1 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `flux_realism_lora.safetensors` | `lora` | style/speed adapter | unknown | unknown | unknown | 1 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Tune steps/CFG conservatively first, then adjust LoRA strength to avoid overcooked textures. |
-| `inflate_20_epochs.safetensors` | `lora` | style/speed adapter | [Remade-AI/Inflate](https://huggingface.co/Remade-AI/Inflate/resolve/main/inflate_20_epochs.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video style/motion adaptation without replacing base model | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `LineDrawing03_CE_QWEN_AIT3k.safetensors` | `lora` | style/speed adapter | unknown | unknown | unknown | 1 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Use detailed prompts and iterate prompt wording, not only seed changes, for better variation. |
-| `muscle_18_epochs.safetensors` | `lora` | style/speed adapter | [Remade-AI/Muscle](https://huggingface.co/Remade-AI/Muscle/resolve/main/muscle_18_epochs.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video style/motion adaptation without replacing base model | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `pixaf4nt4sy fantasy style game item.safetensors` | `lora` | style/speed adapter | [Pixaroma/experimental_loras](https://huggingface.co/Pixaroma/experimental_loras/resolve/main/pixaf4nt4sy%20fantasy%20style%20game%20item.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Use detailed prompts and iterate prompt wording, not only seed changes, for better variation. |
-| `ral-wtrclr-sdxl.safetensors` | `lora` | style/speed adapter | unknown | unknown | unknown | 1 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `Retro_Illustration.safetensors` | `lora` | style/speed adapter | unknown | unknown | unknown | 1 | style transfer and subject-specific tuning | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Confirm model folder placement and refresh node definitions before deeper debugging. |
-| `rotate_20_epochs.safetensors` | `lora` | style/speed adapter | [Remade-AI/Rotate](https://huggingface.co/Remade-AI/Rotate/resolve/main/rotate_20_epochs.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video style/motion adaptation without replacing base model | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `squish_18.safetensors` | `lora` | style/speed adapter | [Remade-AI/Squish](https://huggingface.co/Remade-AI/Squish/resolve/main/squish_18.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video style/motion adaptation without replacing base model | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `Wan2.2-Lightning_I2V-A14B-4steps-lora_HIGH_fp16.safetensors` | `lora` | style/speed adapter | [Kijai/WanVideo_comfy](https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22-Lightning/old/Wan2.2-Lightning_I2V-A14B-4steps-lora_HIGH_fp16.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video style/motion adaptation without replacing base model | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
-| `Wan2.2-Lightning_I2V-A14B-4steps-lora_LOW_fp16.safetensors` | `lora` | style/speed adapter | [Kijai/WanVideo_comfy](https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22-Lightning/old/Wan2.2-Lightning_I2V-A14B-4steps-lora_LOW_fp16.safetensors?download=true) | huggingface | maybe (public for most, some gated models require login/approval) | 1 | video style/motion adaptation without replacing base model | Small footprint, strong style/control impact. | Can over-bias style and needs strength/trigger tuning. | Pick the quantization that fits your VRAM, validate short clips first, then scale resolution/length. |
+```bash
+pip install git+https://github.com/steliosot/comfy-agent.git
+```
 
-## Skill Mapping
+### Option B: Local Development
 
-Use `comfy-data/models_catalog.csv` for full model-to-skill mapping via `used_in_skills` and `used_in_skills_count`.
+```bash
+git clone https://github.com/steliosot/comfy-agent.git
+cd comfy-agent
+python3 -m venv venv
+source venv/bin/activate
+pip install -e .
+```
 
-## Recommendations
+Requirements:
+- Python `>=3.10`
+- Running ComfyUI server
 
-- Standardize one approved model stack per family (`flux`, `wan`, `qwen`) to reduce setup drift across skills.
-- Add a CI check that fails if a model in `requirements.models` has no matching download/source link.
-- Keep at least one low-VRAM fallback variant (Q4/Q6 or fp8) per high-usage model family.
-- For Civitai models, store auth strategy centrally and document commercial-license constraints explicitly.
+## Quickstart (Single Server)
+
+1. Point to your ComfyUI server.
+
+```bash
+export COMFY_URL=http://127.0.0.1:8000
+# optional auth if your gateway requires it
+export COMFY_AUTH_HEADER=
+```
+
+2. Check server status.
+
+```bash
+PYTHONPATH=. python3 skills/infra/get_server_status/scripts/run.py --args '{}' --pretty
+```
+
+3. Run a simple txt2img skill.
+
+```bash
+PYTHONPATH=. python3 skills/workflows/txt2img/generate_sd15_image/scripts/run.py \
+  --args '{"prompt":"cinematic product photo of a coffee mug"}' --pretty
+```
+
+4. Download output image(s) using prompt id.
+
+```bash
+PYTHONPATH=. python3 skills/infra/download_image/scripts/run.py \
+  --args '{"prompt_id":"<PROMPT_ID>","run_id":"quickstart"}' --pretty
+```
+
+## Quickstart (Multi Server via YAML)
+
+Create `.comfy_servers.yaml` (or set `COMFY_SERVERS_FILE`):
+
+```yaml
+default_server: clouda
+servers:
+  local:
+    url: http://localhost:8000
+    api_prefix: /api
+    manager_api_prefix: /manager
+  clouda:
+    url: https://your-public-url.example
+    headers:
+      X-API-Key: ${COMFY_CLOUDA_KEY}
+    api_prefix: /api
+    manager_api_prefix: /manager
+```
+
+Then resolve a server explicitly:
+
+```bash
+export COMFY_SERVERS_FILE=.comfy_servers.yaml
+export COMFY_CLOUDA_KEY=YOUR_KEY
+
+PYTHONPATH=. python3 skills/infra/select_comfy_server/scripts/run.py \
+  --args '{"server_name":"clouda","require_ready":true}' --pretty
+```
+
+Use the returned `server`, `headers`, and `api_prefix` per run.
+
+## Skills Overview
+
+### Infra Skills (`skills/infra/`)
+
+Core operations include:
+- `select_comfy_server`
+- `get_server_status`, `get_queue_status`, `get_progress`
+- `prepare_workflow_dependencies`, `assess_server_resources`
+- `download_model`, `install_custom_node`, `remove_model`
+- `upload_image`, `download_image`, `upload_video`, `download_video`
+- `delete_image_job`, `delete_video_job`
+- `agentic_plan`, `agentic_execute`
+
+Examples:
+
+```bash
+# Dependency preflight (warn only)
+PYTHONPATH=. python3 skills/infra/prepare_workflow_dependencies/scripts/run.py \
+  --args '{"required_models":[{"name":"sd1.5/juggernaut_reborn.safetensors","model_type":"checkpoint"}],"warn_only":true}' --pretty
+
+# Upload an input image
+PYTHONPATH=. python3 skills/infra/upload_image/scripts/run.py \
+  --args '{"image_path":"tmp/inputs/example.png","run_id":"demo"}' --pretty
+```
+
+### Workflow Skills (`skills/workflows/`)
+
+Families:
+- `txt2img`
+- `img2img_inpaint_outpaint`
+- `video_t2v_i2v_avatar`
+- `upscaling`
+- `editing_restyle`
+- `audio`
+
+Run any skill via its `scripts/run.py` with JSON `--args`.
+
+## Agentic Usage
+
+Agentic examples live in `examples/agents_agentic/`.
+
+Start here:
+- `example_agentic_plan_then_execute.py`
+- `example_agentic_select_server_then_execute.py` (server selection first)
+- `example_agentic_slash_commands.py`
+
+Run:
+
+```bash
+PYTHONPATH=. python3 examples/agents_agentic/example_agentic_select_server_then_execute.py
+```
+
+## Development
+
+Run targeted tests:
+
+```bash
+./venv/bin/python -m unittest unit_tests.test_config unit_tests.test_monitoring_skills
+```
+
+Run all tests:
+
+```bash
+./venv/bin/python -m unittest
+```
+
+## Notes
+
+- Keep `.comfy_servers.yaml` local (already gitignored).
+- If using comfy-gate, prefer `X-API-Key` header.
+- For full setup docs, see [documentation.md](documentation.md) and [COMFYUI-POOL.md](COMFYUI-POOL.md).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
