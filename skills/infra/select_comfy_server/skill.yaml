@@ -1,0 +1,29 @@
+name: select_comfy_server
+
+description: Resolve a named Comfy server from YAML registry or fallback env config.
+
+inputs:
+  server_name:
+    type: string
+    required: false
+  require_ready:
+    type: boolean
+    default: false
+
+outputs:
+  status:
+    type: string
+  server_name:
+    type: string
+  server:
+    type: string
+  headers:
+    type: object
+  api_prefix:
+    type: string
+  manager_api_prefix:
+    type: string
+  ready:
+    type: boolean
+  message:
+    type: string

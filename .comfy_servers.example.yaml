@@ -1,0 +1,16 @@
+# Copy to .comfy_servers.yaml (gitignored) and customize per environment.
+default_server: local
+servers:
+  local:
+    url: localhost:8188
+    headers:
+      Authorization: Bearer ${COMFY_LOCAL_TOKEN}
+    api_prefix: /api
+    manager_api_prefix: /manager
+
+  cloud_gpu:
+    url: https://your-cloud-host.example.com/comfy
+    headers:
+      Authorization: Bearer ${COMFY_CLOUD_TOKEN}
+    api_prefix: /api
+    manager_api_prefix: /manager

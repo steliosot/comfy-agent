@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from comfy_agent.config import ComfyConfig, load_env_file
+from comfy_agent.config import ComfyConfig, get_server_config, load_env_file
 from comfy_agent.workflow import Workflow
 
 
@@ -56,6 +56,133 @@ class ConfigTests(unittest.TestCase):
             Workflow()
 
         self.assertEqual(captured["headers"], {"Authorization": "secret-header"})
+
+    def test_get_server_config_from_yaml_named(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            servers_path = os.path.join(tmp_dir, ".comfy_servers.yaml")
+            with open(servers_path, "w", encoding="utf-8") as f:
+                f.write("default_server: local\n")
+                f.write("servers:\n")
+                f.write("  local:\n")
+                f.write("    url: localhost:8188\n")
+                f.write("    headers:\n")
+                f.write("      Authorization: Bearer abc\n")
+                f.write("    api_prefix: /api\n")
+                f.write("    manager_api_prefix: /manager\n")
+                f.write("  cloud:\n")
+                f.write("    url: https://example.com/comfy\n")
+
+            with patch.dict(
+                os.environ,
+                {
+                    "COMFY_SERVERS_FILE": servers_path,
+                    "COMFY_URL": "http://127.0.0.1:8000",
+                },
+                clear=True,
+            ):
+                resolved = get_server_config(name="local", load_env=False)
+
+        self.assertEqual(resolved["server_name"], "local")
+        self.assertEqual(resolved["server"], "http://localhost:8188")
+        self.assertEqual(resolved["headers"]["Authorization"], "Bearer abc")
+        self.assertEqual(resolved["api_prefix"], "/api")
+        self.assertEqual(resolved["manager_api_prefix"], "/manager")
+        self.assertEqual(resolved["source"], "servers_file")
+
+    def test_get_server_config_default_server_fallback(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            servers_path = os.path.join(tmp_dir, ".comfy_servers.yaml")
+            with open(servers_path, "w", encoding="utf-8") as f:
+                f.write("default_server: cloud\n")
+                f.write("servers:\n")
+                f.write("  cloud:\n")
+                f.write("    url: https://cloud.example.net\n")
+                f.write("    api_prefix: api\n")
+
+            with patch.dict(
+                os.environ,
+                {
+                    "COMFY_SERVERS_FILE": servers_path,
+                    "COMFY_URL": "http://127.0.0.1:8000",
+                },
+                clear=True,
+            ):
+                resolved = get_server_config(name=None, load_env=False)
+
+        self.assertEqual(resolved["server_name"], "cloud")
+        self.assertEqual(resolved["server"], "https://cloud.example.net")
+        self.assertEqual(resolved["api_prefix"], "/api")
+        self.assertEqual(resolved["source"], "servers_file")
+
+
+    def test_get_server_config_yaml_without_default_falls_back_to_env(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            servers_path = os.path.join(tmp_dir, ".comfy_servers.yaml")
+            with open(servers_path, "w", encoding="utf-8") as f:
+                f.write("servers:\n")
+                f.write("  local:\n")
+                f.write("    url: localhost:8188\n")
+
+            with patch.dict(
+                os.environ,
+                {
+                    "COMFY_SERVERS_FILE": servers_path,
+                    "COMFY_URL": "localhost:9000",
+                    "COMFY_AUTH_HEADER": "Bearer env-token",
+                },
+                clear=True,
+            ):
+                resolved = get_server_config(name=None, load_env=False)
+
+        self.assertIsNone(resolved["server_name"])
+        self.assertEqual(resolved["server"], "http://localhost:9000")
+        self.assertEqual(resolved["headers"].get("Authorization"), "Bearer env-token")
+        self.assertEqual(resolved["source"], "env")
+
+    def test_get_server_config_unknown_name_raises(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            servers_path = os.path.join(tmp_dir, ".comfy_servers.yaml")
+            with open(servers_path, "w", encoding="utf-8") as f:
+                f.write("default_server: local\n")
+                f.write("servers:\n")
+                f.write("  local:\n")
+                f.write("    url: localhost:8188\n")
+
+            with patch.dict(
+                os.environ,
+                {
+                    "COMFY_SERVERS_FILE": servers_path,
+                },
+                clear=True,
+            ):
+                with self.assertRaises(ValueError):
+                    get_server_config(name="missing", load_env=False)
+
+    def test_from_env_uses_yaml_default_server_when_available(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            servers_path = os.path.join(tmp_dir, ".comfy_servers.yaml")
+            with open(servers_path, "w", encoding="utf-8") as f:
+                f.write("default_server: local\n")
+                f.write("servers:\n")
+                f.write("  local:\n")
+                f.write("    url: localhost:8288\n")
+                f.write("    headers:\n")
+                f.write("      Authorization: Token 123\n")
+                f.write("    api_prefix: /api\n")
+
+            with patch.dict(
+                os.environ,
+                {
+                    "COMFY_SERVERS_FILE": servers_path,
+                    "COMFY_URL": "http://127.0.0.1:8000",
+                },
+                clear=True,
+            ):
+                cfg = ComfyConfig.from_env(load_env=False)
+
+        self.assertEqual(cfg.server, "http://localhost:8288")
+        self.assertEqual(cfg.headers.get("Authorization"), "Token 123")
+        self.assertEqual(cfg.api_prefix, "/api")
 
 
 if __name__ == "__main__":

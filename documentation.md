@@ -97,11 +97,43 @@ export COMFY_URL=localhost:8000
 unset COMFY_AUTH_HEADER
 ```
 
+### Multi-server Registry (YAML)
+
+For simple multi-server support, create `.comfy_servers.yaml` (or point `COMFY_SERVERS_FILE` to a custom path).
+You can start from `.comfy_servers.example.yaml`:
+
+```yaml
+default_server: local
+servers:
+  local:
+    url: localhost:8188
+    headers:
+      Authorization: Bearer local-token
+    api_prefix: /api
+    manager_api_prefix: /manager
+  cloud_gpu:
+    url: https://your-cloud-host.example.com/comfy
+    headers:
+      Authorization: Bearer cloud-token
+    api_prefix: /api
+    manager_api_prefix: /manager
+```
+
+`select_comfy_server` resolves one named server and returns:
+- `server`
+- `headers`
+- `api_prefix`
+- `manager_api_prefix`
+
+Then pass those fields explicitly into your target workflow/infra skill run.  
+No global env mutation is needed.
+
 Optional env keys for dependency auto-repair:
 
 ```bash
 export HF_TOKEN=
 export CIVITAI_API_KEY=
+export COMFY_SERVERS_FILE=.comfy_servers.yaml
 export COMFY_MANAGER_API_PREFIX=/manager
 export COMFY_RESOURCE_MIN_FREE_VRAM_MB=
 export COMFY_RESOURCE_MIN_FREE_STORAGE_GB=

@@ -6,4 +6,5 @@ build/
 dist/
 .DS_Store
 .env
+.comfy_servers.yaml
 tmp/

@@ -42,6 +42,53 @@ class MonitoringSkillTests(unittest.TestCase):
         self.assertGreaterEqual(result1["progress_percent"], 20.0)
         self.assertGreater(result2["progress_percent"], result1["progress_percent"])
 
+    def test_select_comfy_server_resolves_without_readiness_probe(self):
+        from skills.infra.select_comfy_server.skill import run
+
+        resolved = {
+            "server_name": "cloud",
+            "server": "https://cloud.example.net",
+            "headers": {"Authorization": "Bearer test"},
+            "api_prefix": "/api",
+            "manager_api_prefix": "/manager",
+            "source": "servers_file",
+            "servers_file": "/tmp/.comfy_servers.yaml",
+        }
+
+        with patch("skills.infra.select_comfy_server.skill.get_server_config", return_value=resolved):
+            result = run(server_name="cloud", require_ready=False)
+
+        self.assertEqual(result["status"], "ok")
+        self.assertIsNone(result["ready"])
+        self.assertEqual(result["server"], "https://cloud.example.net")
+        self.assertEqual(result["api_prefix"], "/api")
+
+    def test_select_comfy_server_require_ready_blocked_when_object_info_fails(self):
+        from skills.infra.select_comfy_server.skill import run
+
+        resolved = {
+            "server_name": "cloud",
+            "server": "https://cloud.example.net",
+            "headers": {},
+            "api_prefix": "/api",
+            "manager_api_prefix": "/manager",
+            "source": "servers_file",
+            "servers_file": "/tmp/.comfy_servers.yaml",
+        }
+
+        with patch("skills.infra.select_comfy_server.skill.get_server_config", return_value=resolved), patch(
+            "skills.infra.select_comfy_server.skill.fetch_json",
+            return_value={"ok": False, "url": "https://cloud.example.net/api/object_info", "error": "HTTP 404"},
+        ), patch(
+            "skills.infra.select_comfy_server.skill.manager_probe",
+            return_value={"ok": False, "manager_available": False, "root": None, "error": "missing"},
+        ):
+            result = run(server_name="cloud", require_ready=True)
+
+        self.assertEqual(result["status"], "blocked")
+        self.assertFalse(result["ready"])
+        self.assertIn("/object_info", result["message"])
+
 
 if __name__ == "__main__":
     unittest.main()
