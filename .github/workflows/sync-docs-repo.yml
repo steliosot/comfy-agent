@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   sync:
+    if: ${{ secrets.DOCS_REPO_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source repo
@@ -47,3 +48,12 @@ jobs:
           else
             echo "No docs changes to sync"
           fi
+
+  missing-token:
+    if: ${{ secrets.DOCS_REPO_TOKEN == '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain missing secret
+        run: |
+          echo "DOCS_REPO_TOKEN is not configured."
+          echo "Add it in repo settings to enable cross-repo docs sync."
