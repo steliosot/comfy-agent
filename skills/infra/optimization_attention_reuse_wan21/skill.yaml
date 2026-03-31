@@ -1,0 +1,85 @@
+name: optimization_attention_reuse_wan21
+
+description: Enable attention reuse preset tuned for WAN2.1 video pipelines.
+
+inputs:
+  cache_policy:
+    type: string
+    required: false
+  cache_size:
+    type: integer
+    required: false
+  max_models_in_vram:
+    type: integer
+    required: false
+  enable_cpu_offload:
+    type: boolean
+    required: false
+  lazy_loading:
+    type: boolean
+    required: false
+  attn_reuse_threshold:
+    type: number
+    required: false
+  attn_cache_device:
+    type: string
+    required: false
+  attn_store_frequency:
+    type: integer
+    required: false
+  attn_reuse_layers:
+    type: array
+    required: false
+
+outputs:
+  status:
+    type: string
+  mode:
+    type: string
+  workflow:
+    type: object
+  model_manager:
+    type: object
+  attention_reuse:
+    type: object
+  python_snippet:
+    type: string
+---
+name: optimization_attention_reuse_wan21
+description: >
+  Enable attention reuse preset tuned for WAN2.1 video pipelines.
+homepage: https://github.com/steliosot/comfy-agent
+metadata.clawdbot.os: ["darwin", "linux"]
+metadata.clawdbot.requires.bins: ["python3"]
+metadata.clawdbot.requires.env: []
+metadata.clawdbot.files: ["skill.py", "skill.yaml", "scripts/*"]
+metadata.clawdbot.tags: ["comfyui", "skill", "ops", "optimization", "attention", "wan2.1"]
+metadata.clawdbot.category: "ops"
+metadata.clawdbot.input_type: "application/json"
+metadata.clawdbot.output_type: "application/json"
+metadata.clawdbot.output_can_feed_into: []
+metadata.clawdbot.accepts_input_from: []
+metadata.clawdbot.priority: 70
+---
+name: optimization_attention_reuse_wan21
+description: >
+  Enable attention reuse preset tuned for WAN2.1 video pipelines.
+homepage: https://github.com/steliosot/comfy-agent
+metadata.clawdbot.os: ["darwin", "linux"]
+metadata.clawdbot.requires.bins: ["python3"]
+metadata.clawdbot.requires.env: []
+metadata.clawdbot.files: ["skill.py", "skill.yaml", "scripts/*"]
+metadata.clawdbot.tags: ["comfyui", "skill", "ops", "optimization", "attention", "wan2.1"]
+metadata.clawdbot.category: "ops"
+metadata.clawdbot.input_type: "application/json"
+metadata.clawdbot.output_type: "application/json"
+metadata.clawdbot.output_can_feed_into: []
+metadata.clawdbot.accepts_input_from: []
+metadata.clawdbot.priority: 70
+---
+
+# optimization_attention_reuse_wan21
+
+Enable attention reuse preset tuned for WAN2.1 video pipelines.
+
+This skill wraps configure_optimizations with fixed mode: attention_reuse_wan21.

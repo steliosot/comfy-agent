@@ -1,0 +1,46 @@
+name: optimization_attention_reuse_wan22
+
+description: Enable attention reuse preset tuned for WAN2.2 pipelines.
+
+inputs:
+  cache_policy:
+    type: string
+    required: false
+  cache_size:
+    type: integer
+    required: false
+  max_models_in_vram:
+    type: integer
+    required: false
+  enable_cpu_offload:
+    type: boolean
+    required: false
+  lazy_loading:
+    type: boolean
+    required: false
+  attn_reuse_threshold:
+    type: number
+    required: false
+  attn_cache_device:
+    type: string
+    required: false
+  attn_store_frequency:
+    type: integer
+    required: false
+  attn_reuse_layers:
+    type: array
+    required: false
+
+outputs:
+  status:
+    type: string
+  mode:
+    type: string
+  workflow:
+    type: object
+  model_manager:
+    type: object
+  attention_reuse:
+    type: object
+  python_snippet:
+    type: string

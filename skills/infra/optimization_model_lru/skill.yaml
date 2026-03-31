@@ -1,0 +1,48 @@
+name: optimization_model_lru
+
+description: Enable ModelManager LRU without CPU offload.
+
+inputs:
+  cache_policy:
+    type: string
+    required: false
+  cache_size:
+    type: integer
+    required: false
+  max_models_in_vram:
+    type: integer
+    required: false
+  enable_cpu_offload:
+    type: boolean
+    required: false
+  lazy_loading:
+    type: boolean
+    required: false
+
+outputs:
+  status:
+    type: string
+  mode:
+    type: string
+  workflow:
+    type: object
+  model_manager:
+    type: object
+  python_snippet:
+    type: string
+---
+name: optimization_model_lru
+description: >
+  Enable ModelManager LRU without CPU offload.
+homepage: https://github.com/steliosot/comfy-agent
+metadata.clawdbot.os: ["darwin", "linux"]
+metadata.clawdbot.requires.bins: ["python3"]
+metadata.clawdbot.requires.env: []
+metadata.clawdbot.files: ["skill.py", "skill.yaml", "scripts/*"]
+metadata.clawdbot.tags: ["comfyui", "skill", "ops", "optimization"]
+metadata.clawdbot.category: "ops"
+metadata.clawdbot.input_type: "application/json"
+metadata.clawdbot.output_type: "application/json"
+metadata.clawdbot.output_can_feed_into: []
+metadata.clawdbot.accepts_input_from: []
+metadata.clawdbot.priority: 70

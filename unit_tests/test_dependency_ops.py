@@ -28,6 +28,7 @@ class DependencyOpsTests(unittest.TestCase):
             os.environ,
             {
                 "COMFY_URL": "localhost:8000",
+                "COMFY_SERVERS_FILE": "/tmp/nonexistent_comfy_servers.yaml",
                 "COMFY_MANAGER_API_PREFIX": "/manager",
                 "HF_TOKEN": "hf_test",
                 "CIVITAI_API_KEY": "cv_test",
@@ -38,7 +39,7 @@ class DependencyOpsTests(unittest.TestCase):
         ):
             cfg = ComfyConfig.from_env(load_env=False)
 
-        self.assertEqual(cfg.server, "localhost:8000")
+        self.assertEqual(cfg.server, "http://localhost:8000")
         self.assertEqual(cfg.manager_api_prefix, "/manager")
         self.assertEqual(cfg.hf_token, "hf_test")
         self.assertEqual(cfg.civitai_api_key, "cv_test")

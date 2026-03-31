@@ -16,7 +16,11 @@ class ConfigTests(unittest.TestCase):
                 f.write("COMFY_AUTH_HEADER='token123'\n")
                 f.write("COMFY_OUTPUT_DIR=tmp/out\n")
 
-            with patch.dict(os.environ, {}, clear=True):
+            with patch.dict(
+                os.environ,
+                {"COMFY_SERVERS_FILE": "/tmp/nonexistent_comfy_servers.yaml"},
+                clear=True,
+            ):
                 loaded = load_env_file(path=env_path, override=False)
                 cfg = ComfyConfig.from_env(load_env=False)
 
@@ -50,6 +54,7 @@ class ConfigTests(unittest.TestCase):
             {
                 "COMFY_URL": "localhost:8000",
                 "COMFY_AUTH_HEADER": "secret-header",
+                "COMFY_SERVERS_FILE": "/tmp/nonexistent_comfy_servers.yaml",
             },
             clear=True,
         ), patch("comfy_agent.workflow.requests.get", side_effect=fake_get):

@@ -103,6 +103,29 @@ def _convert_exported_to_prompt(exported, registry):
                     break
                 inputs[name] = widget_values[idx]
                 idx += 1
+            # Compatibility shim: older KSampler exports included control_after_generate
+            # in widget values, which newer schemas no longer expose.
+            if (
+                class_type == "KSampler"
+                and len(widget_values) >= 7
+                and isinstance(inputs.get("steps"), str)
+                and isinstance(widget_values[2], (int, float))
+            ):
+                inputs["seed"] = int(widget_values[0])
+                inputs["steps"] = int(widget_values[2])
+                inputs["cfg"] = float(widget_values[3])
+                inputs["sampler_name"] = widget_values[4]
+                inputs["scheduler"] = widget_values[5]
+                inputs["denoise"] = float(widget_values[6])
+            # Compatibility shim: some server versions removed StabilityTextToAudio seed mode,
+            # so exported widget order may shift and place "randomize" into steps.
+            if (
+                class_type == "StabilityTextToAudio"
+                and len(widget_values) >= 6
+                and isinstance(inputs.get("steps"), str)
+                and isinstance(widget_values[-1], (int, float))
+            ):
+                inputs["steps"] = int(widget_values[-1])
         elif widget_values is not None and assignable:
             inputs[assignable[0]] = widget_values
 
@@ -160,6 +183,18 @@ def _apply_overrides(prompt_map, overrides):
             negative_target = clip_nodes[0][0]
         prompt_map[negative_target]["inputs"]["text"] = negative_prompt
 
+    # Audio text conditioning compatibility for AceStep nodes.
+    if prompt is not None:
+        for node in prompt_map.values():
+            if node.get("class_type") in {"TextEncodeAceStepAudio", "TextEncodeAceStepAudio1.5"}:
+                inputs = node.get("inputs") or {}
+                if "lyrics" in inputs:
+                    inputs["lyrics"] = prompt
+                elif "text" in inputs:
+                    inputs["text"] = prompt
+                elif "prompt" in inputs:
+                    inputs["prompt"] = prompt
+
     for node in prompt_map.values():
         class_type = node.get("class_type")
         inputs = node.get("inputs") or {}
@@ -186,6 +221,51 @@ def _apply_overrides(prompt_map, overrides):
     return prompt_map
 
 
+def _prune_unsupported_nodes(prompt_map, registry):
+    if not isinstance(prompt_map, dict) or not prompt_map:
+        return prompt_map
+
+    supported = set(registry.keys()) if isinstance(registry, dict) else set()
+    pruned = dict(prompt_map)
+
+    def _collect_refs(node_inputs):
+        refs = set()
+        if isinstance(node_inputs, dict):
+            stack = list(node_inputs.values())
+        else:
+            stack = []
+        while stack:
+            value = stack.pop()
+            if isinstance(value, list) and len(value) == 2 and str(value[0]).isdigit():
+                refs.add(str(value[0]))
+                continue
+            if isinstance(value, dict):
+                stack.extend(value.values())
+                continue
+            if isinstance(value, (list, tuple)):
+                stack.extend(value)
+        return refs
+
+    changed = True
+    while changed:
+        changed = False
+        referenced = set()
+        for node in pruned.values():
+            referenced.update(_collect_refs((node or {}).get("inputs", {})))
+
+        for node_id, node in list(pruned.items()):
+            class_type = str((node or {}).get("class_type") or "")
+            if class_type in supported:
+                continue
+            # Safe prune only when node is not referenced by any other node.
+            if str(node_id) in referenced:
+                continue
+            pruned.pop(node_id, None)
+            changed = True
+
+    return pruned
+
+
 def run_curated_workflow(
     workflow_path,
     server=None,
@@ -210,6 +290,7 @@ def run_curated_workflow(
 
     exported = json.loads(Path(workflow_path).read_text(encoding="utf-8"))
     prompt_map = _convert_exported_to_prompt(exported, wf.registry)
+    prompt_map = _prune_unsupported_nodes(prompt_map, wf.registry)
     prompt_map = _apply_overrides(
         prompt_map,
         {

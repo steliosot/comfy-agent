@@ -138,7 +138,7 @@
       "widgets_values": [
         648919830374189,
         "randomize",
-        50,
+        8,
         4,
         "res_multistep",
         "simple",
@@ -261,7 +261,7 @@
         "Node name for S&R": "EmptyAceStepLatentAudio"
       },
       "widgets_values": [
-        135,
+        16,
         1
       ],
       "color": "#323",
@@ -336,7 +336,7 @@
       },
       "widgets_values": [
         "romantic, soft pop, piano, acoustic guitar, female vocal, emotional, slow tempo, love song, beautiful",
-        "[intro]\nSoft as rain upon my skin\nYou’re the place my heart begins\n\n[verse 1]\nI was lost, then you appeared\nPulled me close, erased the fear\nEvery word, a melody\nLove was quiet till you found me\n\n[chorus]\nHold me now, don’t let me go\nTime stands still, just so you know\nEvery beat, I’m falling more\nYou’re the one I’m living for\n\n[verse 2]\nWhispers bloom like songs at night\nEyes like stars that steal the light\nYou and me, we feel like home\nIn your arms, I’m not alone\n\n[bridge]\nAll I need is you this way\nLove that grows and wants to stay\n\n[chorus]\nHold me now, don’t let me go\nTime stands still, just so you know\nEvery beat, I’m falling more\nYou’re the one I’m living for\n\n[outro]\nYou’re the love I waited for",
+        "[intro]\nSoft as rain upon my skin\nYou\u2019re the place my heart begins\n\n[verse 1]\nI was lost, then you appeared\nPulled me close, erased the fear\nEvery word, a melody\nLove was quiet till you found me\n\n[chorus]\nHold me now, don\u2019t let me go\nTime stands still, just so you know\nEvery beat, I\u2019m falling more\nYou\u2019re the one I\u2019m living for\n\n[verse 2]\nWhispers bloom like songs at night\nEyes like stars that steal the light\nYou and me, we feel like home\nIn your arms, I\u2019m not alone\n\n[bridge]\nAll I need is you this way\nLove that grows and wants to stay\n\n[chorus]\nHold me now, don\u2019t let me go\nTime stands still, just so you know\nEvery beat, I\u2019m falling more\nYou\u2019re the one I\u2019m living for\n\n[outro]\nYou\u2019re the love I waited for",
         1
       ],
       "color": "#232",
@@ -387,7 +387,7 @@
       "title": "Pixaroma - Note - START HERE",
       "properties": {},
       "widgets_values": [
-        "# MODELS USED IN THIS WORKFLOW  \n\n## ⚛️ Load Checkpoint\n### Download ace_step_v1_3.5b model from [HERE](https://huggingface.co/Comfy-Org/ACE-Step_ComfyUI_repackaged/resolve/main/all_in_one/ace_step_v1_3.5b.safetensors?download=true)\n\n**Place in:**`ComfyUI/models/checkpoints`  \n\n---\n\n## 📚 Resources  \n🎥 **Tutorials:** [Pixaroma YouTube Channel](https://www.youtube.com/@pixaroma)  \n💬 **Community Discord:** [Join Here](https://discord.com/invite/gggpkVgBf3)\n\nRead more on [Comfy Blog](https://docs.comfy.org/tutorials/audio/ace-step/ace-step-v1), or on [GitHub](https://github.com/ace-step/ACE-Step), or [HuggingFace](https://huggingface.co/ACE-Step/ACE-Step-v1-3.5B)\n\nRead about Multilanguage Support [HERE](https://docs.comfy.org/tutorials/audio/ace-step/ace-step-v1#multilingual-support)"
+        "# MODELS USED IN THIS WORKFLOW  \n\n## \u269b\ufe0f Load Checkpoint\n### Download ace_step_v1_3.5b model from [HERE](https://huggingface.co/Comfy-Org/ACE-Step_ComfyUI_repackaged/resolve/main/all_in_one/ace_step_v1_3.5b.safetensors?download=true)\n\n**Place in:**`ComfyUI/models/checkpoints`  \n\n---\n\n## \ud83d\udcda Resources  \n\ud83c\udfa5 **Tutorials:** [Pixaroma YouTube Channel](https://www.youtube.com/@pixaroma)  \n\ud83d\udcac **Community Discord:** [Join Here](https://discord.com/invite/gggpkVgBf3)\n\nRead more on [Comfy Blog](https://docs.comfy.org/tutorials/audio/ace-step/ace-step-v1), or on [GitHub](https://github.com/ace-step/ACE-Step), or [HuggingFace](https://huggingface.co/ACE-Step/ACE-Step-v1-3.5B)\n\nRead about Multilanguage Support [HERE](https://docs.comfy.org/tutorials/audio/ace-step/ace-step-v1#multilingual-support)"
       ],
       "color": "#432",
       "bgcolor": "#653"

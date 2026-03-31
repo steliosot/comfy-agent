@@ -1,0 +1,65 @@
+name: configure_optimizations
+
+description: Build optimization profile config for workflow cache/memoization/model manager modes.
+
+inputs:
+  mode:
+    type: string
+    default: full_stack
+  cache_policy:
+    type: string
+    default: LRU
+  cache_size:
+    type: integer
+    default: 256
+  max_models_in_vram:
+    type: integer
+    default: 1
+  enable_cpu_offload:
+    type: boolean
+    default: true
+  lazy_loading:
+    type: boolean
+    default: true
+  attn_reuse_threshold:
+    type: number
+    default: 0.6
+  attn_cache_device:
+    type: string
+    default: cpu
+  attn_store_frequency:
+    type: integer
+    default: 2
+  attn_reuse_layers:
+    type: array
+    default: ["cross_attention"]
+
+outputs:
+  status:
+    type: string
+  mode:
+    type: string
+  workflow:
+    type: object
+  model_manager:
+    type: object
+  attention_reuse:
+    type: object
+  python_snippet:
+    type: string
+---
+name: configure_optimizations
+description: >
+  Build optimization profile config for workflow cache/memoization/model manager modes.
+homepage: https://github.com/steliosot/comfy-agent
+metadata.clawdbot.os: ["darwin", "linux"]
+metadata.clawdbot.requires.bins: ["python3"]
+metadata.clawdbot.requires.env: []
+metadata.clawdbot.files: ["skill.py", "skill.yaml", "scripts/*"]
+metadata.clawdbot.tags: ["comfyui", "skill", "ops", "optimization", "cache", "memoization"]
+metadata.clawdbot.category: "ops"
+metadata.clawdbot.input_type: "application/json"
+metadata.clawdbot.output_type: "application/json"
+metadata.clawdbot.output_can_feed_into: []
+metadata.clawdbot.accepts_input_from: []
+metadata.clawdbot.priority: 74

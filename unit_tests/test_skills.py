@@ -199,6 +199,138 @@ class SkillTests(unittest.TestCase):
         self.assertIn("exists", result)
         self.assertIn("missing", result)
 
+    def test_configure_optimizations_skill_returns_profile(self):
+        from skills.infra.configure_optimizations.skill import run
+
+        result = run(mode="graph_memoization", cache_policy="LRU", cache_size=128)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["mode"], "graph_memoization")
+        self.assertTrue(result["workflow"]["cache_enabled"])
+        self.assertTrue(result["workflow"]["memoization_enabled"])
+        self.assertIn("python_snippet", result)
+
+    def test_configure_optimizations_attention_reuse_mode(self):
+        from skills.infra.configure_optimizations.skill import run
+
+        result = run(mode="attention_reuse", attn_reuse_threshold=0.7, attn_store_frequency=3)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["mode"], "attention_reuse")
+        self.assertTrue(result["attention_reuse"]["enabled"])
+        self.assertEqual(result["attention_reuse"]["threshold"], 0.7)
+        self.assertEqual(result["attention_reuse"]["store_frequency"], 3)
+
+    def test_optimization_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_full_stack.skill import run
+
+        result = run(cache_size=64, max_models_in_vram=2)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_full_stack")
+        self.assertEqual(result["mode"], "full_stack")
+        self.assertTrue(result["workflow"]["cache_enabled"])
+        self.assertTrue(result["workflow"]["memoization_enabled"])
+        self.assertTrue(result["model_manager"]["enabled"])
+
+    def test_optimization_attention_reuse_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_attention_reuse.skill import run
+
+        result = run(attn_reuse_threshold=0.65)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_attention_reuse")
+        self.assertEqual(result["mode"], "attention_reuse")
+        self.assertTrue(result["attention_reuse"]["enabled"])
+
+    def test_optimization_attention_reuse_cpu_offload_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_attention_reuse_cpu_offload.skill import run
+
+        result = run(max_models_in_vram=2)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_attention_reuse_cpu_offload")
+        self.assertEqual(result["mode"], "attention_reuse_cpu_offload")
+        self.assertTrue(result["attention_reuse"]["enabled"])
+        self.assertTrue(result["model_manager"]["enabled"])
+
+    def test_optimization_attention_reuse_wan21_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_attention_reuse_wan21.skill import run
+
+        result = run(attn_reuse_threshold=0.6)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_attention_reuse_wan21")
+        self.assertEqual(result["mode"], "attention_reuse_wan21")
+        self.assertEqual(
+            result["attention_reuse"]["reuse_layers"],
+            ["cross_attention", "temporal_attention", "transformer_attention"],
+        )
+
+    def test_optimization_attention_reuse_wan21_cpu_offload_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_attention_reuse_wan21_cpu_offload.skill import run
+
+        result = run(max_models_in_vram=1)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_attention_reuse_wan21_cpu_offload")
+        self.assertEqual(result["mode"], "attention_reuse_wan21_cpu_offload")
+        self.assertTrue(result["attention_reuse"]["enabled"])
+        self.assertTrue(result["model_manager"]["enabled"])
+
+    def test_optimization_attention_reuse_ltxv_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_attention_reuse_ltxv.skill import run
+
+        result = run(attn_reuse_threshold=0.6)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_attention_reuse_ltxv")
+        self.assertEqual(result["mode"], "attention_reuse")
+        self.assertEqual(
+            result["attention_reuse"]["reuse_layers"],
+            ["cross_attention", "temporal_attention", "transformer_attention"],
+        )
+
+    def test_optimization_attention_reuse_ltxv_cpu_offload_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_attention_reuse_ltxv_cpu_offload.skill import run
+
+        result = run(max_models_in_vram=1)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_attention_reuse_ltxv_cpu_offload")
+        self.assertEqual(result["mode"], "attention_reuse_cpu_offload")
+        self.assertTrue(result["model_manager"]["enabled"])
+
+    def test_optimization_attention_reuse_sd_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_attention_reuse_sd.skill import run
+
+        result = run(attn_reuse_threshold=0.6)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_attention_reuse_sd")
+        self.assertEqual(result["mode"], "attention_reuse")
+        self.assertEqual(result["attention_reuse"]["reuse_layers"], ["cross_attention"])
+
+    def test_optimization_attention_reuse_sd_cpu_offload_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_attention_reuse_sd_cpu_offload.skill import run
+
+        result = run(max_models_in_vram=1)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_attention_reuse_sd_cpu_offload")
+        self.assertEqual(result["mode"], "attention_reuse_cpu_offload")
+        self.assertTrue(result["model_manager"]["enabled"])
+
+    def test_optimization_attention_reuse_wan22_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_attention_reuse_wan22.skill import run
+
+        result = run(attn_reuse_threshold=0.6)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_attention_reuse_wan22")
+        self.assertEqual(result["mode"], "attention_reuse")
+        self.assertEqual(
+            result["attention_reuse"]["reuse_layers"],
+            ["cross_attention", "temporal_attention", "transformer_attention"],
+        )
+
+    def test_optimization_attention_reuse_wan22_cpu_offload_wrapper_skill_fixed_mode(self):
+        from skills.infra.optimization_attention_reuse_wan22_cpu_offload.skill import run
+
+        result = run(max_models_in_vram=1)
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["skill"], "optimization_attention_reuse_wan22_cpu_offload")
+        self.assertEqual(result["mode"], "attention_reuse_cpu_offload")
+        self.assertTrue(result["model_manager"]["enabled"])
+
 
 if __name__ == "__main__":
     unittest.main()

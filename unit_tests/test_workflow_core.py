@@ -10,6 +10,33 @@ from unit_tests.test_helpers import mocked_comfy_api
 
 
 class WorkflowCoreTests(unittest.TestCase):
+    def test_checkpoint_uses_model_manager_without_changing_dag(self):
+        class RecordingModelManager:
+            def __init__(self):
+                self.calls = []
+
+            def get_model(self, model_name):
+                self.calls.append(model_name)
+                return {"name": model_name}
+
+        manager = RecordingModelManager()
+        with mocked_comfy_api():
+            wf = Workflow(model_manager=manager)
+            (
+                wf
+                .checkpoint("sd1.5/juggernaut_reborn.safetensors")
+                .prompt("robot")
+                .latent(512, 512)
+                .sample()
+                .decode()
+                .save("robot")
+            )
+            dag = json.loads(wf.to_json())
+
+        self.assertEqual(manager.calls, ["sd1.5/juggernaut_reborn.safetensors"])
+        self.assertEqual(dag["1"]["class_type"], "CheckpointLoaderSimple")
+        self.assertEqual(dag["1"]["inputs"]["ckpt_name"], "sd1.5/juggernaut_reborn.safetensors")
+
     def test_comfy_url_env_without_scheme_gets_http_prefix(self):
         captured = {"url": None}
 
@@ -32,7 +59,11 @@ class WorkflowCoreTests(unittest.TestCase):
 
         with patch.dict(
             os.environ,
-            {"COMFY_URL": "localhost:8000", "COMFY_API_PREFIX": ""},
+            {
+                "COMFY_URL": "localhost:8000",
+                "COMFY_API_PREFIX": "",
+                "COMFY_SERVERS_FILE": "/tmp/nonexistent_comfy_servers.yaml",
+            },
         ), patch(
             "comfy_agent.workflow.requests.get", side_effect=fake_get
         ):

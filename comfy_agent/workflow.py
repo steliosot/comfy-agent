@@ -5,6 +5,7 @@ import mimetypes
 import os
 import time
 import uuid
+from collections import OrderedDict
 from pathlib import Path
 from urllib.parse import urlencode, urlparse
 from urllib import error, request
@@ -134,12 +135,15 @@ except ImportError:  # pragma: no cover
 from .node import Node
 from .refs import DataRef, NodeResult
 from .config import ComfyConfig
+from .cache_utils import hash_node, hash_value
+from .model_manager import get_default_model_manager
+from .attention_reuse_plugin import AttentionReusePlugin
 
 
 class Workflow:
     """Spark-style lazy DAG builder for ComfyUI"""
 
-    def __init__(self, comfy_url=None, server=None, headers=None, api_prefix=None):
+    def __init__(self, comfy_url=None, server=None, headers=None, api_prefix=None, model_manager=None):
         cfg = ComfyConfig.from_env(load_env=True)
         base_url = server or comfy_url or cfg.server
         if not base_url:
@@ -191,6 +195,22 @@ class Workflow:
         self.next_id = 1
         self._last_checkpoint = None
         self.last_prompt_id = None
+        self.cache_enabled = False
+        self.memoization_enabled = False
+        self.cache_policy = "FULL"
+        self.cache_size = None
+        self.cache = {}
+        self.execution_state = {}
+        self._last_run_signature = None
+        self._last_run_result = None
+        self.model_manager = model_manager or get_default_model_manager()
+        self._active_checkpoint_model_object = None
+        self._active_checkpoint_name = None
+        self.attention_reuse_plugin = AttentionReusePlugin()
+        self.attn_reuse_threshold = 0.6
+        self.attn_cache_device = "cpu"
+        self.attn_store_frequency = 2
+        self.attn_reuse_layers = ["cross_attention"]
         self._reset_pipeline_state()
         print("Loaded nodes:", len(self.registry), "via", self.url)
 
@@ -296,8 +316,13 @@ class Workflow:
         self._current_latent = None
         self._current_image = None
         self._current_mask = None
+        self._current_prompt_text = ""
+        self._current_negative_text = ""
+        self._current_sample_steps = 20
 
     def checkpoint(self, ckpt_name):
+        self._active_checkpoint_model_object = self.model_manager.get_model(str(ckpt_name))
+        self._active_checkpoint_name = str(ckpt_name)
         checkpoint = self._add_node(
             "CheckpointLoaderSimple",
             __alias="checkpoint",
@@ -307,6 +332,49 @@ class Workflow:
         self._current_model = checkpoint.MODEL
         self._current_clip = checkpoint.CLIP
         self._current_vae = checkpoint.VAE
+        return self
+
+    def set_model_manager(self, model_manager):
+        self.model_manager = model_manager
+        return self
+
+    def configure_model_manager(self, max_models_in_vram=None, enable_cpu_offload=None):
+        manager = self.model_manager or get_default_model_manager()
+        if max_models_in_vram is not None:
+            manager.max_models_in_vram = max(1, int(max_models_in_vram))
+            manager._evict_if_needed()
+        if enable_cpu_offload is not None:
+            manager.enable_cpu_offload = bool(enable_cpu_offload)
+        self.model_manager = manager
+        return self
+
+    def set_attention_reuse_adapter(self, adapter):
+        self.attention_reuse_plugin.set_adapter(adapter)
+        return self
+
+    def enable_attention_reuse(
+        self,
+        threshold=0.6,
+        cache_device="cpu",
+        store_frequency=2,
+        reuse_layers=None,
+        debug=False,
+    ):
+        self.attn_reuse_threshold = float(threshold)
+        self.attn_cache_device = str(cache_device or "cpu")
+        self.attn_store_frequency = max(1, int(store_frequency))
+        self.attn_reuse_layers = list(reuse_layers or ["cross_attention"])
+        self.attention_reuse_plugin.enable(
+            threshold=self.attn_reuse_threshold,
+            cache_device=self.attn_cache_device,
+            store_frequency=self.attn_store_frequency,
+            reuse_layers=self.attn_reuse_layers,
+            debug=bool(debug),
+        )
+        return self
+
+    def disable_attention_reuse(self):
+        self.attention_reuse_plugin.disable()
         return self
 
     def lora(self, lora_name, strength=1.0):
@@ -334,6 +402,7 @@ class Workflow:
             text=text,
         )
         self._current_positive = conditioning.CONDITIONING
+        self._current_prompt_text = str(text)
         return self
 
     def negative(self, text):
@@ -347,6 +416,7 @@ class Workflow:
             text=text,
         )
         self._current_negative = conditioning.CONDITIONING
+        self._current_negative_text = str(text)
         return self
 
     def latent(self, width, height, batch_size=1):
@@ -439,6 +509,7 @@ class Workflow:
             denoise=denoise,
         )
         self._current_latent = sample.LATENT
+        self._current_sample_steps = int(steps)
         return self
 
     def decode(self):
@@ -672,8 +743,14 @@ class Workflow:
         return self._add_node(name, **kwargs)
 
     def _build_dag(self):
+        return self._build_dag_subset(include_node_ids=None)
+
+    def _build_dag_subset(self, include_node_ids=None):
+        include_set = set(include_node_ids) if include_node_ids is not None else None
         dag = {}
         for node in self.nodes:
+            if include_set is not None and node.node_id not in include_set:
+                continue
             dag[node.node_id] = {
                 "class_type": node.class_type,
                 "inputs": {k: self._resolve(v) for k, v in node.inputs.items()},
@@ -714,31 +791,380 @@ class Workflow:
             for v in value.values():
                 self._validate_refs(v, produced)
 
-    def run(self, debug=False):
-        self.validate()
-        dag = self._build_dag()
+    def enable_cache(self, policy="FULL", size=None):
+        normalized = str(policy or "FULL").strip().upper()
+        if normalized not in {"FULL", "LRU"}:
+            raise ValueError("cache policy must be FULL or LRU")
+        self.cache_enabled = True
+        self.cache_policy = normalized
+        self.cache_size = int(size) if size is not None else None
+        if self.cache_policy == "LRU":
+            if not isinstance(self.cache, OrderedDict):
+                self.cache = OrderedDict(self.cache)
+        elif isinstance(self.cache, OrderedDict):
+            self.cache = dict(self.cache)
+        return self
 
-        payload = {
-            "prompt": dag,
-            "client_id": str(uuid.uuid4())
+    def disable_cache(self):
+        self.cache_enabled = False
+        return self
+
+    def enable_memoization(self):
+        self.memoization_enabled = True
+        return self
+
+    def disable_memoization(self):
+        self.memoization_enabled = False
+        return self
+
+    def clear_cache(self):
+        self.cache.clear()
+        self.execution_state.clear()
+        self._last_run_signature = None
+        self._last_run_result = None
+        self.attention_reuse_plugin.clear()
+        return self
+
+    def _cache_get(self, key):
+        if key not in self.cache:
+            return None
+        if self.cache_policy == "LRU" and isinstance(self.cache, OrderedDict):
+            self.cache.move_to_end(key)
+        return self.cache[key]
+
+    def _cache_put(self, key, value):
+        if self.cache_policy == "LRU":
+            if not isinstance(self.cache, OrderedDict):
+                self.cache = OrderedDict(self.cache)
+            self.cache[key] = value
+            self.cache.move_to_end(key)
+            if self.cache_size is not None and self.cache_size > 0:
+                while len(self.cache) > self.cache_size:
+                    self.cache.popitem(last=False)
+            return
+
+        self.cache[key] = value
+        if self.cache_size is not None and self.cache_size > 0 and len(self.cache) > self.cache_size:
+            # Keep behavior simple for FULL policy with optional cap.
+            for stale_key in list(self.cache.keys())[:-self.cache_size]:
+                self.cache.pop(stale_key, None)
+
+    def _collect_ref_node_ids(self, value, out):
+        if isinstance(value, DataRef):
+            out.add(str(value.node_id))
+            return
+        if isinstance(value, NodeResult):
+            for ref in value:
+                self._collect_ref_node_ids(ref, out)
+            return
+        if isinstance(value, (list, tuple)):
+            for item in value:
+                self._collect_ref_node_ids(item, out)
+            return
+        if isinstance(value, dict):
+            for item in value.values():
+                self._collect_ref_node_ids(item, out)
+
+    def _resolve_target_nodes(self, target):
+        if target is None:
+            return [node.node_id for node in self.nodes]
+
+        if isinstance(target, Node):
+            return [target.node_id]
+
+        if isinstance(target, (list, tuple, set)):
+            resolved = []
+            for item in target:
+                resolved.extend(self._resolve_target_nodes(item))
+            unique = []
+            seen = set()
+            for node_id in resolved:
+                if node_id not in seen:
+                    seen.add(node_id)
+                    unique.append(node_id)
+            return unique
+
+        if isinstance(target, int):
+            target = str(target)
+
+        if isinstance(target, str):
+            text = target.strip()
+            if not text:
+                raise ValueError("target selector must not be empty")
+            if text.isdigit():
+                node_id = str(int(text))
+                node = next((n for n in self.nodes if n.node_id == node_id), None)
+                if node is None:
+                    raise KeyError(f"No node with id '{node_id}'")
+                return [node_id]
+            node = self._find_node(text)
+            return [node.node_id]
+
+        raise TypeError("target must be None, selector string, node id, Node, or list of selectors")
+
+    def _ancestor_closure(self, target_node_ids):
+        node_by_id = {node.node_id: node for node in self.nodes}
+        closure = set()
+        stack = [str(node_id) for node_id in target_node_ids]
+
+        while stack:
+            node_id = stack.pop()
+            if node_id in closure:
+                continue
+            closure.add(node_id)
+            node = node_by_id.get(node_id)
+            if node is None:
+                continue
+            refs = set()
+            for value in node.inputs.values():
+                self._collect_ref_node_ids(value, refs)
+            for ref_id in refs:
+                if ref_id not in closure:
+                    stack.append(ref_id)
+
+        ordered = [node.node_id for node in self.nodes if node.node_id in closure]
+        return ordered
+
+    def _compute_signatures(self):
+        signatures = {}
+        for node in self.nodes:
+            upstream_ids = set()
+            for value in node.inputs.values():
+                self._collect_ref_node_ids(value, upstream_ids)
+            upstream_signatures = [
+                {"node_id": upstream_id, "signature": signatures.get(upstream_id)}
+                for upstream_id in sorted(upstream_ids)
+            ]
+            signatures[node.node_id] = hash_node(
+                class_type=node.class_type,
+                inputs=node.inputs,
+                upstream_signatures=upstream_signatures,
+            )
+        return signatures
+
+    def _attention_runtime_hints(self):
+        seed = None
+        frame_count = None
+        scheduler = None
+
+        # Prefer explicit sampler/sequencer-like nodes.
+        for node in self.nodes:
+            class_name = str(node.class_type or "").lower()
+            inputs = node.inputs if isinstance(node.inputs, dict) else {}
+
+            if seed is None:
+                for key in ("seed", "noise_seed"):
+                    if key in inputs and isinstance(inputs.get(key), (int, float)):
+                        seed = int(inputs.get(key))
+                        break
+
+            if scheduler is None:
+                for key in ("scheduler", "sampler_name", "sampler"):
+                    value = inputs.get(key)
+                    if isinstance(value, str) and value.strip():
+                        scheduler = value.strip()
+                        break
+
+            if frame_count is None:
+                for key in ("length", "frame_count", "frames", "num_frames"):
+                    value = inputs.get(key)
+                    if isinstance(value, (int, float)):
+                        frame_count = int(value)
+                        break
+
+            if seed is not None and frame_count is not None and scheduler is not None:
+                break
+
+        return {
+            "seed": seed,
+            "frame_count": frame_count,
+            "scheduler": scheduler,
         }
 
-        if debug:
-            print(json.dumps(payload, indent=2))
+    def run(self, target=None, debug=False):
+        if isinstance(target, bool) and debug is False:
+            # Backward compatibility with historical positional style run(True).
+            debug = target
+            target = None
 
-        r = requests.post(f"{self.url}/prompt", json=payload, headers=self.headers)
-        if not r.ok:
-            message = f"ComfyUI prompt request failed with {r.status_code}"
-            try:
-                detail = r.json()
-                message += f": {json.dumps(detail, indent=2)}"
-            except ValueError:
-                message += f": {r.text}"
-            raise requests.HTTPError(message, response=r)
-        result = r.json()
-        self.last_prompt_id = result.get("prompt_id")
-        print(result)
-        return result
+        attn_hints = self._attention_runtime_hints()
+        run_context = {
+            "model_id": str(self._active_checkpoint_name or ""),
+            "model_obj": self._active_checkpoint_model_object,
+            "prompt_fingerprint": hash_value(
+                {
+                    "prompt": self._current_prompt_text,
+                    "negative": self._current_negative_text,
+                }
+            ),
+            "total_steps": int(self._current_sample_steps or 0),
+            "seed": attn_hints.get("seed"),
+            "frame_count": attn_hints.get("frame_count"),
+            "scheduler": attn_hints.get("scheduler"),
+        }
+        self.attention_reuse_plugin.begin_run(run_context)
+
+        try:
+            self.validate()
+            target_ids = self._resolve_target_nodes(target)
+            closure_ids = self._ancestor_closure(target_ids)
+            closure_set = set(closure_ids)
+            signatures = self._compute_signatures()
+
+            trace = []
+            execute_required = set()
+            unchanged = set()
+            skipped_by_target = set()
+
+            for node in self.nodes:
+                node_id = node.node_id
+                if node_id not in closure_set:
+                    skipped_by_target.add(node_id)
+                    trace.append(
+                        {"event": "skip", "node_id": node_id, "class_type": node.class_type, "reason": "outside_target"}
+                    )
+                    continue
+
+                signature = signatures[node_id]
+                previous = self.execution_state.get(node_id, {})
+                previous_signature = previous.get("signature")
+                in_cache = self._cache_get(signature) is not None if self.cache_enabled else False
+
+                if self.cache_enabled and previous_signature == signature and in_cache:
+                    unchanged.add(node_id)
+                    trace.append({"event": "cache_hit", "node_id": node_id, "class_type": node.class_type})
+                else:
+                    execute_required.add(node_id)
+                    if self.cache_enabled:
+                        trace.append(
+                            {
+                                "event": "cache_miss",
+                                "node_id": node_id,
+                                "class_type": node.class_type,
+                                "reason": "signature_changed_or_missing",
+                            }
+                        )
+                    trace.append({"event": "execute", "node_id": node_id, "class_type": node.class_type})
+
+            run_signature_payload = {
+                "target": target_ids,
+                "closure": closure_ids,
+                "signatures": [signatures[node_id] for node_id in closure_ids],
+            }
+            run_signature = hash_value(run_signature_payload)
+
+            if (
+                self.cache_enabled
+                and self.memoization_enabled
+                and not execute_required
+                and self._last_run_signature == run_signature
+                and self._last_run_result is not None
+            ):
+                result = copy.deepcopy(self._last_run_result)
+                metrics = self._trace_metrics(trace)
+                metrics.update(self.attention_reuse_plugin.run_stats())
+                if debug:
+                    for item in trace:
+                        if item["event"] == "cache_hit":
+                            print(f"[CACHE HIT] {item['class_type']}#{item['node_id']}")
+                        elif item["event"] == "cache_miss":
+                            print(f"[CACHE MISS] {item['class_type']}#{item['node_id']}")
+                        elif item["event"] == "skip":
+                            print(f"[SKIP] {item['class_type']}#{item['node_id']} (outside target)")
+                    print("[CACHE HIT] WORKFLOW")
+                    result["execution_trace"] = trace
+                result["execution_metrics"] = metrics
+                return result
+
+            dag = self._build_dag_subset(include_node_ids=closure_ids)
+
+            payload = {
+                "prompt": dag,
+                "client_id": str(uuid.uuid4())
+            }
+
+            if debug:
+                for item in trace:
+                    if item["event"] == "execute":
+                        print(f"[EXECUTE] {item['class_type']}#{item['node_id']}")
+                    elif item["event"] == "cache_hit":
+                        print(f"[CACHE HIT] {item['class_type']}#{item['node_id']}")
+                    elif item["event"] == "cache_miss":
+                        print(f"[CACHE MISS] {item['class_type']}#{item['node_id']}")
+                    elif item["event"] == "skip":
+                        print(f"[SKIP] {item['class_type']}#{item['node_id']} (outside target)")
+                print(json.dumps(payload, indent=2))
+
+            r = requests.post(f"{self.url}/prompt", json=payload, headers=self.headers)
+            if not r.ok:
+                message = f"ComfyUI prompt request failed with {r.status_code}"
+                try:
+                    detail = r.json()
+                    message += f": {json.dumps(detail, indent=2)}"
+                except ValueError:
+                    message += f": {r.text}"
+                raise requests.HTTPError(message, response=r)
+            result = r.json()
+            self.last_prompt_id = result.get("prompt_id")
+            metrics = self._trace_metrics(trace)
+            metrics.update(self.attention_reuse_plugin.run_stats())
+            result = dict(result)
+            result["execution_metrics"] = metrics
+            if debug:
+                result["execution_trace"] = trace
+
+            for node_id in closure_ids:
+                signature = signatures[node_id]
+                state = self.execution_state.get(node_id, {})
+                state["signature"] = signature
+                state["last_run_marker"] = run_signature
+                state["output"] = self._cache_get(signature) if self.cache_enabled else None
+                self.execution_state[node_id] = state
+                if self.cache_enabled:
+                    self._cache_put(
+                        signature,
+                        {
+                            "node_id": node_id,
+                            "class_type": next(n.class_type for n in self.nodes if n.node_id == node_id),
+                        },
+                    )
+
+            if self.cache_enabled:
+                self._last_run_signature = run_signature
+                self._last_run_result = copy.deepcopy(result)
+
+            print(result)
+            return result
+        finally:
+            self.attention_reuse_plugin.end_run()
+
+    @staticmethod
+    def _trace_metrics(trace):
+        executed = 0
+        skipped = 0
+        cache_hits = 0
+        cache_misses = 0
+        sampler_runs = 0
+        for item in trace:
+            event = item.get("event")
+            class_type = item.get("class_type")
+            if event == "execute":
+                executed += 1
+                if class_type == "KSampler":
+                    sampler_runs += 1
+            elif event == "skip":
+                skipped += 1
+            elif event == "cache_hit":
+                cache_hits += 1
+            elif event == "cache_miss":
+                cache_misses += 1
+        return {
+            "executed_nodes": executed,
+            "skipped_nodes": skipped,
+            "cache_hits": cache_hits,
+            "cache_misses": cache_misses,
+            "sampler_runs": sampler_runs,
+        }
 
     def history(self, prompt_id=None):
         target = prompt_id or self.last_prompt_id
@@ -761,7 +1187,7 @@ class Workflow:
 
             images = []
             for node_id, node_output in outputs.items():
-                for key in ("images", "gifs", "videos"):
+                for key in ("images", "gifs", "videos", "audio", "audios"):
                     for image in node_output.get(key, []):
                         item = dict(image)
                         item["node_id"] = str(node_id)
