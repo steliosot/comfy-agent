@@ -1,0 +1,67 @@
+site_name: comfy-agent docs
+site_description: Skill-first documentation for comfy-agent
+site_url: https://steliosot.github.io/comfy-agent-docs/
+repo_url: https://github.com/steliosot/comfy-agent
+repo_name: steliosot/comfy-agent
+edit_uri: ''
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Get Started:
+      - Installation: getting-started/installation.md
+      - Quickstart (Skills): getting-started/quickstart-skills.md
+      - Quickstart (Python DSL): getting-started/quickstart-python-dsl.md
+      - Quickstart (Agentic): getting-started/quickstart-agentic.md
+  - Guides:
+      - Server Setup: guides/server-setup.md
+      - Multi-Server Routing: guides/multi-server-routing.md
+      - Optimizations: guides/optimizations.md
+      - Benchmarks: guides/benchmarks.md
+  - Workflows:
+      - Library Overview: workflows/library-overview.md
+      - Txt2Img: workflows/txt2img.md
+      - Img2Img: workflows/img2img.md
+      - Video: workflows/video.md
+      - Audio: workflows/audio.md
+      - Upscale: workflows/upscale.md
+      - Editing: workflows/editing.md
+  - Skills:
+      - Infra Catalog: skills/infra-catalog.md
+      - Workflow Catalog: skills/workflow-catalog.md
+  - Reference:
+      - Python API: reference/python-api.md
+      - Configuration: reference/configuration.md
+  - Troubleshooting:
+      - Common Errors: troubleshooting/common-errors.md
+  - Changelog:
+      - Releases: changelog/releases.md

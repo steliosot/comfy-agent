@@ -1,0 +1,49 @@
+name: Sync Docs Repo
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "README.md"
+      - "OPTIMIZATIONS.md"
+      - "documentation.md"
+      - "COMFYUI-POOL.md"
+      - ".github/workflows/sync-docs-repo.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Checkout docs repo
+        uses: actions/checkout@v4
+        with:
+          repository: steliosot/comfy-agent-docs
+          token: ${{ secrets.DOCS_REPO_TOKEN }}
+          path: docs-repo
+
+      - name: Sync docs content
+        run: |
+          rsync -av --delete docs/ docs-repo/docs/
+          cp mkdocs.yml docs-repo/mkdocs.yml
+
+      - name: Commit and push if changed
+        working-directory: docs-repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add .
+            git commit -m "docs: sync from comfy-agent ${GITHUB_SHA::7}"
+            git push
+          else
+            echo "No docs changes to sync"
+          fi
